@@ -1,20 +1,31 @@
 # Project Overview: ref-backbone
 
 ## Purpose
-This project is a Next.js application, likely serving as a reference backbone or boilerplate for the "pj_coreloop" initiative. It provides a foundational structure with common UI components and utilities.
+**Anti-Fraud Crowdsourcing Platform (仮称)**
+This project is a platform for collecting, sharing, and searching information about online fraud (SNS, messaging apps, suspicious URLs). It allows users to report cases and view statistics to prevent fraud victimhood.
 
 ## Tech Stack
-- **Framework**: Next.js 16 (App Router)
-- **Library**: React 19
-- **Styling**: Tailwind CSS 4
-- **UI Components**: Radix UI, Lucide React, Embla Carousel
+- **Framework**: Next.js 16.1.6 (App Router)
+- **Library**: React 19.2.4
+- **Styling**: Tailwind CSS 4.1.18
+- **UI Components**: Radix UI, Lucide React, Embla Carousel, Recharts
 - **Forms & Validation**: React Hook Form, Zod
-- **Data Visualization**: Recharts
-- **Tooling**: Biome (Linting & Formatting), pnpm (Package Manager)
+- **Database**: PostgreSQL 17 (via Docker Compose)
+- **Tooling**: Biome (Linting & Formatting), pnpm (Package Manager), ESLint
 
-## Structure
+## Codebase Structure
 - `app/`: Next.js App Router pages and layouts.
-- `components/`: Reusable UI components (likely including shadcn/ui components).
+- `components/`: UI components, including a large set of `ui/` components (Radix-based).
 - `hooks/`: Custom React hooks.
 - `lib/`: Utility functions and shared logic.
-- `public/`: Static assets.
+- `docs/`: Project documentation, including `SPEC.md`.
+- `migration.sql`: Initial database schema.
+- `seed.sql`: Seed data for the database.
+- `compose.yaml`: Docker Compose configuration for the database.
+
+## Key Features (from SPEC.md)
+- **Search & List**: Incremental search for fraud cases with status badges.
+- **Case Detail**: Detailed information, evidence images, and processing timeline.
+- **Statistics**: KPI visualization using Recharts.
+- **Reporting Form**: Form for reporting fraud with SMS OTP authentication.
+- **Admin Management**: Backend for reviewing reports and managing contents.
