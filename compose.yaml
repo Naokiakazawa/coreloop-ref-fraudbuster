@@ -1,0 +1,21 @@
+services:
+  db:
+    image: postgres:17
+    pull_policy: never
+    container_name: ref-backbone-postgres
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_DB: ref_backbone
+      POSTGRES_USER: ref_backbone
+      POSTGRES_PASSWORD: ref_backbone
+    volumes:
+      - ./migration.sql:/docker-entrypoint-initdb.d/001_migration.sql:ro
+    tmpfs:
+      - /var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $$POSTGRES_USER -d $$POSTGRES_DB"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+      start_period: 5s
