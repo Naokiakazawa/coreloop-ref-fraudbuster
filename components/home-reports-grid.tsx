@@ -62,7 +62,11 @@ function riskStyle(score: number | null) {
 
 function ReportSummaryCard({ report }: { report: ReportSummary }) {
 	return (
-		<Link href={`/reports/${report.id}`} className="block h-full">
+		<Link
+			href={`/reports/${report.id}`}
+			className="block h-full"
+			data-testid="report-card"
+		>
 			<Card className="group h-full transition-all hover:-translate-y-0.5 hover:shadow-md">
 				<CardContent className="flex h-full flex-col gap-4 p-5">
 					<div className="aspect-video w-full overflow-hidden rounded-xl bg-muted/70">
@@ -278,6 +282,7 @@ export function HomeReportsGrid() {
 					<div className="relative w-full sm:w-80">
 						<Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
 						<Input
+							data-testid="report-search-input"
 							value={searchInput}
 							onChange={(event) => setSearchInput(event.target.value)}
 							placeholder="URL・タイトル・説明で検索"
@@ -336,6 +341,7 @@ export function HomeReportsGrid() {
 						<div
 							ref={sentinelRef}
 							className="flex min-h-12 items-center justify-center"
+							data-testid="report-scroll-sentinel"
 						>
 							{isLoading ? (
 								<div className="inline-flex items-center gap-2 text-sm text-muted-foreground">
