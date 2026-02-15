@@ -173,11 +173,13 @@ export default function NewReportPage() {
 										<SelectValue placeholder="選択してください" />
 									</SelectTrigger>
 									<SelectContent>
-										<SelectItem value="1">Twitter (X)</SelectItem>
-										<SelectItem value="2">Instagram</SelectItem>
-										<SelectItem value="3">LINE</SelectItem>
-										<SelectItem value="4">Facebook</SelectItem>
-										<SelectItem value="5">その他</SelectItem>
+										<SelectItem value="1">Facebook</SelectItem>
+										<SelectItem value="2">LINE</SelectItem>
+										<SelectItem value="3">Instagram</SelectItem>
+										<SelectItem value="4">Threads</SelectItem>
+										<SelectItem value="5">Google</SelectItem>
+										<SelectItem value="6">TikTok</SelectItem>
+										<SelectItem value="7">その他 (Meta等)</SelectItem>
 									</SelectContent>
 								</Select>
 							</div>
@@ -193,11 +195,12 @@ export default function NewReportPage() {
 										<SelectValue placeholder="選択してください" />
 									</SelectTrigger>
 									<SelectContent>
-										<SelectItem value="1">フィッシング詐欺</SelectItem>
-										<SelectItem value="2">なりすまし</SelectItem>
-										<SelectItem value="3">当選詐欺</SelectItem>
-										<SelectItem value="4">投資詐欺</SelectItem>
-										<SelectItem value="5">その他</SelectItem>
+										<SelectItem value="8">フィッシング</SelectItem>
+										<SelectItem value="5">なりすまし</SelectItem>
+										<SelectItem value="2">投資詐欺</SelectItem>
+										<SelectItem value="4">求人詐欺</SelectItem>
+										<SelectItem value="3">ロマンス詐欺</SelectItem>
+										<SelectItem value="1">その他 (製品等)</SelectItem>
 									</SelectContent>
 								</Select>
 							</div>
