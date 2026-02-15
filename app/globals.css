@@ -46,6 +46,11 @@
   --radius-4xl: calc(var(--radius) + 16px);
 }
 
+@utility container {
+  margin-inline: auto;
+  padding-inline: 1rem;
+}
+
 :root {
   --font-geist-sans: "Hiragino Kaku Gothic ProN", "Yu Gothic", "Meiryo", "Noto Sans JP", system-ui, -apple-system, sans-serif;
   --font-geist-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;

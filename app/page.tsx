@@ -1,24 +1,10 @@
-import { Search, ShieldAlert, TrendingUp, Clock, Star } from "lucide-react";
+import { ShieldAlert, TrendingUp, Clock, Star } from "lucide-react";
 import Link from "next/link";
 
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import {
-	Card,
-	CardContent,
-	CardFooter,
-	CardHeader,
-	CardTitle,
-} from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
-import {
-	Carousel,
-	CarouselContent,
-	CarouselItem,
-	CarouselNext,
-	CarouselPrevious,
-} from "@/components/ui/carousel";
 
 export default async function Home() {
 	// In a real app, these would be fetched from the API
@@ -29,8 +15,8 @@ export default async function Home() {
 		<div className="flex flex-col gap-12 pb-20">
 			{/* Hero Section */}
 			<section className="relative overflow-hidden bg-primary/5 py-20 lg:py-32">
-				<div className="container relative z-10 flex flex-col items-center text-center space-y-8">
-					<div className="space-y-4 max-w-3xl">
+				<div className="container relative z-10 grid gap-10 lg:grid-cols-2 lg:items-center">
+					<div className="space-y-6 text-center lg:text-left">
 						<Badge
 							variant="outline"
 							className="px-4 py-1 border-primary/20 bg-primary/5 text-primary"
@@ -38,49 +24,28 @@ export default async function Home() {
 							ネット詐欺から身を守る
 						</Badge>
 						<h1 className="text-4xl md:text-6xl font-extrabold tracking-tight text-foreground">
-							あやしいURLや
-							<br className="sm:hidden" />
-							アカウントを
+							あやしいURLやアカウントを
+							<br className="hidden sm:block" />
 							<span className="text-primary italic">検索・通報</span>
 						</h1>
-						<p className="text-lg text-muted-foreground md:px-20">
+						<p className="text-lg text-muted-foreground max-w-2xl mx-auto lg:mx-0">
 							SNSやメッセージアプリの詐欺情報をクラウドソーシングで集めています。
 							被害に遭う前に、情報をチェックしましょう。
 						</p>
+						<div className="flex flex-wrap justify-center lg:justify-start gap-3">
+							<Link href="/report/new">
+								<Button className="rounded-full px-8">通報する</Button>
+							</Link>
+							<Link href="/statistics">
+								<Button variant="outline" className="rounded-full px-8">
+									統計を見る
+								</Button>
+							</Link>
+						</div>
 					</div>
 
-					<div className="w-full max-w-2xl relative">
-						<div className="relative flex items-center">
-							<Search className="absolute left-4 h-5 w-5 text-muted-foreground" />
-							<Input
-								placeholder="URL、電話番号、ユーザー、キーワードで検索..."
-								className="h-14 pl-12 pr-32 rounded-full shadow-lg border-primary/20 focus-visible:ring-primary/20"
-							/>
-							<Button className="absolute right-1.5 h-11 rounded-full px-8">
-								検索
-							</Button>
-						</div>
-						<div className="mt-4 flex flex-wrap justify-center gap-2 text-sm text-muted-foreground">
-							<span>急上昇キーワード:</span>
-							<Link
-								href="/search?q=当選"
-								className="hover:underline text-foreground/80"
-							>
-								#当選
-							</Link>
-							<Link
-								href="/search?q=Amazon"
-								className="hover:underline text-foreground/80"
-							>
-								#Amazon
-							</Link>
-							<Link
-								href="/search?q=給付金"
-								className="hover:underline text-foreground/80"
-							>
-								#給付金
-							</Link>
-						</div>
+					<div className="w-full max-w-xl mx-auto lg:mx-0 lg:justify-self-end">
+						<CurrentStatusCard />
 					</div>
 				</div>
 
@@ -94,32 +59,6 @@ export default async function Home() {
 			{/* Main Content */}
 			<div className="container grid grid-cols-1 lg:grid-cols-3 gap-12">
 				<div className="lg:col-span-2 space-y-10">
-					{/* Banner Carousel */}
-					<section>
-						<Carousel className="w-full">
-							<CarouselContent>
-								{[1, 2, 3].map((i) => (
-									<CarouselItem key={i}>
-										<div className="p-1">
-											<Card className="overflow-hidden border-none bg-gradient-to-r from-primary/10 to-blue-500/10 h-48 sm:h-64 flex items-center justify-center">
-												<div className="text-center p-6">
-													<h3 className="text-2xl font-bold mb-2">
-														フィッシング詐欺にご注意
-													</h3>
-													<p className="text-muted-foreground">
-														公的機関を装ったメールやSMSが増加しています。
-													</p>
-												</div>
-											</Card>
-										</div>
-									</CarouselItem>
-								))}
-							</CarouselContent>
-							<CarouselPrevious className="left-4" />
-							<CarouselNext className="right-4" />
-						</Carousel>
-					</section>
-
 					{/* Feed Tabs */}
 					<section>
 						<Tabs defaultValue="recent" className="w-full">
@@ -158,59 +97,7 @@ export default async function Home() {
 				</div>
 
 				{/* Sidebar */}
-				<aside className="space-y-10">
-					{/* Activity Widget */}
-					<Card className="border-primary/10 bg-primary/5">
-						<CardHeader>
-							<CardTitle className="text-lg flex items-center gap-2">
-								<TrendingUp className="h-5 w-5 text-primary" />
-								現在の状況
-							</CardTitle>
-						</CardHeader>
-						<CardContent className="space-y-6">
-							<div className="grid grid-cols-2 gap-4">
-								<div className="space-y-1">
-									<p className="text-xs text-muted-foreground uppercase tracking-wider">
-										合計通報件数
-									</p>
-									<p className="text-2xl font-bold">1,248</p>
-								</div>
-								<div className="space-y-1">
-									<p className="text-xs text-muted-foreground uppercase tracking-wider">
-										本日の新規
-									</p>
-									<p className="text-2xl font-bold text-primary">+24</p>
-								</div>
-							</div>
-							<div className="space-y-3 pt-4 border-t">
-								<p className="text-sm font-medium">カテゴリー別</p>
-								<div className="space-y-2">
-									<div className="flex items-center justify-between text-sm">
-										<span className="text-muted-foreground">フィッシング</span>
-										<span className="font-medium">42%</span>
-									</div>
-									<div className="w-full h-2 bg-muted rounded-full overflow-hidden">
-										<div className="h-full bg-primary w-[42%]" />
-									</div>
-								</div>
-								<div className="space-y-2">
-									<div className="flex items-center justify-between text-sm">
-										<span className="text-muted-foreground">なりすまし</span>
-										<span className="font-medium">28%</span>
-									</div>
-									<div className="w-full h-2 bg-muted rounded-full overflow-hidden">
-										<div className="h-full bg-blue-500 w-[28%]" />
-									</div>
-								</div>
-							</div>
-							<Link href="/statistics" className="block">
-								<Button variant="outline" className="w-full rounded-xl">
-									詳細な統計を見る
-								</Button>
-							</Link>
-						</CardContent>
-					</Card>
-
+				<aside className="space-y-10 lg:pt-2">
 					{/* Announcement Widget */}
 					<Card>
 						<CardHeader>
@@ -244,6 +131,61 @@ export default async function Home() {
 				</aside>
 			</div>
 		</div>
+	);
+}
+
+function CurrentStatusCard() {
+	return (
+		<Card className="border-primary/10 bg-background/90 shadow-lg backdrop-blur-sm">
+			<CardHeader>
+				<CardTitle className="text-lg flex items-center gap-2">
+					<TrendingUp className="h-5 w-5 text-primary" />
+					現在の状況
+				</CardTitle>
+			</CardHeader>
+			<CardContent className="space-y-6">
+				<div className="grid grid-cols-2 gap-4">
+					<div className="space-y-1">
+						<p className="text-xs text-muted-foreground uppercase tracking-wider">
+							合計通報件数
+						</p>
+						<p className="text-2xl font-bold">1,248</p>
+					</div>
+					<div className="space-y-1">
+						<p className="text-xs text-muted-foreground uppercase tracking-wider">
+							本日の新規
+						</p>
+						<p className="text-2xl font-bold text-primary">+24</p>
+					</div>
+				</div>
+				<div className="space-y-3 pt-4 border-t">
+					<p className="text-sm font-medium">カテゴリー別</p>
+					<div className="space-y-2">
+						<div className="flex items-center justify-between text-sm">
+							<span className="text-muted-foreground">フィッシング</span>
+							<span className="font-medium">42%</span>
+						</div>
+						<div className="w-full h-2 bg-muted rounded-full overflow-hidden">
+							<div className="h-full bg-primary w-[42%]" />
+						</div>
+					</div>
+					<div className="space-y-2">
+						<div className="flex items-center justify-between text-sm">
+							<span className="text-muted-foreground">なりすまし</span>
+							<span className="font-medium">28%</span>
+						</div>
+						<div className="w-full h-2 bg-muted rounded-full overflow-hidden">
+							<div className="h-full bg-blue-500 w-[28%]" />
+						</div>
+					</div>
+				</div>
+				<Link href="/statistics" className="block">
+					<Button variant="outline" className="w-full rounded-xl">
+						詳細な統計を見る
+					</Button>
+				</Link>
+			</CardContent>
+		</Card>
 	);
 }
 
