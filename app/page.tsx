@@ -1,9 +1,9 @@
-import { ShieldAlert, TrendingUp, Clock, Star } from "lucide-react";
+import { TrendingUp } from "lucide-react";
 import Link from "next/link";
 
+import { HomeReportsGrid } from "@/components/home-reports-grid";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 
 export default async function Home() {
@@ -57,79 +57,23 @@ export default async function Home() {
 			</section>
 
 			{/* Main Content */}
-			<div className="container grid grid-cols-1 lg:grid-cols-3 gap-12">
-				<div className="lg:col-span-2 space-y-10">
-					{/* Feed Tabs */}
-					<section>
-						<Tabs defaultValue="recent" className="w-full">
-							<div className="flex items-center justify-between mb-6">
-								<TabsList className="bg-muted/50 p-1 rounded-xl">
-									<TabsTrigger value="recent" className="rounded-lg gap-2">
-										<Clock className="h-4 w-4" />
-										最新の通報
-									</TabsTrigger>
-									<TabsTrigger value="popular" className="rounded-lg gap-2">
-										<TrendingUp className="h-4 w-4" />
-										注目の案件
-									</TabsTrigger>
-								</TabsList>
-								<Link
-									href="/reports"
-									className="text-sm font-medium text-primary hover:underline"
-								>
-									すべて見る
-								</Link>
-							</div>
-
-							<TabsContent value="recent" className="space-y-4">
-								{[1, 2, 3, 4, 5].map((i) => (
-									<ReportCard key={i} />
-								))}
-							</TabsContent>
-
-							<TabsContent value="popular" className="space-y-4">
-								{[1, 2, 3].map((i) => (
-									<ReportCard key={i} highlighted />
-								))}
-							</TabsContent>
-						</Tabs>
-					</section>
+			<section className="container space-y-6">
+				<div className="flex items-center justify-between gap-4">
+					<div className="space-y-1">
+						<h2 className="text-2xl font-bold tracking-tight">最新の通報</h2>
+						<p className="text-sm text-muted-foreground">
+							通報内容をカード形式で表示しています。下へスクロールすると自動で読み込みます。
+						</p>
+					</div>
+					<Link
+						href="/reports"
+						className="shrink-0 text-sm font-medium text-primary hover:underline"
+					>
+						詳細ページへ
+					</Link>
 				</div>
-
-				{/* Sidebar */}
-				<aside className="space-y-10 lg:pt-2">
-					{/* Announcement Widget */}
-					<Card>
-						<CardHeader>
-							<CardTitle className="text-lg flex items-center justify-between">
-								お知らせ
-								<Link
-									href="/announcements"
-									className="text-xs font-normal text-primary hover:underline"
-								>
-									一覧
-								</Link>
-							</CardTitle>
-						</CardHeader>
-						<CardContent className="space-y-4">
-							{[1, 2, 3].map((i) => (
-								<div
-									key={i}
-									className="flex flex-col gap-1 text-sm border-b pb-3 last:border-0 last:pb-0"
-								>
-									<p className="text-xs text-muted-foreground">2026.02.14</p>
-									<Link
-										href={`/announcements/${i}`}
-										className="font-medium hover:text-primary transition-colors"
-									>
-										システムメンテナンスのお知らせ
-									</Link>
-								</div>
-							))}
-						</CardContent>
-					</Card>
-				</aside>
-			</div>
+				<HomeReportsGrid />
+			</section>
 		</div>
 	);
 }
@@ -185,50 +129,6 @@ function CurrentStatusCard() {
 					</Button>
 				</Link>
 			</CardContent>
-		</Card>
-	);
-}
-
-function ReportCard({ highlighted = false }: { highlighted?: boolean }) {
-	return (
-		<Card
-			className={`group transition-all hover:shadow-md ${highlighted ? "border-primary/20 bg-primary/5" : ""}`}
-		>
-			<Link href="/reports/1">
-				<div className="flex flex-col sm:flex-row p-4 gap-4">
-					<div className="w-full sm:w-32 h-32 rounded-lg bg-muted flex items-center justify-center shrink-0 overflow-hidden">
-						<ShieldAlert className="h-8 w-8 text-muted-foreground/50" />
-					</div>
-					<div className="flex-1 space-y-2">
-						<div className="flex items-center gap-2">
-							<Badge variant="secondary" className="hover:bg-secondary">
-								フィッシング
-							</Badge>
-							<Badge variant="outline">Amazon</Badge>
-							<span className="text-xs text-muted-foreground ml-auto">
-								2時間前
-							</span>
-						</div>
-						<h3 className="font-bold text-lg leading-tight group-hover:text-primary transition-colors">
-							Amazonを騙る偽のログインメールが届きました。
-						</h3>
-						<p className="text-sm text-muted-foreground line-clamp-2">
-							URL: https://amazon-secure-login.jp-login.support/...
-							アカウント情報の更新を求める内容です。
-						</p>
-						<div className="flex items-center gap-4 pt-2">
-							<div className="flex items-center gap-1 text-xs text-muted-foreground">
-								<TrendingUp className="h-3 w-3" />
-								<span>閲覧数: 42</span>
-							</div>
-							<div className="flex items-center gap-1 text-xs text-muted-foreground">
-								<Star className="h-3 w-3" />
-								<span>注目の疑い: Aリト</span>
-							</div>
-						</div>
-					</div>
-				</div>
-			</Link>
 		</Card>
 	);
 }

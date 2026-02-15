@@ -14,6 +14,7 @@ export async function GET(request: NextRequest) {
 	try {
 		const { searchParams } = new URL(request.url);
 		const query = searchParams.get("q") || undefined;
+		const cursor = searchParams.get("cursor") || undefined;
 		const platformId = searchParams.get("platformId")
 			? Number.parseInt(searchParams.get("platformId")!)
 			: undefined;
@@ -24,11 +25,16 @@ export async function GET(request: NextRequest) {
 			? Number.parseInt(searchParams.get("statusId")!)
 			: undefined;
 		const sort = searchParams.get("sort") || "newest";
+		const limitParam = searchParams.get("limit");
+		const parsedLimit = limitParam ? Number.parseInt(limitParam, 10) : 12;
+		const take = Number.isNaN(parsedLimit)
+			? 12
+			: Math.min(Math.max(parsedLimit, 1), 30);
 
 		const orderBy =
 			sort === "popular"
-				? { viewCount: "desc" as const }
-				: { createdAt: "desc" as const };
+				? [{ viewCount: "desc" as const }, { id: "desc" as const }]
+				: [{ createdAt: "desc" as const }, { id: "desc" as const }];
 
 		const reports = await prisma.report.findMany({
 			where: {
@@ -62,10 +68,23 @@ export async function GET(request: NextRequest) {
 				},
 			},
 			orderBy,
-			take: 50,
+			take: take + 1,
+			...(cursor
+				? {
+						cursor: { id: cursor },
+						skip: 1,
+					}
+				: {}),
 		});
 
-		return successResponse(reports);
+		const hasMore = reports.length > take;
+		const items = hasMore ? reports.slice(0, take) : reports;
+		const nextCursor = hasMore ? (items[items.length - 1]?.id ?? null) : null;
+
+		return successResponse({
+			items,
+			nextCursor,
+		});
 	} catch (error) {
 		console.error("Failed to fetch reports:", error);
 		return errorResponse("Internal Server Error");
