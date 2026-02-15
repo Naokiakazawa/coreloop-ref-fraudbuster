@@ -20,7 +20,7 @@ export function SiteHeader() {
 							href="/"
 							className="transition-colors hover:text-foreground/80 text-foreground"
 						>
-							検索
+							ホーム
 						</Link>
 						<Link
 							href="/statistics"

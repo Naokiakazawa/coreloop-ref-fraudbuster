@@ -49,21 +49,7 @@ export default async function Home() {
 			</section>
 
 			{/* Main Content */}
-			<section className="container space-y-6">
-				<div className="flex items-center justify-between gap-4">
-					<div className="space-y-1">
-						<h2 className="text-2xl font-bold tracking-tight">最新の通報</h2>
-						<p className="text-sm text-muted-foreground">
-							下へスクロールすると自動で読み込みます。
-						</p>
-					</div>
-					<Link
-						href="/reports"
-						className="shrink-0 text-sm font-medium text-primary hover:underline"
-					>
-						詳細ページへ
-					</Link>
-				</div>
+			<section className="container">
 				<HomeReportsGrid />
 			</section>
 		</div>

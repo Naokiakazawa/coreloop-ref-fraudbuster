@@ -2,13 +2,15 @@
 
 import * as React from "react";
 import Link from "next/link";
-import { AlertTriangle, Clock3, Eye, ShieldAlert } from "lucide-react";
+import { AlertTriangle, Clock3, Eye, Search, ShieldAlert } from "lucide-react";
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Spinner } from "@/components/ui/spinner";
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 const PAGE_SIZE = 12;
 
@@ -42,6 +44,8 @@ type ReportsResponse = {
 	items: ReportSummary[];
 	nextCursor: string | null;
 };
+
+type SortOrder = "popular" | "newest";
 
 function normalizeResponse(payload: unknown): ReportsResponse {
 	if (Array.isArray(payload)) {
@@ -141,53 +145,101 @@ function ReportSummaryCard({ report }: { report: ReportSummary }) {
 export function HomeReportsGrid() {
 	const [reports, setReports] = React.useState<ReportSummary[]>([]);
 	const [nextCursor, setNextCursor] = React.useState<string | null>(null);
+	const [sortOrder, setSortOrder] = React.useState<SortOrder>("newest");
+	const [searchInput, setSearchInput] = React.useState("");
+	const [debouncedQuery, setDebouncedQuery] = React.useState("");
 	const [isLoading, setIsLoading] = React.useState(false);
 	const [hasLoadedInitial, setHasLoadedInitial] = React.useState(false);
 	const [errorMessage, setErrorMessage] = React.useState<string | null>(null);
 	const sentinelRef = React.useRef<HTMLDivElement | null>(null);
 	const isFetchingRef = React.useRef(false);
+	const requestVersionRef = React.useRef(0);
 
-	const fetchReports = React.useCallback(async (cursor: string | null) => {
-		if (isFetchingRef.current) return;
-		isFetchingRef.current = true;
-		setIsLoading(true);
+	const fetchReports = React.useCallback(
+		async ({
+			cursor,
+			append,
+			version,
+		}: {
+			cursor: string | null;
+			append: boolean;
+			version: number;
+		}) => {
+			if (isFetchingRef.current) return;
+			isFetchingRef.current = true;
+			setIsLoading(true);
 
-		try {
-			const params = new URLSearchParams({
-				sort: "newest",
-				limit: String(PAGE_SIZE),
-			});
-			if (cursor) {
-				params.set("cursor", cursor);
+			try {
+				const params = new URLSearchParams({
+					sort: sortOrder,
+					limit: String(PAGE_SIZE),
+				});
+				if (debouncedQuery) {
+					params.set("q", debouncedQuery);
+				}
+				if (cursor) {
+					params.set("cursor", cursor);
+				}
+
+				const response = await fetch(`/api/reports?${params.toString()}`, {
+					cache: "no-store",
+				});
+
+				if (!response.ok) {
+					throw new Error(`Failed to fetch reports: ${response.status}`);
+				}
+
+				const payload = normalizeResponse(await response.json());
+				if (version !== requestVersionRef.current) return;
+
+				setReports((prev) =>
+					append ? [...prev, ...payload.items] : payload.items,
+				);
+				setNextCursor(payload.nextCursor);
+				setErrorMessage(null);
+			} catch (error) {
+				if (version !== requestVersionRef.current) return;
+
+				console.error(error);
+				setErrorMessage("通報データの取得に失敗しました。");
+			} finally {
+				if (version === requestVersionRef.current) {
+					isFetchingRef.current = false;
+					setIsLoading(false);
+					setHasLoadedInitial(true);
+				}
 			}
+		},
+		[debouncedQuery, sortOrder],
+	);
 
-			const response = await fetch(`/api/reports?${params.toString()}`, {
-				cache: "no-store",
-			});
+	const loadFirstPage = React.useCallback(() => {
+		const version = requestVersionRef.current + 1;
+		requestVersionRef.current = version;
+		isFetchingRef.current = false;
+		setReports([]);
+		setNextCursor(null);
+		setHasLoadedInitial(false);
+		setErrorMessage(null);
 
-			if (!response.ok) {
-				throw new Error(`Failed to fetch reports: ${response.status}`);
-			}
-
-			const payload = normalizeResponse(await response.json());
-			setReports((prev) =>
-				cursor ? [...prev, ...payload.items] : payload.items,
-			);
-			setNextCursor(payload.nextCursor);
-			setErrorMessage(null);
-		} catch (error) {
-			console.error(error);
-			setErrorMessage("通報データの取得に失敗しました。");
-		} finally {
-			isFetchingRef.current = false;
-			setIsLoading(false);
-			setHasLoadedInitial(true);
-		}
-	}, []);
+		void fetchReports({
+			cursor: null,
+			append: false,
+			version,
+		});
+	}, [fetchReports]);
 
 	React.useEffect(() => {
-		void fetchReports(null);
-	}, [fetchReports]);
+		const timeout = window.setTimeout(() => {
+			setDebouncedQuery(searchInput.trim());
+		}, 300);
+
+		return () => window.clearTimeout(timeout);
+	}, [searchInput]);
+
+	React.useEffect(() => {
+		loadFirstPage();
+	}, [loadFirstPage]);
 
 	React.useEffect(() => {
 		const target = sentinelRef.current;
@@ -196,9 +248,13 @@ export function HomeReportsGrid() {
 		const observer = new IntersectionObserver(
 			(entries) => {
 				const [entry] = entries;
-				if (entry?.isIntersecting) {
-					void fetchReports(nextCursor);
-				}
+				if (!entry?.isIntersecting) return;
+
+				void fetchReports({
+					cursor: nextCursor,
+					append: true,
+					version: requestVersionRef.current,
+				});
 			},
 			{
 				rootMargin: "320px 0px",
@@ -209,9 +265,43 @@ export function HomeReportsGrid() {
 		return () => observer.disconnect();
 	}, [nextCursor, fetchReports]);
 
-	if (!hasLoadedInitial) {
-		return (
-			<div className="space-y-6">
+	return (
+		<div className="space-y-5">
+			<div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
+				<div className="space-y-1">
+					<h2 className="text-2xl font-bold tracking-tight">最新の通報</h2>
+					<p className="text-sm text-muted-foreground">
+						下へスクロールすると自動で読み込みます。
+					</p>
+				</div>
+				<div className="flex w-full flex-col gap-3 sm:flex-row sm:items-center sm:justify-end lg:w-auto">
+					<Tabs
+						value={sortOrder}
+						onValueChange={(value) => {
+							if (value === "popular" || value === "newest") {
+								setSortOrder(value);
+							}
+						}}
+						className="w-fit"
+					>
+						<TabsList>
+							<TabsTrigger value="popular">話題</TabsTrigger>
+							<TabsTrigger value="newest">最新</TabsTrigger>
+						</TabsList>
+					</Tabs>
+					<div className="relative w-full sm:w-80">
+						<Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+						<Input
+							value={searchInput}
+							onChange={(event) => setSearchInput(event.target.value)}
+							placeholder="URL・タイトル・説明で検索"
+							className="pl-9"
+						/>
+					</div>
+				</div>
+			</div>
+
+			{!hasLoadedInitial ? (
 				<div className="grid grid-cols-1 gap-5 sm:grid-cols-2 xl:grid-cols-3">
 					{Array.from({ length: 6 }).map((_, index) => (
 						<Card key={`skeleton-${index}`}>
@@ -224,61 +314,61 @@ export function HomeReportsGrid() {
 						</Card>
 					))}
 				</div>
-			</div>
-		);
-	}
+			) : (
+				<div className="space-y-6">
+					{errorMessage ? (
+						<Card>
+							<CardContent className="flex flex-col items-center gap-3 py-10 text-center">
+								<p className="text-sm text-muted-foreground">{errorMessage}</p>
+								<Button onClick={loadFirstPage} variant="outline">
+									再読み込み
+								</Button>
+							</CardContent>
+						</Card>
+					) : null}
 
-	return (
-		<div className="space-y-6">
-			{errorMessage ? (
-				<Card>
-					<CardContent className="flex flex-col items-center gap-3 py-10 text-center">
-						<p className="text-sm text-muted-foreground">{errorMessage}</p>
-						<Button onClick={() => void fetchReports(null)} variant="outline">
-							再読み込み
-						</Button>
-					</CardContent>
-				</Card>
-			) : null}
-
-			{reports.length > 0 ? (
-				<div className="grid grid-cols-1 gap-5 sm:grid-cols-2 xl:grid-cols-3">
-					{reports.map((report) => (
-						<ReportSummaryCard key={report.id} report={report} />
-					))}
-				</div>
-			) : !errorMessage ? (
-				<Card>
-					<CardContent className="flex flex-col items-center gap-3 py-10 text-center">
-						<Clock3 className="h-5 w-5 text-muted-foreground" />
-						<p className="text-sm text-muted-foreground">
-							表示できる通報データがありません。
-						</p>
-					</CardContent>
-				</Card>
-			) : null}
-
-			{nextCursor ? (
-				<div
-					ref={sentinelRef}
-					className="flex min-h-12 items-center justify-center"
-				>
-					{isLoading ? (
-						<div className="inline-flex items-center gap-2 text-sm text-muted-foreground">
-							<Spinner className="size-4" />
-							読み込み中...
+					{reports.length > 0 ? (
+						<div className="grid grid-cols-1 gap-5 sm:grid-cols-2 xl:grid-cols-3">
+							{reports.map((report) => (
+								<ReportSummaryCard key={report.id} report={report} />
+							))}
 						</div>
-					) : (
-						<span className="text-xs text-muted-foreground">
-							スクロールで続きを読み込み
-						</span>
-					)}
+					) : !errorMessage ? (
+						<Card>
+							<CardContent className="flex flex-col items-center gap-3 py-10 text-center">
+								<Clock3 className="h-5 w-5 text-muted-foreground" />
+								<p className="text-sm text-muted-foreground">
+									{debouncedQuery
+										? "検索条件に一致する通報は見つかりませんでした。"
+										: "表示できる通報データがありません。"}
+								</p>
+							</CardContent>
+						</Card>
+					) : null}
+
+					{nextCursor ? (
+						<div
+							ref={sentinelRef}
+							className="flex min-h-12 items-center justify-center"
+						>
+							{isLoading ? (
+								<div className="inline-flex items-center gap-2 text-sm text-muted-foreground">
+									<Spinner className="size-4" />
+									読み込み中...
+								</div>
+							) : (
+								<span className="text-xs text-muted-foreground">
+									スクロールで続きを読み込み
+								</span>
+							)}
+						</div>
+					) : reports.length > 0 ? (
+						<p className="text-center text-xs text-muted-foreground">
+							すべての通報を表示しました。
+						</p>
+					) : null}
 				</div>
-			) : reports.length > 0 ? (
-				<p className="text-center text-xs text-muted-foreground">
-					すべての通報を表示しました。
-				</p>
-			) : null}
+			)}
 		</div>
 	);
 }
