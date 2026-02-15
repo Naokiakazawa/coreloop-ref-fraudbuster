@@ -107,9 +107,7 @@ export default function NewReportPage() {
 	return (
 		<div className="container max-w-2xl py-12 space-y-8">
 			<div className="space-y-2 text-center">
-				<h1 className="text-3xl font-bold tracking-tight">
-					詐欺情報を共有する
-				</h1>
+				<h1 className="text-3xl font-bold tracking-tight">広告を通報する</h1>
 				<p className="text-muted-foreground">
 					あなたの情報が、誰かの被害を未然に防ぐ力になります。
 				</p>

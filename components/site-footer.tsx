@@ -77,7 +77,7 @@ export function SiteFooter() {
 					</div>
 				</div>
 				<div className="mt-12 pt-8 border-t text-center text-sm text-muted-foreground">
-					<p>© 2026 Anti-Fraud Crowdsourcing Platform. All rights reserved.</p>
+					<p>© 2026 デジタル民主主義2030 All rights reserved.</p>
 				</div>
 			</div>
 		</footer>
