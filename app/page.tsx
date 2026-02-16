@@ -105,6 +105,8 @@ function CurrentStatusCard({
 	todayReports: number;
 	categories: { name: string; percentage: number }[];
 }) {
+	const topCategories = categories.slice(0, 3);
+
 	return (
 		<Card className="border-primary/10 bg-background/90 shadow-lg backdrop-blur-sm">
 			<CardHeader>
@@ -133,9 +135,9 @@ function CurrentStatusCard({
 					</div>
 				</div>
 				<div className="space-y-3 pt-4 border-t">
-					<p className="text-sm font-medium">カテゴリー別</p>
-					{categories.length > 0 ? (
-						categories.map((cat, i) => (
+					<p className="text-sm font-medium">カテゴリー別（上位3件）</p>
+					{topCategories.length > 0 ? (
+						topCategories.map((cat, i) => (
 							<div key={cat.name} className="space-y-2">
 								<div className="flex items-center justify-between text-sm">
 									<span className="text-muted-foreground">{cat.name}</span>

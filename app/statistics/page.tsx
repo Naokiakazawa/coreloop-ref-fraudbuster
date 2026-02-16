@@ -266,7 +266,8 @@ export default function StatisticsPage() {
 									cy="50%"
 									innerRadius={60}
 									outerRadius={100}
-									paddingAngle={5}
+									paddingAngle={0}
+									stroke="none"
 									dataKey="count"
 									nameKey="label"
 								>
@@ -274,10 +275,15 @@ export default function StatisticsPage() {
 										<Cell
 											key={`${entry.label}-${entry.id ?? index}`}
 											fill={CHART_COLORS[index % CHART_COLORS.length]}
+											stroke="none"
 										/>
 									))}
 								</Pie>
-								<Tooltip contentStyle={ChartTooltipStyle()} />
+								<Tooltip
+									contentStyle={ChartTooltipStyle()}
+									labelStyle={{ color: "var(--foreground)" }}
+									itemStyle={{ color: "var(--foreground)" }}
+								/>
 								<Legend verticalAlign="bottom" height={36} iconType="circle" />
 							</PieChart>
 						</ResponsiveContainer>
