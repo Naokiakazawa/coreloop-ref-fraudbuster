@@ -107,6 +107,19 @@ export default function NewReportPage() {
 		setTurnstileWidgetId(widgetId);
 	}, [step, turnstileScriptReady, turnstileSiteKey, turnstileWidgetId]);
 
+	React.useEffect(() => {
+		if (step === "verify") return;
+		if (!turnstileWidgetId) return;
+
+		const turnstile = (window as WindowWithTurnstile).turnstile;
+		if (turnstile) {
+			turnstile.remove(turnstileWidgetId);
+		}
+
+		setTurnstileWidgetId(null);
+		setTurnstileToken("");
+	}, [step, turnstileWidgetId]);
+
 	const resetTurnstile = React.useCallback(() => {
 		setTurnstileToken("");
 		if (!turnstileWidgetId) return;
