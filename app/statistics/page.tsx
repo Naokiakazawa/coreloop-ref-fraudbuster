@@ -1,6 +1,5 @@
 "use client";
 
-import * as React from "react";
 import {
 	Activity,
 	AlertTriangle,
@@ -8,6 +7,7 @@ import {
 	PieChart as PieChartIcon,
 	TrendingUp,
 } from "lucide-react";
+import * as React from "react";
 import {
 	Bar,
 	BarChart,
@@ -23,11 +23,6 @@ import {
 	XAxis,
 	YAxis,
 } from "recharts";
-
-import type {
-	StatisticsBreakdownItem,
-	StatisticsResponse,
-} from "@/lib/types/api";
 import { Badge } from "@/components/ui/badge";
 import {
 	Card,
@@ -37,6 +32,10 @@ import {
 	CardTitle,
 } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
+import type {
+	StatisticsBreakdownItem,
+	StatisticsResponse,
+} from "@/lib/types/api";
 
 const FALLBACK_TREND_DATA = [
 	{ date: "02.08", count: 42 },

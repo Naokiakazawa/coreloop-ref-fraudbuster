@@ -64,7 +64,7 @@ model Admin {
 }
 
 model Report {
-  id                        String           @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  id                        String           @id @db.VarChar(64)
   userId                    String?          @map("user_id") @db.Uuid
   url                       String
   title                     String?          @db.VarChar(255)
@@ -95,7 +95,7 @@ model Report {
 
 model ReportImage {
   id           String   @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
-  reportId     String   @map("report_id") @db.Uuid
+  reportId     String   @map("report_id") @db.VarChar(64)
   imageUrl     String   @map("image_url")
   displayOrder Int?     @default(0) @map("display_order")
   createdAt    DateTime? @default(now()) @map("created_at") @db.Timestamptz
@@ -107,7 +107,7 @@ model ReportImage {
 
 model ReportTimeline {
   id          String    @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
-  reportId    String    @map("report_id") @db.Uuid
+  reportId    String    @map("report_id") @db.VarChar(64)
   actionLabel String    @map("action_label") @db.VarChar(100)
   description String?
   createdBy   String?   @map("created_by") @db.Uuid

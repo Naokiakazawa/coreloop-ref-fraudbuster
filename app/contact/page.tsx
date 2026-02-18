@@ -1,7 +1,7 @@
 "use client";
 
-import * as React from "react";
 import { Clock, Mail, MessageSquare, Send } from "lucide-react";
+import * as React from "react";
 import { toast } from "sonner";
 
 import { Badge } from "@/components/ui/badge";

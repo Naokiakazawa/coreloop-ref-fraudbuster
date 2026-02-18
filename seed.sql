@@ -70,7 +70,7 @@ INSERT INTO reports (
   risk_score, view_count, report_count, source_ip, privacy_policy_agreed_at, created_at, updated_at
 ) VALUES
   (
-    '30000000-0000-4000-8000-000000000001',
+    'rpt8k2m1xq9v',
     '20000000-0000-4000-8000-000000000001',
     'https://line-support-check.example.com/login',
     'LINEサポートを装った認証誘導',
@@ -84,7 +84,7 @@ INSERT INTO reports (
     CURRENT_TIMESTAMP - INTERVAL '2 days'
   ),
   (
-    '30000000-0000-4000-8000-000000000002',
+    'rpt4d7n3b6ty',
     '20000000-0000-4000-8000-000000000002',
     'https://guaranteed-profit-invest.example.net',
     '高配当をうたう投資グループ勧誘',
@@ -98,7 +98,7 @@ INSERT INTO reports (
     CURRENT_TIMESTAMP - INTERVAL '1 day'
   ),
   (
-    '30000000-0000-4000-8000-000000000003',
+    'rpt1z5c8w2hj',
     '20000000-0000-4000-8000-000000000003',
     'https://job-fastincome.example.org/apply',
     '即日高収入求人の個人情報収集',
@@ -113,17 +113,17 @@ INSERT INTO reports (
   );
 
 INSERT INTO report_images (id, report_id, image_url, display_order, created_at) VALUES
-  ('31000000-0000-4000-8000-000000000001', '30000000-0000-4000-8000-000000000001', 'https://cdn.example.com/reports/line-phishing-01.png', 1, CURRENT_TIMESTAMP - INTERVAL '9 days'),
-  ('31000000-0000-4000-8000-000000000002', '30000000-0000-4000-8000-000000000001', 'https://cdn.example.com/reports/line-phishing-02.png', 2, CURRENT_TIMESTAMP - INTERVAL '9 days'),
-  ('31000000-0000-4000-8000-000000000003', '30000000-0000-4000-8000-000000000002', 'https://cdn.example.com/reports/invest-01.png', 1, CURRENT_TIMESTAMP - INTERVAL '6 days'),
-  ('31000000-0000-4000-8000-000000000004', '30000000-0000-4000-8000-000000000003', 'https://cdn.example.com/reports/job-01.png', 1, CURRENT_TIMESTAMP - INTERVAL '3 days');
+  ('31000000-0000-4000-8000-000000000001', 'rpt8k2m1xq9v', 'https://cdn.example.com/reports/line-phishing-01.png', 1, CURRENT_TIMESTAMP - INTERVAL '9 days'),
+  ('31000000-0000-4000-8000-000000000002', 'rpt8k2m1xq9v', 'https://cdn.example.com/reports/line-phishing-02.png', 2, CURRENT_TIMESTAMP - INTERVAL '9 days'),
+  ('31000000-0000-4000-8000-000000000003', 'rpt4d7n3b6ty', 'https://cdn.example.com/reports/invest-01.png', 1, CURRENT_TIMESTAMP - INTERVAL '6 days'),
+  ('31000000-0000-4000-8000-000000000004', 'rpt1z5c8w2hj', 'https://cdn.example.com/reports/job-01.png', 1, CURRENT_TIMESTAMP - INTERVAL '3 days');
 
 INSERT INTO report_timelines (id, report_id, action_label, description, created_by, occurred_at) VALUES
-  ('32000000-0000-4000-8000-000000000001', '30000000-0000-4000-8000-000000000001', 'ユーザー通報受付', '通報フォームから案件を受理。', NULL, CURRENT_TIMESTAMP - INTERVAL '9 days'),
-  ('32000000-0000-4000-8000-000000000002', '30000000-0000-4000-8000-000000000001', 'プラットフォームへ通知', 'LINE運営窓口に削除依頼を送信。', '10000000-0000-4000-8000-000000000002', CURRENT_TIMESTAMP - INTERVAL '8 days'),
-  ('32000000-0000-4000-8000-000000000003', '30000000-0000-4000-8000-000000000001', '詐欺確定', '複数の同種報告と照合し詐欺確定と判定。', '10000000-0000-4000-8000-000000000001', CURRENT_TIMESTAMP - INTERVAL '7 days'),
-  ('32000000-0000-4000-8000-000000000004', '30000000-0000-4000-8000-000000000002', '調査開始', '投資勧誘の証拠資料を精査中。', '10000000-0000-4000-8000-000000000002', CURRENT_TIMESTAMP - INTERVAL '5 days'),
-  ('32000000-0000-4000-8000-000000000005', '30000000-0000-4000-8000-000000000003', '追加情報待ち', '投稿者へ追加スクリーンショット提出を依頼。', '10000000-0000-4000-8000-000000000002', CURRENT_TIMESTAMP - INTERVAL '2 days');
+  ('32000000-0000-4000-8000-000000000001', 'rpt8k2m1xq9v', 'ユーザー通報受付', '通報フォームから案件を受理。', NULL, CURRENT_TIMESTAMP - INTERVAL '9 days'),
+  ('32000000-0000-4000-8000-000000000002', 'rpt8k2m1xq9v', 'プラットフォームへ通知', 'LINE運営窓口に削除依頼を送信。', '10000000-0000-4000-8000-000000000002', CURRENT_TIMESTAMP - INTERVAL '8 days'),
+  ('32000000-0000-4000-8000-000000000003', 'rpt8k2m1xq9v', '詐欺確定', '複数の同種報告と照合し詐欺確定と判定。', '10000000-0000-4000-8000-000000000001', CURRENT_TIMESTAMP - INTERVAL '7 days'),
+  ('32000000-0000-4000-8000-000000000004', 'rpt4d7n3b6ty', '調査開始', '投資勧誘の証拠資料を精査中。', '10000000-0000-4000-8000-000000000002', CURRENT_TIMESTAMP - INTERVAL '5 days'),
+  ('32000000-0000-4000-8000-000000000005', 'rpt1z5c8w2hj', '追加情報待ち', '投稿者へ追加スクリーンショット提出を依頼。', '10000000-0000-4000-8000-000000000002', CURRENT_TIMESTAMP - INTERVAL '2 days');
 
 -- =============================================
 -- 4) CMS

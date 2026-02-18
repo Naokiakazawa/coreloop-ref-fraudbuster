@@ -216,7 +216,7 @@ export type ReportImageWhereInput = {
 	OR?: Prisma.ReportImageWhereInput[];
 	NOT?: Prisma.ReportImageWhereInput | Prisma.ReportImageWhereInput[];
 	id?: Prisma.UuidFilter<"ReportImage"> | string;
-	reportId?: Prisma.UuidFilter<"ReportImage"> | string;
+	reportId?: Prisma.StringFilter<"ReportImage"> | string;
 	imageUrl?: Prisma.StringFilter<"ReportImage"> | string;
 	displayOrder?: Prisma.IntNullableFilter<"ReportImage"> | number | null;
 	createdAt?:
@@ -245,7 +245,7 @@ export type ReportImageWhereUniqueInput = Prisma.AtLeast<
 		AND?: Prisma.ReportImageWhereInput | Prisma.ReportImageWhereInput[];
 		OR?: Prisma.ReportImageWhereInput[];
 		NOT?: Prisma.ReportImageWhereInput | Prisma.ReportImageWhereInput[];
-		reportId?: Prisma.UuidFilter<"ReportImage"> | string;
+		reportId?: Prisma.StringFilter<"ReportImage"> | string;
 		imageUrl?: Prisma.StringFilter<"ReportImage"> | string;
 		displayOrder?: Prisma.IntNullableFilter<"ReportImage"> | number | null;
 		createdAt?:
@@ -283,7 +283,7 @@ export type ReportImageScalarWhereWithAggregatesInput = {
 		| Prisma.ReportImageScalarWhereWithAggregatesInput
 		| Prisma.ReportImageScalarWhereWithAggregatesInput[];
 	id?: Prisma.UuidWithAggregatesFilter<"ReportImage"> | string;
-	reportId?: Prisma.UuidWithAggregatesFilter<"ReportImage"> | string;
+	reportId?: Prisma.StringWithAggregatesFilter<"ReportImage"> | string;
 	imageUrl?: Prisma.StringWithAggregatesFilter<"ReportImage"> | string;
 	displayOrder?:
 		| Prisma.IntNullableWithAggregatesFilter<"ReportImage">
@@ -585,7 +585,7 @@ export type ReportImageScalarWhereInput = {
 		| Prisma.ReportImageScalarWhereInput
 		| Prisma.ReportImageScalarWhereInput[];
 	id?: Prisma.UuidFilter<"ReportImage"> | string;
-	reportId?: Prisma.UuidFilter<"ReportImage"> | string;
+	reportId?: Prisma.StringFilter<"ReportImage"> | string;
 	imageUrl?: Prisma.StringFilter<"ReportImage"> | string;
 	displayOrder?: Prisma.IntNullableFilter<"ReportImage"> | number | null;
 	createdAt?:

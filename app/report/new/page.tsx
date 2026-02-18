@@ -1,32 +1,32 @@
 "use client";
 
-import * as React from "react";
+import {
+	AlertCircle,
+	ArrowLeft,
+	ArrowRight,
+	CheckCircle2,
+	Lock,
+	ShieldAlert,
+	ShieldCheck,
+	Upload,
+} from "lucide-react";
 import { useRouter } from "next/navigation";
 import Script from "next/script";
-import {
-	ShieldAlert,
-	ArrowRight,
-	ArrowLeft,
-	CheckCircle2,
-	Upload,
-	AlertCircle,
-	Lock,
-	ShieldCheck,
-} from "lucide-react";
+import * as React from "react";
 import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
 import {
 	Card,
 	CardContent,
-	CardHeader,
-	CardTitle,
 	CardDescription,
 	CardFooter,
+	CardHeader,
+	CardTitle,
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
+import { Progress } from "@/components/ui/progress";
 import {
 	Select,
 	SelectContent,
@@ -34,8 +34,8 @@ import {
 	SelectTrigger,
 	SelectValue,
 } from "@/components/ui/select";
-import { Progress } from "@/components/ui/progress";
 import { Separator } from "@/components/ui/separator";
+import { Textarea } from "@/components/ui/textarea";
 
 type TurnstileRenderOptions = {
 	sitekey: string;
@@ -72,9 +72,9 @@ export default function NewReportPage() {
 	});
 	const [turnstileToken, setTurnstileToken] = React.useState("");
 	const [turnstileScriptReady, setTurnstileScriptReady] = React.useState(false);
-	const [turnstileWidgetId, setTurnstileWidgetId] = React.useState<string | null>(
-		null,
-	);
+	const [turnstileWidgetId, setTurnstileWidgetId] = React.useState<
+		string | null
+	>(null);
 	const [loading, setLoading] = React.useState(false);
 	const formStartedAtRef = React.useRef(Date.now());
 	const turnstileContainerRef = React.useRef<HTMLDivElement | null>(null);
@@ -156,9 +156,9 @@ export default function NewReportPage() {
 			});
 
 			if (!response.ok) {
-				const payload = (await response
-					.json()
-					.catch(() => null)) as { error?: string } | null;
+				const payload = (await response.json().catch(() => null)) as {
+					error?: string;
+				} | null;
 				if (response.status === 400 || response.status === 403) {
 					resetTurnstile();
 				}
@@ -170,7 +170,9 @@ export default function NewReportPage() {
 		} catch (error) {
 			resetTurnstile();
 			toast.error(
-				error instanceof Error ? error.message : "送信中にエラーが発生しました。",
+				error instanceof Error
+					? error.message
+					: "送信中にエラーが発生しました。",
 			);
 			console.error(error);
 		} finally {
@@ -416,7 +418,10 @@ export default function NewReportPage() {
 							</p>
 						</div>
 
-						<div aria-hidden="true" className="absolute -left-[9999px] top-auto">
+						<div
+							aria-hidden="true"
+							className="absolute -left-[9999px] top-auto"
+						>
 							<Label htmlFor="spamTrap">ウェブサイト</Label>
 							<Input
 								id="spamTrap"

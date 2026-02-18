@@ -305,7 +305,7 @@ export type ReportWhereInput = {
 	AND?: Prisma.ReportWhereInput | Prisma.ReportWhereInput[];
 	OR?: Prisma.ReportWhereInput[];
 	NOT?: Prisma.ReportWhereInput | Prisma.ReportWhereInput[];
-	id?: Prisma.UuidFilter<"Report"> | string;
+	id?: Prisma.StringFilter<"Report"> | string;
 	userId?: Prisma.UuidNullableFilter<"Report"> | string | null;
 	url?: Prisma.StringFilter<"Report"> | string;
 	title?: Prisma.StringNullableFilter<"Report"> | string | null;
@@ -437,7 +437,7 @@ export type ReportScalarWhereWithAggregatesInput = {
 	NOT?:
 		| Prisma.ReportScalarWhereWithAggregatesInput
 		| Prisma.ReportScalarWhereWithAggregatesInput[];
-	id?: Prisma.UuidWithAggregatesFilter<"Report"> | string;
+	id?: Prisma.StringWithAggregatesFilter<"Report"> | string;
 	userId?: Prisma.UuidNullableWithAggregatesFilter<"Report"> | string | null;
 	url?: Prisma.StringWithAggregatesFilter<"Report"> | string;
 	title?: Prisma.StringNullableWithAggregatesFilter<"Report"> | string | null;
@@ -475,7 +475,7 @@ export type ReportScalarWhereWithAggregatesInput = {
 };
 
 export type ReportCreateInput = {
-	id?: string;
+	id: string;
 	url: string;
 	title?: string | null;
 	description?: string | null;
@@ -495,7 +495,7 @@ export type ReportCreateInput = {
 };
 
 export type ReportUncheckedCreateInput = {
-	id?: string;
+	id: string;
 	userId?: string | null;
 	url: string;
 	title?: string | null;
@@ -577,7 +577,7 @@ export type ReportUncheckedUpdateInput = {
 };
 
 export type ReportCreateManyInput = {
-	id?: string;
+	id: string;
 	userId?: string | null;
 	url: string;
 	title?: string | null;
@@ -1136,7 +1136,7 @@ export type ReportUpdateOneRequiredWithoutTimelinesNestedInput = {
 };
 
 export type ReportCreateWithoutCategoryInput = {
-	id?: string;
+	id: string;
 	url: string;
 	title?: string | null;
 	description?: string | null;
@@ -1155,7 +1155,7 @@ export type ReportCreateWithoutCategoryInput = {
 };
 
 export type ReportUncheckedCreateWithoutCategoryInput = {
-	id?: string;
+	id: string;
 	userId?: string | null;
 	url: string;
 	title?: string | null;
@@ -1220,7 +1220,7 @@ export type ReportScalarWhereInput = {
 	AND?: Prisma.ReportScalarWhereInput | Prisma.ReportScalarWhereInput[];
 	OR?: Prisma.ReportScalarWhereInput[];
 	NOT?: Prisma.ReportScalarWhereInput | Prisma.ReportScalarWhereInput[];
-	id?: Prisma.UuidFilter<"Report"> | string;
+	id?: Prisma.StringFilter<"Report"> | string;
 	userId?: Prisma.UuidNullableFilter<"Report"> | string | null;
 	url?: Prisma.StringFilter<"Report"> | string;
 	title?: Prisma.StringNullableFilter<"Report"> | string | null;
@@ -1238,7 +1238,7 @@ export type ReportScalarWhereInput = {
 };
 
 export type ReportCreateWithoutPlatformInput = {
-	id?: string;
+	id: string;
 	url: string;
 	title?: string | null;
 	description?: string | null;
@@ -1257,7 +1257,7 @@ export type ReportCreateWithoutPlatformInput = {
 };
 
 export type ReportUncheckedCreateWithoutPlatformInput = {
-	id?: string;
+	id: string;
 	userId?: string | null;
 	url: string;
 	title?: string | null;
@@ -1319,7 +1319,7 @@ export type ReportUpdateManyWithWhereWithoutPlatformInput = {
 };
 
 export type ReportCreateWithoutStatusInput = {
-	id?: string;
+	id: string;
 	url: string;
 	title?: string | null;
 	description?: string | null;
@@ -1338,7 +1338,7 @@ export type ReportCreateWithoutStatusInput = {
 };
 
 export type ReportUncheckedCreateWithoutStatusInput = {
-	id?: string;
+	id: string;
 	userId?: string | null;
 	url: string;
 	title?: string | null;
@@ -1400,7 +1400,7 @@ export type ReportUpdateManyWithWhereWithoutStatusInput = {
 };
 
 export type ReportCreateWithoutUserInput = {
-	id?: string;
+	id: string;
 	url: string;
 	title?: string | null;
 	description?: string | null;
@@ -1419,7 +1419,7 @@ export type ReportCreateWithoutUserInput = {
 };
 
 export type ReportUncheckedCreateWithoutUserInput = {
-	id?: string;
+	id: string;
 	url: string;
 	title?: string | null;
 	description?: string | null;
@@ -1479,7 +1479,7 @@ export type ReportUpdateManyWithWhereWithoutUserInput = {
 };
 
 export type ReportCreateWithoutImagesInput = {
-	id?: string;
+	id: string;
 	url: string;
 	title?: string | null;
 	description?: string | null;
@@ -1498,7 +1498,7 @@ export type ReportCreateWithoutImagesInput = {
 };
 
 export type ReportUncheckedCreateWithoutImagesInput = {
-	id?: string;
+	id: string;
 	userId?: string | null;
 	url: string;
 	title?: string | null;
@@ -1605,7 +1605,7 @@ export type ReportUncheckedUpdateWithoutImagesInput = {
 };
 
 export type ReportCreateWithoutTimelinesInput = {
-	id?: string;
+	id: string;
 	url: string;
 	title?: string | null;
 	description?: string | null;
@@ -1624,7 +1624,7 @@ export type ReportCreateWithoutTimelinesInput = {
 };
 
 export type ReportUncheckedCreateWithoutTimelinesInput = {
-	id?: string;
+	id: string;
 	userId?: string | null;
 	url: string;
 	title?: string | null;
@@ -1731,7 +1731,7 @@ export type ReportUncheckedUpdateWithoutTimelinesInput = {
 };
 
 export type ReportCreateManyCategoryInput = {
-	id?: string;
+	id: string;
 	userId?: string | null;
 	url: string;
 	title?: string | null;
@@ -1836,7 +1836,7 @@ export type ReportUncheckedUpdateManyWithoutCategoryInput = {
 };
 
 export type ReportCreateManyPlatformInput = {
-	id?: string;
+	id: string;
 	userId?: string | null;
 	url: string;
 	title?: string | null;
@@ -1941,7 +1941,7 @@ export type ReportUncheckedUpdateManyWithoutPlatformInput = {
 };
 
 export type ReportCreateManyStatusInput = {
-	id?: string;
+	id: string;
 	userId?: string | null;
 	url: string;
 	title?: string | null;
@@ -2046,7 +2046,7 @@ export type ReportUncheckedUpdateManyWithoutStatusInput = {
 };
 
 export type ReportCreateManyUserInput = {
-	id?: string;
+	id: string;
 	url: string;
 	title?: string | null;
 	description?: string | null;

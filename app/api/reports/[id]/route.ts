@@ -1,9 +1,9 @@
-import { prisma } from "@/lib/prisma";
 import {
-	successResponse,
 	errorResponse,
 	notFoundResponse,
+	successResponse,
 } from "@/lib/api-utils";
+import { prisma } from "@/lib/prisma";
 
 /**
  * GET /api/reports/[id]

@@ -1,6 +1,6 @@
+import { ArrowLeft, Calendar, Megaphone, User } from "lucide-react";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { ArrowLeft, Calendar, Megaphone, User } from "lucide-react";
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";

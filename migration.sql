@@ -60,7 +60,7 @@ CREATE TABLE admins (
 
 -- 通報案件メインテーブル
 CREATE TABLE reports (
-    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    id VARCHAR(64) PRIMARY KEY, -- nanoid をアプリケーション側で生成
     user_id UUID REFERENCES users(id) ON DELETE SET NULL, -- 通報者
     
     -- 案件基本情報
@@ -88,7 +88,7 @@ CREATE TABLE reports (
 -- 案件に関連する画像（証拠スクショなど）
 CREATE TABLE report_images (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-    report_id UUID NOT NULL REFERENCES reports(id) ON DELETE CASCADE,
+    report_id VARCHAR(64) NOT NULL REFERENCES reports(id) ON DELETE CASCADE,
     image_url TEXT NOT NULL,
     display_order INT DEFAULT 0,
     created_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP
@@ -98,7 +98,7 @@ CREATE TABLE report_images (
 -- 例：「通報受付」→「分析中」→「Facebookへ通報済」
 CREATE TABLE report_timelines (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-    report_id UUID NOT NULL REFERENCES reports(id) ON DELETE CASCADE,
+    report_id VARCHAR(64) NOT NULL REFERENCES reports(id) ON DELETE CASCADE,
     action_label VARCHAR(100) NOT NULL, -- 例: "プラットフォームへ通知"
     description TEXT, -- 詳細
     created_by UUID REFERENCES admins(id), -- 操作した管理者（システム自動の場合はNULL）

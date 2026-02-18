@@ -194,7 +194,7 @@ export type ReportTimelineWhereInput = {
 	OR?: Prisma.ReportTimelineWhereInput[];
 	NOT?: Prisma.ReportTimelineWhereInput | Prisma.ReportTimelineWhereInput[];
 	id?: Prisma.UuidFilter<"ReportTimeline"> | string;
-	reportId?: Prisma.UuidFilter<"ReportTimeline"> | string;
+	reportId?: Prisma.StringFilter<"ReportTimeline"> | string;
 	actionLabel?: Prisma.StringFilter<"ReportTimeline"> | string;
 	description?: Prisma.StringNullableFilter<"ReportTimeline"> | string | null;
 	createdBy?: Prisma.UuidNullableFilter<"ReportTimeline"> | string | null;
@@ -230,7 +230,7 @@ export type ReportTimelineWhereUniqueInput = Prisma.AtLeast<
 		AND?: Prisma.ReportTimelineWhereInput | Prisma.ReportTimelineWhereInput[];
 		OR?: Prisma.ReportTimelineWhereInput[];
 		NOT?: Prisma.ReportTimelineWhereInput | Prisma.ReportTimelineWhereInput[];
-		reportId?: Prisma.UuidFilter<"ReportTimeline"> | string;
+		reportId?: Prisma.StringFilter<"ReportTimeline"> | string;
 		actionLabel?: Prisma.StringFilter<"ReportTimeline"> | string;
 		description?: Prisma.StringNullableFilter<"ReportTimeline"> | string | null;
 		createdBy?: Prisma.UuidNullableFilter<"ReportTimeline"> | string | null;
@@ -272,7 +272,7 @@ export type ReportTimelineScalarWhereWithAggregatesInput = {
 		| Prisma.ReportTimelineScalarWhereWithAggregatesInput
 		| Prisma.ReportTimelineScalarWhereWithAggregatesInput[];
 	id?: Prisma.UuidWithAggregatesFilter<"ReportTimeline"> | string;
-	reportId?: Prisma.UuidWithAggregatesFilter<"ReportTimeline"> | string;
+	reportId?: Prisma.StringWithAggregatesFilter<"ReportTimeline"> | string;
 	actionLabel?: Prisma.StringWithAggregatesFilter<"ReportTimeline"> | string;
 	description?:
 		| Prisma.StringNullableWithAggregatesFilter<"ReportTimeline">
@@ -691,7 +691,7 @@ export type ReportTimelineScalarWhereInput = {
 		| Prisma.ReportTimelineScalarWhereInput
 		| Prisma.ReportTimelineScalarWhereInput[];
 	id?: Prisma.UuidFilter<"ReportTimeline"> | string;
-	reportId?: Prisma.UuidFilter<"ReportTimeline"> | string;
+	reportId?: Prisma.StringFilter<"ReportTimeline"> | string;
 	actionLabel?: Prisma.StringFilter<"ReportTimeline"> | string;
 	description?: Prisma.StringNullableFilter<"ReportTimeline"> | string | null;
 	createdBy?: Prisma.UuidNullableFilter<"ReportTimeline"> | string | null;

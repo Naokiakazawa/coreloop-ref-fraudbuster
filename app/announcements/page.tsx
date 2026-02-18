@@ -1,8 +1,8 @@
-import { prisma } from "@/lib/prisma";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
 import { Calendar, ChevronRight } from "lucide-react";
 import Link from "next/link";
+import { Badge } from "@/components/ui/badge";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { prisma } from "@/lib/prisma";
 
 export default async function AnnouncementsPage() {
 	const announcements = await prisma.announcement.findMany({

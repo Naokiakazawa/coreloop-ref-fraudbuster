@@ -1,7 +1,7 @@
 "use client";
 
-import Link from "next/link";
 import { ShieldAlert } from "lucide-react";
+import Link from "next/link";
 import { usePathname } from "next/navigation";
 
 import { ModeToggle } from "@/components/mode-toggle";

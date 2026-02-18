@@ -1,16 +1,17 @@
-import { type NextRequest } from "next/server";
 import { isIP } from "node:net";
+import { customAlphabet } from "nanoid";
+import type { NextRequest } from "next/server";
+import {
+	badRequestResponse,
+	errorResponse,
+	successResponse,
+} from "@/lib/api-utils";
 import { prisma } from "@/lib/prisma";
 import type {
-	ReportsListResponse,
 	ReportSortOrder,
 	ReportSummary,
+	ReportsListResponse,
 } from "@/lib/types/api";
-import {
-	successResponse,
-	errorResponse,
-	badRequestResponse,
-} from "@/lib/api-utils";
 
 function parseOptionalInteger(value: string | null): number | undefined {
 	if (!value) return undefined;
@@ -30,6 +31,10 @@ const MIN_FORM_COMPLETION_MS = 6 * 1000;
 const rateLimitStore = new Map<string, number[]>();
 const TURNSTILE_VERIFY_ENDPOINT =
 	"https://challenges.cloudflare.com/turnstile/v0/siteverify";
+const createReportId = customAlphabet(
+	"0123456789abcdefghijklmnopqrstuvwxyz",
+	12,
+);
 
 type TurnstileVerificationResult = {
 	success: boolean;
@@ -72,7 +77,9 @@ function getClientIp(request: NextRequest): string | null {
 function maybeCleanupRateLimitStore(now: number) {
 	if (rateLimitStore.size < 100 || Math.random() > 0.02) return;
 	for (const [key, timestamps] of rateLimitStore.entries()) {
-		const active = timestamps.filter((timestamp) => now - timestamp < SUBMISSION_WINDOW_MS);
+		const active = timestamps.filter(
+			(timestamp) => now - timestamp < SUBMISSION_WINDOW_MS,
+		);
 		if (active.length === 0) {
 			rateLimitStore.delete(key);
 			continue;
@@ -88,9 +95,9 @@ function checkAndRecordSubmission(key: string): {
 	const now = Date.now();
 	maybeCleanupRateLimitStore(now);
 
-	const timestamps = (
-		rateLimitStore.get(key) ?? []
-	).filter((timestamp) => now - timestamp < SUBMISSION_WINDOW_MS);
+	const timestamps = (rateLimitStore.get(key) ?? []).filter(
+		(timestamp) => now - timestamp < SUBMISSION_WINDOW_MS,
+	);
 	const lastSubmission = timestamps[timestamps.length - 1];
 
 	if (lastSubmission && now - lastSubmission < MIN_SUBMISSION_INTERVAL_MS) {
@@ -195,8 +202,12 @@ function isPrivateHostname(hostname: string): boolean {
 
 	const ipv4Match = host.match(/^(\d{1,3})\.(\d{1,3})\.(\d{1,3})\.(\d{1,3})$/);
 	if (ipv4Match) {
-		const octets = ipv4Match.slice(1).map((value) => Number.parseInt(value, 10));
-		if (octets.some((octet) => Number.isNaN(octet) || octet < 0 || octet > 255)) {
+		const octets = ipv4Match
+			.slice(1)
+			.map((value) => Number.parseInt(value, 10));
+		if (
+			octets.some((octet) => Number.isNaN(octet) || octet < 0 || octet > 255)
+		) {
 			return true;
 		}
 
@@ -281,7 +292,9 @@ function extractThumbnailFromHtml(html: string, pageUrl: URL): string | null {
 
 		const isImageRel =
 			rel.includes("image_src") ||
-			rel.split(/\s+/).some((item) => item === "icon" || item === "apple-touch-icon");
+			rel
+				.split(/\s+/)
+				.some((item) => item === "icon" || item === "apple-touch-icon");
 		if (!isImageRel) continue;
 
 		const href = extractAttributeValue(tag, "href");
@@ -314,7 +327,9 @@ async function fetchReportThumbnailUrl(rawUrl: string): Promise<string | null> {
 		});
 
 		if (!response.ok) return null;
-		const contentType = (response.headers.get("content-type") ?? "").toLowerCase();
+		const contentType = (
+			response.headers.get("content-type") ?? ""
+		).toLowerCase();
 		if (!contentType.includes("text/html")) return null;
 		const contentLength = Number.parseInt(
 			response.headers.get("content-length") ?? "",
@@ -469,7 +484,8 @@ export async function POST(request: NextRequest) {
 				: null;
 		const turnstileToken =
 			typeof body.turnstileToken === "string" ? body.turnstileToken.trim() : "";
-		const spamTrap = typeof body.spamTrap === "string" ? body.spamTrap.trim() : "";
+		const spamTrap =
+			typeof body.spamTrap === "string" ? body.spamTrap.trim() : "";
 		const formStartedAt =
 			typeof body.formStartedAt === "number" ? body.formStartedAt : Number.NaN;
 		const clientIp = getClientIp(request);
@@ -514,12 +530,17 @@ export async function POST(request: NextRequest) {
 			);
 		}
 
-		const turnstileResult = await verifyTurnstileToken(turnstileToken, clientIp);
+		const turnstileResult = await verifyTurnstileToken(
+			turnstileToken,
+			clientIp,
+		);
 		if (!turnstileResult.success) {
-			console.error("Turnstile verification rejected", turnstileResult.errorCodes);
-			const isServerMisconfigured = turnstileResult.errorCodes.includes(
-				"missing-secret-key",
+			console.error(
+				"Turnstile verification rejected",
+				turnstileResult.errorCodes,
 			);
+			const isServerMisconfigured =
+				turnstileResult.errorCodes.includes("missing-secret-key");
 			return errorResponse(
 				isServerMisconfigured
 					? "スパム対策設定エラーです。管理者へお問い合わせください。"
@@ -534,6 +555,7 @@ export async function POST(request: NextRequest) {
 		// In a real app, this would be the authenticated user's ID
 		const report = await prisma.report.create({
 			data: {
+				id: createReportId(),
 				url,
 				title,
 				description,

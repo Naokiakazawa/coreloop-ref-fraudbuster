@@ -1,10 +1,10 @@
+import { errorResponse, successResponse } from "@/lib/api-utils";
 import { prisma } from "@/lib/prisma";
 import type {
 	StatisticsBreakdownItem,
 	StatisticsResponse,
 	StatisticsTrendItem,
 } from "@/lib/types/api";
-import { errorResponse, successResponse } from "@/lib/api-utils";
 
 const DEFAULT_DAYS = 7;
 const MAX_DAYS = 90;
