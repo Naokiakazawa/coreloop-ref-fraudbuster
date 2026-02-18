@@ -24,6 +24,10 @@ function parseSortOrder(value: string | null): ReportSortOrder {
 	return value === "popular" ? "popular" : "newest";
 }
 
+function isValidEmail(value: string): boolean {
+	return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
+}
+
 const SUBMISSION_WINDOW_MS = 10 * 60 * 1000;
 const MAX_SUBMISSIONS_PER_WINDOW = 5;
 const MIN_SUBMISSION_INTERVAL_MS = 10 * 1000;
@@ -372,7 +376,7 @@ export async function GET(request: NextRequest) {
 
 		const orderBy =
 			sort === "popular"
-				? [{ viewCount: "desc" as const }, { id: "desc" as const }]
+				? [{ reportCount: "desc" as const }, { id: "desc" as const }]
 				: [{ createdAt: "desc" as const }, { id: "desc" as const }];
 
 		const reports = await prisma.report.findMany({
@@ -403,7 +407,6 @@ export async function GET(request: NextRequest) {
 				title: true,
 				description: true,
 				createdAt: true,
-				viewCount: true,
 				riskScore: true,
 				platform: {
 					select: {
@@ -474,6 +477,8 @@ export async function POST(request: NextRequest) {
 		const title = typeof body.title === "string" ? body.title : null;
 		const description =
 			typeof body.description === "string" ? body.description : null;
+		const email =
+			typeof body.email === "string" ? body.email.trim().toLowerCase() : "";
 		const platformId =
 			typeof body.platformId === "string" || typeof body.platformId === "number"
 				? String(body.platformId)
@@ -496,6 +501,12 @@ export async function POST(request: NextRequest) {
 
 		if (!url) {
 			return badRequestResponse("URL is required");
+		}
+		if (!email) {
+			return badRequestResponse("メールアドレスは必須です");
+		}
+		if (!isValidEmail(email)) {
+			return badRequestResponse("メールアドレスの形式が不正です");
 		}
 
 		if (spamTrap) {
@@ -550,12 +561,16 @@ export async function POST(request: NextRequest) {
 		}
 
 		const thumbnailUrl = await fetchReportThumbnailUrl(url);
+		const user = await prisma.user.upsert({
+			where: { email },
+			update: { lastLoginAt: new Date() },
+			create: { email, lastLoginAt: new Date() },
+		});
 
-		// For now, we use a placeholder user ID or create a mock user if none exists
-		// In a real app, this would be the authenticated user's ID
 		const report = await prisma.report.create({
 			data: {
 				id: createReportId(),
+				userId: user.id,
 				url,
 				title,
 				description,
@@ -563,7 +578,6 @@ export async function POST(request: NextRequest) {
 				categoryId: categoryId ? Number.parseInt(categoryId) : undefined,
 				statusId: 1, // Default to first status (usually 'Pending' or 'Investigating')
 				riskScore: 0,
-				viewCount: 0,
 				reportCount: 1,
 				sourceIp: clientIp,
 				images: thumbnailUrl

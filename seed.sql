@@ -56,10 +56,10 @@ INSERT INTO admins (id, email, password_hash, name, role, created_at) VALUES
   ('10000000-0000-4000-8000-000000000001', 'admin@example.com', '$2b$12$admin.seed.hash.placeholder', '運営管理者', 'SUPER_ADMIN', CURRENT_TIMESTAMP - INTERVAL '30 days'),
   ('10000000-0000-4000-8000-000000000002', 'moderator@example.com', '$2b$12$moderator.seed.hash.placeholder', '審査担当', 'MODERATOR', CURRENT_TIMESTAMP - INTERVAL '15 days');
 
-INSERT INTO users (id, phone_hash, phone_verified_at, created_at, last_login_at) VALUES
-  ('20000000-0000-4000-8000-000000000001', 'sha256:5f16f8b94a95f15a2cc0fd8f5f0d4c0d4ff07f47f8f6d1fb9ec5f7ae2d9c8b10', CURRENT_TIMESTAMP - INTERVAL '20 days', CURRENT_TIMESTAMP - INTERVAL '20 days', CURRENT_TIMESTAMP - INTERVAL '1 day'),
-  ('20000000-0000-4000-8000-000000000002', 'sha256:702ce4cb6fd87f5f95d2d4b6fc2f9096302efdc6afab2fe7e59b4fbc0d0f3a48', CURRENT_TIMESTAMP - INTERVAL '12 days', CURRENT_TIMESTAMP - INTERVAL '12 days', CURRENT_TIMESTAMP - INTERVAL '2 days'),
-  ('20000000-0000-4000-8000-000000000003', 'sha256:0f4988bb2dbd3e430f7c5726a4f49198772ac0cf88fd5ab322218f8da6f9a5db', CURRENT_TIMESTAMP - INTERVAL '8 days', CURRENT_TIMESTAMP - INTERVAL '8 days', CURRENT_TIMESTAMP - INTERVAL '6 hours');
+INSERT INTO users (id, email, created_at, last_login_at) VALUES
+  ('20000000-0000-4000-8000-000000000001', 'reporter1@example.com', CURRENT_TIMESTAMP - INTERVAL '20 days', CURRENT_TIMESTAMP - INTERVAL '1 day'),
+  ('20000000-0000-4000-8000-000000000002', 'reporter2@example.com', CURRENT_TIMESTAMP - INTERVAL '12 days', CURRENT_TIMESTAMP - INTERVAL '2 days'),
+  ('20000000-0000-4000-8000-000000000003', 'reporter3@example.com', CURRENT_TIMESTAMP - INTERVAL '8 days', CURRENT_TIMESTAMP - INTERVAL '6 hours');
 
 -- =============================================
 -- 3) Reports / cases

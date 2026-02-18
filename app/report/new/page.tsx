@@ -57,6 +57,7 @@ type TurnstileApi = {
 type WindowWithTurnstile = Window & { turnstile?: TurnstileApi };
 
 type Step = "basic" | "details" | "verify" | "complete";
+const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 export default function NewReportPage() {
 	const turnstileSiteKey = process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY ?? "";
@@ -68,6 +69,7 @@ export default function NewReportPage() {
 		platformId: "",
 		title: "",
 		description: "",
+		email: "",
 		spamTrap: "",
 	});
 	const [turnstileToken, setTurnstileToken] = React.useState("");
@@ -85,6 +87,8 @@ export default function NewReportPage() {
 		verify: 75,
 		complete: 100,
 	}[step];
+	const email = formData.email.trim().toLowerCase();
+	const isEmailValid = EMAIL_PATTERN.test(email);
 
 	React.useEffect(() => {
 		if (step !== "verify") return;
@@ -129,6 +133,14 @@ export default function NewReportPage() {
 	}, [turnstileWidgetId]);
 
 	const handleSubmit = async () => {
+		if (!email) {
+			toast.error("メールアドレスを入力してください。");
+			return;
+		}
+		if (!isEmailValid) {
+			toast.error("メールアドレスの形式を確認してください。");
+			return;
+		}
 		if (!turnstileSiteKey) {
 			toast.error("Turnstileの設定が未完了です。");
 			return;
@@ -147,6 +159,7 @@ export default function NewReportPage() {
 					url: formData.url,
 					title: formData.title,
 					description: formData.description,
+					email,
 					platformId: formData.platformId,
 					categoryId: formData.categoryId,
 					formStartedAt: formStartedAtRef.current,
@@ -251,7 +264,7 @@ export default function NewReportPage() {
 							/>
 							<p className="text-xs text-muted-foreground flex items-center gap-1">
 								<AlertCircle className="h-3 w-3" />
-								SNSのアカウント名や電話番号の場合はその情報を入力してください。
+								SNSのアカウント名やメールアドレスの場合はその情報を入力してください。
 							</p>
 						</div>
 						<div className="grid grid-cols-2 gap-4">
@@ -402,6 +415,23 @@ export default function NewReportPage() {
 
 						<Separator />
 
+						<div className="space-y-2">
+							<Label htmlFor="verifyEmail">連絡用メールアドレス (必須)</Label>
+							<Input
+								id="verifyEmail"
+								type="email"
+								autoComplete="email"
+								placeholder="you@example.com"
+								value={formData.email}
+								onChange={(e) =>
+									setFormData({ ...formData, email: e.target.value })
+								}
+							/>
+							<p className="text-xs text-muted-foreground">
+								内容確認のために連絡する場合があります。
+							</p>
+						</div>
+
 						<div className="space-y-3">
 							{turnstileSiteKey ? (
 								<div
@@ -445,7 +475,9 @@ export default function NewReportPage() {
 						<Button
 							className="flex-1 h-12 rounded-xl font-bold text-lg"
 							onClick={nextStep}
-							disabled={loading || !turnstileSiteKey || !turnstileToken}
+							disabled={
+								loading || !turnstileSiteKey || !turnstileToken || !isEmailValid
+							}
 						>
 							{loading ? "送信中..." : "通報を完了する"}
 						</Button>

@@ -1,6 +1,6 @@
 "use client";
 
-import { AlertTriangle, Clock3, Eye, Search, ShieldAlert } from "lucide-react";
+import { AlertTriangle, Clock3, Search, ShieldAlert } from "lucide-react";
 import Link from "next/link";
 import * as React from "react";
 import { Badge } from "@/components/ui/badge";
@@ -118,10 +118,6 @@ function ReportSummaryCard({ report }: { report: ReportSummary }) {
 					</div>
 
 					<div className="mt-auto flex items-center justify-between gap-3 pt-2">
-						<div className="inline-flex items-center gap-1 text-xs text-muted-foreground">
-							<Eye className="h-3.5 w-3.5" />
-							<span>{report.viewCount ?? 0} 閲覧</span>
-						</div>
 						<div
 							className={`inline-flex items-center gap-1 rounded-full border px-2.5 py-1 text-xs font-medium ${riskStyle(report.riskScore)}`}
 						>

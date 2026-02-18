@@ -35,11 +35,10 @@ CREATE TABLE report_statuses (
 -- =============================================
 
 -- 一般ユーザー（通報者）
--- 電話番号認証を想定。プライバシー保護のため最小限の情報のみ保持。
+-- 連絡先メールアドレスを保持。プライバシー保護のため最小限の情報のみ保持。
 CREATE TABLE users (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-    phone_hash VARCHAR(255) UNIQUE NOT NULL, -- 電話番号はハッシュ化推奨
-    phone_verified_at TIMESTAMPTZ, -- SMS OTP認証完了日時
+    email VARCHAR(255) UNIQUE NOT NULL,
     created_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
     last_login_at TIMESTAMPTZ
 );

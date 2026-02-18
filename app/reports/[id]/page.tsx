@@ -4,22 +4,13 @@ import {
 	CheckCircle2,
 	Clock,
 	ExternalLink,
-	Eye,
 	Share2,
-	ShieldAlert,
 } from "lucide-react";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import {
-	Carousel,
-	CarouselContent,
-	CarouselItem,
-	CarouselNext,
-	CarouselPrevious,
-} from "@/components/ui/carousel";
 import { Separator } from "@/components/ui/separator";
 import { prisma } from "@/lib/prisma";
 
@@ -38,9 +29,6 @@ export default async function ReportDetailPage({
 			platform: true,
 			category: true,
 			status: true,
-			images: {
-				orderBy: { displayOrder: "asc" as const },
-			},
 			timelines: {
 				orderBy: { occurredAt: "asc" as const },
 				include: { admin: { select: { name: true } } },
@@ -90,9 +78,6 @@ export default async function ReportDetailPage({
 								{report.platform?.name || "不明なプラットフォーム"}
 							</Badge>
 							<div className="flex items-center gap-2 ml-auto text-sm text-muted-foreground">
-								<Eye className="h-4 w-4" />
-								<span>{report.viewCount} 閲覧</span>
-								<Separator orientation="vertical" className="h-4" />
 								<Calendar className="h-4 w-4" />
 								<span>
 									{report.createdAt?.toLocaleDateString("ja-JP") || "日付不明"}
@@ -129,34 +114,6 @@ export default async function ReportDetailPage({
 							</div>
 						</div>
 					</section>
-
-					{/* Image Carousel */}
-					{report.images.length > 0 && (
-						<section className="space-y-4">
-							<h2 className="text-xl font-bold flex items-center gap-2">
-								<ShieldAlert className="h-5 w-5 text-primary" />
-								証拠のスクリーンショット
-							</h2>
-							<div className="relative group overflow-hidden rounded-2xl border bg-black/5 dark:bg-white/5">
-								<Carousel className="w-full">
-									<CarouselContent>
-										{report.images.map((image) => (
-											<CarouselItem key={image.id}>
-												<div className="flex aspect-video items-center justify-center p-0">
-													{/* In a real app, use next/image with the actual URL */}
-													<div className="w-full h-full bg-muted flex items-center justify-center text-muted-foreground">
-														スクリーンショットを表示（URL: {image.imageUrl}）
-													</div>
-												</div>
-											</CarouselItem>
-										))}
-									</CarouselContent>
-									<CarouselPrevious className="left-4 opacity-0 group-hover:opacity-100 transition-opacity" />
-									<CarouselNext className="right-4 opacity-0 group-hover:opacity-100 transition-opacity" />
-								</Carousel>
-							</div>
-						</section>
-					)}
 
 					{/* Description */}
 					<section className="space-y-4">

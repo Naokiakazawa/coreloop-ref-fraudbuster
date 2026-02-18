@@ -6,7 +6,6 @@ export type ReportSummary = {
 	title: string | null;
 	description: string | null;
 	createdAt: string | null;
-	viewCount: number | null;
 	riskScore: number | null;
 	platform: {
 		id: number;

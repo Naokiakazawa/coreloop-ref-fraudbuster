@@ -36,16 +36,6 @@ export async function GET(
 			return notFoundResponse("Report not found");
 		}
 
-		// Increment view count asynchronously (not blocking the response)
-		prisma.report
-			.update({
-				where: { id },
-				data: { viewCount: { increment: 1 } },
-			})
-			.catch((err: unknown) =>
-				console.error("Failed to increment view count:", err),
-			);
-
 		return successResponse(report);
 	} catch (error) {
 		console.error("Failed to fetch report details:", error);

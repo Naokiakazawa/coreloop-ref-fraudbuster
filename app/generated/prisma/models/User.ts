@@ -26,24 +26,21 @@ export type AggregateUser = {
 
 export type UserMinAggregateOutputType = {
 	id: string | null;
-	phoneHash: string | null;
-	phoneVerifiedAt: Date | null;
+	email: string | null;
 	createdAt: Date | null;
 	lastLoginAt: Date | null;
 };
 
 export type UserMaxAggregateOutputType = {
 	id: string | null;
-	phoneHash: string | null;
-	phoneVerifiedAt: Date | null;
+	email: string | null;
 	createdAt: Date | null;
 	lastLoginAt: Date | null;
 };
 
 export type UserCountAggregateOutputType = {
 	id: number;
-	phoneHash: number;
-	phoneVerifiedAt: number;
+	email: number;
 	createdAt: number;
 	lastLoginAt: number;
 	_all: number;
@@ -51,24 +48,21 @@ export type UserCountAggregateOutputType = {
 
 export type UserMinAggregateInputType = {
 	id?: true;
-	phoneHash?: true;
-	phoneVerifiedAt?: true;
+	email?: true;
 	createdAt?: true;
 	lastLoginAt?: true;
 };
 
 export type UserMaxAggregateInputType = {
 	id?: true;
-	phoneHash?: true;
-	phoneVerifiedAt?: true;
+	email?: true;
 	createdAt?: true;
 	lastLoginAt?: true;
 };
 
 export type UserCountAggregateInputType = {
 	id?: true;
-	phoneHash?: true;
-	phoneVerifiedAt?: true;
+	email?: true;
 	createdAt?: true;
 	lastLoginAt?: true;
 	_all?: true;
@@ -155,8 +149,7 @@ export type UserGroupByArgs<
 
 export type UserGroupByOutputType = {
 	id: string;
-	phoneHash: string;
-	phoneVerifiedAt: Date | null;
+	email: string;
 	createdAt: Date | null;
 	lastLoginAt: Date | null;
 	_count: UserCountAggregateOutputType | null;
@@ -181,12 +174,7 @@ export type UserWhereInput = {
 	OR?: Prisma.UserWhereInput[];
 	NOT?: Prisma.UserWhereInput | Prisma.UserWhereInput[];
 	id?: Prisma.UuidFilter<"User"> | string;
-	phoneHash?: Prisma.StringFilter<"User"> | string;
-	phoneVerifiedAt?:
-		| Prisma.DateTimeNullableFilter<"User">
-		| Date
-		| string
-		| null;
+	email?: Prisma.StringFilter<"User"> | string;
 	createdAt?: Prisma.DateTimeNullableFilter<"User"> | Date | string | null;
 	lastLoginAt?: Prisma.DateTimeNullableFilter<"User"> | Date | string | null;
 	reports?: Prisma.ReportListRelationFilter;
@@ -194,8 +182,7 @@ export type UserWhereInput = {
 
 export type UserOrderByWithRelationInput = {
 	id?: Prisma.SortOrder;
-	phoneHash?: Prisma.SortOrder;
-	phoneVerifiedAt?: Prisma.SortOrderInput | Prisma.SortOrder;
+	email?: Prisma.SortOrder;
 	createdAt?: Prisma.SortOrderInput | Prisma.SortOrder;
 	lastLoginAt?: Prisma.SortOrderInput | Prisma.SortOrder;
 	reports?: Prisma.ReportOrderByRelationAggregateInput;
@@ -204,26 +191,20 @@ export type UserOrderByWithRelationInput = {
 export type UserWhereUniqueInput = Prisma.AtLeast<
 	{
 		id?: string;
-		phoneHash?: string;
+		email?: string;
 		AND?: Prisma.UserWhereInput | Prisma.UserWhereInput[];
 		OR?: Prisma.UserWhereInput[];
 		NOT?: Prisma.UserWhereInput | Prisma.UserWhereInput[];
-		phoneVerifiedAt?:
-			| Prisma.DateTimeNullableFilter<"User">
-			| Date
-			| string
-			| null;
 		createdAt?: Prisma.DateTimeNullableFilter<"User"> | Date | string | null;
 		lastLoginAt?: Prisma.DateTimeNullableFilter<"User"> | Date | string | null;
 		reports?: Prisma.ReportListRelationFilter;
 	},
-	"id" | "phoneHash"
+	"id" | "email"
 >;
 
 export type UserOrderByWithAggregationInput = {
 	id?: Prisma.SortOrder;
-	phoneHash?: Prisma.SortOrder;
-	phoneVerifiedAt?: Prisma.SortOrderInput | Prisma.SortOrder;
+	email?: Prisma.SortOrder;
 	createdAt?: Prisma.SortOrderInput | Prisma.SortOrder;
 	lastLoginAt?: Prisma.SortOrderInput | Prisma.SortOrder;
 	_count?: Prisma.UserCountOrderByAggregateInput;
@@ -240,12 +221,7 @@ export type UserScalarWhereWithAggregatesInput = {
 		| Prisma.UserScalarWhereWithAggregatesInput
 		| Prisma.UserScalarWhereWithAggregatesInput[];
 	id?: Prisma.UuidWithAggregatesFilter<"User"> | string;
-	phoneHash?: Prisma.StringWithAggregatesFilter<"User"> | string;
-	phoneVerifiedAt?:
-		| Prisma.DateTimeNullableWithAggregatesFilter<"User">
-		| Date
-		| string
-		| null;
+	email?: Prisma.StringWithAggregatesFilter<"User"> | string;
 	createdAt?:
 		| Prisma.DateTimeNullableWithAggregatesFilter<"User">
 		| Date
@@ -260,8 +236,7 @@ export type UserScalarWhereWithAggregatesInput = {
 
 export type UserCreateInput = {
 	id?: string;
-	phoneHash: string;
-	phoneVerifiedAt?: Date | string | null;
+	email: string;
 	createdAt?: Date | string | null;
 	lastLoginAt?: Date | string | null;
 	reports?: Prisma.ReportCreateNestedManyWithoutUserInput;
@@ -269,8 +244,7 @@ export type UserCreateInput = {
 
 export type UserUncheckedCreateInput = {
 	id?: string;
-	phoneHash: string;
-	phoneVerifiedAt?: Date | string | null;
+	email: string;
 	createdAt?: Date | string | null;
 	lastLoginAt?: Date | string | null;
 	reports?: Prisma.ReportUncheckedCreateNestedManyWithoutUserInput;
@@ -278,12 +252,7 @@ export type UserUncheckedCreateInput = {
 
 export type UserUpdateInput = {
 	id?: Prisma.StringFieldUpdateOperationsInput | string;
-	phoneHash?: Prisma.StringFieldUpdateOperationsInput | string;
-	phoneVerifiedAt?:
-		| Prisma.NullableDateTimeFieldUpdateOperationsInput
-		| Date
-		| string
-		| null;
+	email?: Prisma.StringFieldUpdateOperationsInput | string;
 	createdAt?:
 		| Prisma.NullableDateTimeFieldUpdateOperationsInput
 		| Date
@@ -299,12 +268,7 @@ export type UserUpdateInput = {
 
 export type UserUncheckedUpdateInput = {
 	id?: Prisma.StringFieldUpdateOperationsInput | string;
-	phoneHash?: Prisma.StringFieldUpdateOperationsInput | string;
-	phoneVerifiedAt?:
-		| Prisma.NullableDateTimeFieldUpdateOperationsInput
-		| Date
-		| string
-		| null;
+	email?: Prisma.StringFieldUpdateOperationsInput | string;
 	createdAt?:
 		| Prisma.NullableDateTimeFieldUpdateOperationsInput
 		| Date
@@ -320,20 +284,14 @@ export type UserUncheckedUpdateInput = {
 
 export type UserCreateManyInput = {
 	id?: string;
-	phoneHash: string;
-	phoneVerifiedAt?: Date | string | null;
+	email: string;
 	createdAt?: Date | string | null;
 	lastLoginAt?: Date | string | null;
 };
 
 export type UserUpdateManyMutationInput = {
 	id?: Prisma.StringFieldUpdateOperationsInput | string;
-	phoneHash?: Prisma.StringFieldUpdateOperationsInput | string;
-	phoneVerifiedAt?:
-		| Prisma.NullableDateTimeFieldUpdateOperationsInput
-		| Date
-		| string
-		| null;
+	email?: Prisma.StringFieldUpdateOperationsInput | string;
 	createdAt?:
 		| Prisma.NullableDateTimeFieldUpdateOperationsInput
 		| Date
@@ -348,12 +306,7 @@ export type UserUpdateManyMutationInput = {
 
 export type UserUncheckedUpdateManyInput = {
 	id?: Prisma.StringFieldUpdateOperationsInput | string;
-	phoneHash?: Prisma.StringFieldUpdateOperationsInput | string;
-	phoneVerifiedAt?:
-		| Prisma.NullableDateTimeFieldUpdateOperationsInput
-		| Date
-		| string
-		| null;
+	email?: Prisma.StringFieldUpdateOperationsInput | string;
 	createdAt?:
 		| Prisma.NullableDateTimeFieldUpdateOperationsInput
 		| Date
@@ -368,24 +321,21 @@ export type UserUncheckedUpdateManyInput = {
 
 export type UserCountOrderByAggregateInput = {
 	id?: Prisma.SortOrder;
-	phoneHash?: Prisma.SortOrder;
-	phoneVerifiedAt?: Prisma.SortOrder;
+	email?: Prisma.SortOrder;
 	createdAt?: Prisma.SortOrder;
 	lastLoginAt?: Prisma.SortOrder;
 };
 
 export type UserMaxOrderByAggregateInput = {
 	id?: Prisma.SortOrder;
-	phoneHash?: Prisma.SortOrder;
-	phoneVerifiedAt?: Prisma.SortOrder;
+	email?: Prisma.SortOrder;
 	createdAt?: Prisma.SortOrder;
 	lastLoginAt?: Prisma.SortOrder;
 };
 
 export type UserMinOrderByAggregateInput = {
 	id?: Prisma.SortOrder;
-	phoneHash?: Prisma.SortOrder;
-	phoneVerifiedAt?: Prisma.SortOrder;
+	email?: Prisma.SortOrder;
 	createdAt?: Prisma.SortOrder;
 	lastLoginAt?: Prisma.SortOrder;
 };
@@ -429,16 +379,14 @@ export type UserUpdateOneWithoutReportsNestedInput = {
 
 export type UserCreateWithoutReportsInput = {
 	id?: string;
-	phoneHash: string;
-	phoneVerifiedAt?: Date | string | null;
+	email: string;
 	createdAt?: Date | string | null;
 	lastLoginAt?: Date | string | null;
 };
 
 export type UserUncheckedCreateWithoutReportsInput = {
 	id?: string;
-	phoneHash: string;
-	phoneVerifiedAt?: Date | string | null;
+	email: string;
 	createdAt?: Date | string | null;
 	lastLoginAt?: Date | string | null;
 };
@@ -473,12 +421,7 @@ export type UserUpdateToOneWithWhereWithoutReportsInput = {
 
 export type UserUpdateWithoutReportsInput = {
 	id?: Prisma.StringFieldUpdateOperationsInput | string;
-	phoneHash?: Prisma.StringFieldUpdateOperationsInput | string;
-	phoneVerifiedAt?:
-		| Prisma.NullableDateTimeFieldUpdateOperationsInput
-		| Date
-		| string
-		| null;
+	email?: Prisma.StringFieldUpdateOperationsInput | string;
 	createdAt?:
 		| Prisma.NullableDateTimeFieldUpdateOperationsInput
 		| Date
@@ -493,12 +436,7 @@ export type UserUpdateWithoutReportsInput = {
 
 export type UserUncheckedUpdateWithoutReportsInput = {
 	id?: Prisma.StringFieldUpdateOperationsInput | string;
-	phoneHash?: Prisma.StringFieldUpdateOperationsInput | string;
-	phoneVerifiedAt?:
-		| Prisma.NullableDateTimeFieldUpdateOperationsInput
-		| Date
-		| string
-		| null;
+	email?: Prisma.StringFieldUpdateOperationsInput | string;
 	createdAt?:
 		| Prisma.NullableDateTimeFieldUpdateOperationsInput
 		| Date
@@ -555,8 +493,7 @@ export type UserSelect<
 > = runtime.Types.Extensions.GetSelect<
 	{
 		id?: boolean;
-		phoneHash?: boolean;
-		phoneVerifiedAt?: boolean;
+		email?: boolean;
 		createdAt?: boolean;
 		lastLoginAt?: boolean;
 		reports?: boolean | Prisma.User$reportsArgs<ExtArgs>;
@@ -571,8 +508,7 @@ export type UserSelectCreateManyAndReturn<
 > = runtime.Types.Extensions.GetSelect<
 	{
 		id?: boolean;
-		phoneHash?: boolean;
-		phoneVerifiedAt?: boolean;
+		email?: boolean;
 		createdAt?: boolean;
 		lastLoginAt?: boolean;
 	},
@@ -585,8 +521,7 @@ export type UserSelectUpdateManyAndReturn<
 > = runtime.Types.Extensions.GetSelect<
 	{
 		id?: boolean;
-		phoneHash?: boolean;
-		phoneVerifiedAt?: boolean;
+		email?: boolean;
 		createdAt?: boolean;
 		lastLoginAt?: boolean;
 	},
@@ -595,8 +530,7 @@ export type UserSelectUpdateManyAndReturn<
 
 export type UserSelectScalar = {
 	id?: boolean;
-	phoneHash?: boolean;
-	phoneVerifiedAt?: boolean;
+	email?: boolean;
 	createdAt?: boolean;
 	lastLoginAt?: boolean;
 };
@@ -605,7 +539,7 @@ export type UserOmit<
 	ExtArgs extends
 		runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs,
 > = runtime.Types.Extensions.GetOmit<
-	"id" | "phoneHash" | "phoneVerifiedAt" | "createdAt" | "lastLoginAt",
+	"id" | "email" | "createdAt" | "lastLoginAt",
 	ExtArgs["result"]["user"]
 >;
 export type UserInclude<
@@ -635,8 +569,7 @@ export type $UserPayload<
 	scalars: runtime.Types.Extensions.GetPayloadResult<
 		{
 			id: string;
-			phoneHash: string;
-			phoneVerifiedAt: Date | null;
+			email: string;
 			createdAt: Date | null;
 			lastLoginAt: Date | null;
 		},
@@ -1243,8 +1176,7 @@ export interface Prisma__UserClient<
  */
 export interface UserFieldRefs {
 	readonly id: Prisma.FieldRef<"User", "String">;
-	readonly phoneHash: Prisma.FieldRef<"User", "String">;
-	readonly phoneVerifiedAt: Prisma.FieldRef<"User", "DateTime">;
+	readonly email: Prisma.FieldRef<"User", "String">;
 	readonly createdAt: Prisma.FieldRef<"User", "DateTime">;
 	readonly lastLoginAt: Prisma.FieldRef<"User", "DateTime">;
 }

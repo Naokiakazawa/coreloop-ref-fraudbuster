@@ -6,7 +6,6 @@ function createReport(params: {
 	id: string;
 	title: string;
 	description: string;
-	viewCount: number;
 	createdAt: string;
 }): ReportSummary {
 	return {
@@ -15,7 +14,6 @@ function createReport(params: {
 		title: params.title,
 		description: params.description,
 		createdAt: params.createdAt,
-		viewCount: params.viewCount,
 		riskScore: 85,
 		platform: { id: 1, name: "LINE" },
 		category: { id: 1, name: "フィッシング" },
@@ -39,7 +37,6 @@ function createReportRange(
 			id: `${prefix}-${number}`,
 			title: `${prefix} 通報 ${number}`,
 			description: `${prefix} の説明 ${number}`,
-			viewCount: 100 + number,
 			createdAt: date.toISOString(),
 		});
 	});
@@ -56,7 +53,6 @@ newestItems.unshift(
 		id: "newest-1",
 		title: "最新: Amazonなりすまし",
 		description: "最新順の先頭データ",
-		viewCount: 120,
 		createdAt: "2026-02-15T12:00:00.000Z",
 	}),
 );
@@ -72,7 +68,6 @@ popularItems.unshift(
 		id: "popular-1",
 		title: "話題: 高リスク投資詐欺",
 		description: "人気順の先頭データ",
-		viewCount: 9999,
 		createdAt: "2026-02-01T12:00:00.000Z",
 	}),
 );
@@ -98,7 +93,6 @@ const SEARCH_PAGE: ReportsListResponse = {
 			id: "search-1",
 			title: "LINE緊急確認",
 			description: "検索結果データ",
-			viewCount: 321,
 			createdAt: "2026-02-15T09:00:00.000Z",
 		}),
 	],

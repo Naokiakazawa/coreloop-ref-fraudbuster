@@ -118,8 +118,7 @@ export type ReportStatusScalarFieldEnum =
 
 export const UserScalarFieldEnum = {
 	id: "id",
-	phoneHash: "phoneHash",
-	phoneVerifiedAt: "phoneVerifiedAt",
+	email: "email",
 	createdAt: "createdAt",
 	lastLoginAt: "lastLoginAt",
 } as const;
