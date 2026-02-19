@@ -1,5 +1,6 @@
 import { isIP } from "node:net";
 import { customAlphabet } from "nanoid";
+import { revalidateTag } from "next/cache";
 import type { NextRequest } from "next/server";
 import {
 	badRequestResponse,
@@ -607,6 +608,13 @@ export async function POST(request: NextRequest) {
 				description: "システムによる自動受付完了",
 			},
 		});
+
+		try {
+			revalidateTag("reports", "max");
+			revalidateTag("home-stats", "max");
+		} catch (cacheError) {
+			console.error("Failed to revalidate cache tags:", cacheError);
+		}
 
 		return successResponse(report, 201);
 	} catch (error) {

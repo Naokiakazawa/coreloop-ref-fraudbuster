@@ -1,52 +1,69 @@
 import { TrendingUp } from "lucide-react";
+import { unstable_cache } from "next/cache";
 import Link from "next/link";
+import { connection } from "next/server";
 
 import { HomeReportsGrid } from "@/components/home-reports-grid";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { prisma } from "@/lib/prisma";
 
-export const dynamic = "force-dynamic";
+const getCurrentStatus = unstable_cache(
+	async () => {
+		const [totalReports, todayReports, categoryStats] = await Promise.all([
+			prisma.report.count(),
+			prisma.report.count({
+				where: {
+					createdAt: {
+						gte: new Date(new Date().setHours(0, 0, 0, 0)),
+					},
+				},
+			}),
+			prisma.fraudCategory.findMany({
+				select: {
+					name: true,
+					_count: {
+						select: { reports: true },
+					},
+				},
+				orderBy: {
+					reports: {
+						_count: "desc",
+					},
+				},
+				take: 3,
+			}),
+		]);
+
+		const totalWithReports = categoryStats.reduce(
+			(acc, cat) => acc + cat._count.reports,
+			0,
+		);
+
+		const categories = categoryStats.map((cat) => ({
+			name: cat.name,
+			percentage:
+				totalWithReports > 0
+					? Math.round((cat._count.reports / totalWithReports) * 100)
+					: 0,
+		}));
+
+		return {
+			totalReports,
+			todayReports,
+			categories,
+		};
+	},
+	["home-current-status"],
+	{
+		tags: ["reports", "home-stats"],
+		revalidate: 60,
+	},
+);
 
 export default async function Home() {
-	// Fetch real stats from database
-	const [totalReports, todayReports, categoryStats] = await Promise.all([
-		prisma.report.count(),
-		prisma.report.count({
-			where: {
-				createdAt: {
-					gte: new Date(new Date().setHours(0, 0, 0, 0)),
-				},
-			},
-		}),
-		prisma.fraudCategory.findMany({
-			select: {
-				name: true,
-				_count: {
-					select: { reports: true },
-				},
-			},
-			orderBy: {
-				reports: {
-					_count: "desc",
-				},
-			},
-			take: 3,
-		}),
-	]);
-
-	const totalWithReports = categoryStats.reduce(
-		(acc, cat) => acc + cat._count.reports,
-		0,
-	);
-
-	const formattedCategoryStats = categoryStats.map((cat) => ({
-		name: cat.name,
-		percentage:
-			totalWithReports > 0
-				? Math.round((cat._count.reports / totalWithReports) * 100)
-				: 0,
-	}));
+	await connection();
+	const { totalReports, todayReports, categories } = await getCurrentStatus();
 
 	return (
 		<div className="flex flex-col gap-12 pb-20">
@@ -78,7 +95,7 @@ export default async function Home() {
 						<CurrentStatusCard
 							totalReports={totalReports}
 							todayReports={todayReports}
-							categories={formattedCategoryStats}
+							categories={categories}
 						/>
 					</div>
 				</div>

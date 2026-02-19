@@ -1,13 +1,33 @@
 import { ArrowLeft, Calendar, Megaphone, User } from "lucide-react";
+import { unstable_cache } from "next/cache";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { connection } from "next/server";
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { prisma } from "@/lib/prisma";
 
-export const dynamic = "force-dynamic";
+const getAnnouncementById = unstable_cache(
+	async (id: string) =>
+		prisma.announcement.findUnique({
+			where: { id },
+			include: {
+				tags: {
+					include: { tag: true },
+				},
+				admin: {
+					select: { name: true },
+				},
+			},
+		}),
+	["announcement-detail"],
+	{
+		tags: ["announcements"],
+		revalidate: 300,
+	},
+);
 
 interface AnnouncementDetailPageProps {
 	params: Promise<{ id: string }>;
@@ -17,18 +37,9 @@ export default async function AnnouncementDetailPage({
 	params,
 }: AnnouncementDetailPageProps) {
 	const { id } = await params;
+	await connection();
 
-	const announcement = await prisma.announcement.findUnique({
-		where: { id },
-		include: {
-			tags: {
-				include: { tag: true },
-			},
-			admin: {
-				select: { name: true },
-			},
-		},
-	});
+	const announcement = await getAnnouncementById(id);
 
 	if (!announcement) {
 		notFound();

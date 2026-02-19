@@ -6,15 +6,36 @@ import {
 	ExternalLink,
 	Share2,
 } from "lucide-react";
+import { unstable_cache } from "next/cache";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { connection } from "next/server";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { prisma } from "@/lib/prisma";
 
-export const dynamic = "force-dynamic";
+const getReportById = unstable_cache(
+	async (id: string) =>
+		prisma.report.findUnique({
+			where: { id },
+			include: {
+				platform: true,
+				category: true,
+				status: true,
+				timelines: {
+					orderBy: { occurredAt: "asc" as const },
+					include: { admin: { select: { name: true } } },
+				},
+			},
+		}),
+	["report-detail"],
+	{
+		tags: ["reports"],
+		revalidate: 60,
+	},
+);
 
 interface ReportDetailPageProps {
 	params: Promise<{ id: string }>;
@@ -24,19 +45,9 @@ export default async function ReportDetailPage({
 	params,
 }: ReportDetailPageProps) {
 	const { id } = await params;
+	await connection();
 
-	const report = await prisma.report.findUnique({
-		where: { id },
-		include: {
-			platform: true,
-			category: true,
-			status: true,
-			timelines: {
-				orderBy: { occurredAt: "asc" as const },
-				include: { admin: { select: { name: true } } },
-			},
-		},
-	});
+	const report = await getReportById(id);
 
 	if (!report) {
 		notFound();

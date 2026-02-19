@@ -1,20 +1,31 @@
 import { Calendar, ChevronRight } from "lucide-react";
+import { unstable_cache } from "next/cache";
 import Link from "next/link";
+import { connection } from "next/server";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { prisma } from "@/lib/prisma";
 
-export const dynamic = "force-dynamic";
+const getAnnouncements = unstable_cache(
+	async () =>
+		prisma.announcement.findMany({
+			include: {
+				tags: {
+					include: { tag: true },
+				},
+			},
+			orderBy: { createdAt: "desc" },
+		}),
+	["announcements-list"],
+	{
+		tags: ["announcements"],
+		revalidate: 300,
+	},
+);
 
 export default async function AnnouncementsPage() {
-	const announcements = await prisma.announcement.findMany({
-		include: {
-			tags: {
-				include: { tag: true },
-			},
-		},
-		orderBy: { createdAt: "desc" },
-	});
+	await connection();
+	const announcements = await getAnnouncements();
 
 	return (
 		<div className="container py-12 space-y-10">
