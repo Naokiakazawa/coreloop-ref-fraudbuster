@@ -14,6 +14,8 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { prisma } from "@/lib/prisma";
 
+export const dynamic = "force-dynamic";
+
 interface ReportDetailPageProps {
 	params: Promise<{ id: string }>;
 }
