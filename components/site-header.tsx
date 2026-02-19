@@ -38,9 +38,9 @@ export function SiteHeader() {
 								key={item.href}
 								href={item.href}
 								className={cn(
-									"transition-colors hover:text-foreground/80",
+									"relative pb-1 transition-colors hover:text-foreground/80 after:absolute after:left-0 after:-bottom-1 after:h-0.5 after:w-full after:scale-x-0 after:bg-blue-500 after:transition-transform after:duration-200 after:content-['']",
 									isActive(item.href)
-										? "font-bold text-foreground"
+										? "font-bold text-foreground after:scale-x-100"
 										: "text-foreground/60",
 								)}
 							>
