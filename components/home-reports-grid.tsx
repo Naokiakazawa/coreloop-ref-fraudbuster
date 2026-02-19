@@ -96,9 +96,9 @@ function ReportSummaryCard({ report }: { report: ReportSummary }) {
 			className="block h-full"
 			data-testid="report-card"
 		>
-			<Card className="group h-full transition-all hover:-translate-y-0.5 hover:shadow-md">
-				<CardContent className="flex h-full flex-col gap-4 p-5">
-					<div className="aspect-video w-full overflow-hidden rounded-xl bg-muted/70">
+			<Card className="group transition-all hover:-translate-y-0.5 hover:shadow-md">
+				<CardContent className="flex items-start gap-4 p-4 sm:p-5">
+					<div className="h-24 w-36 shrink-0 overflow-hidden rounded-lg bg-muted/70 sm:h-28 sm:w-44">
 						{thumbnailUrl && !hasThumbnailError ? (
 							<img
 								src={thumbnailUrl}
@@ -115,37 +115,38 @@ function ReportSummaryCard({ report }: { report: ReportSummary }) {
 							</div>
 						)}
 					</div>
+					<div className="flex min-w-0 flex-1 flex-col gap-3">
+						<div className="flex flex-wrap items-center gap-2">
+							<Badge variant="secondary">
+								{report.category?.name || "未分類"}
+							</Badge>
+							<Badge variant="outline">
+								{report.platform?.name || "不明なプラットフォーム"}
+							</Badge>
+							{report.status?.label ? (
+								<Badge variant="outline">{report.status.label}</Badge>
+							) : null}
+							<span className="ml-auto text-xs text-muted-foreground">
+								{formatDate(report.createdAt)}
+							</span>
+						</div>
 
-					<div className="flex flex-wrap items-center gap-2">
-						<Badge variant="secondary">
-							{report.category?.name || "未分類"}
-						</Badge>
-						<Badge variant="outline">
-							{report.platform?.name || "不明なプラットフォーム"}
-						</Badge>
-						{report.status?.label ? (
-							<Badge variant="outline">{report.status.label}</Badge>
-						) : null}
-						<span className="ml-auto text-xs text-muted-foreground">
-							{formatDate(report.createdAt)}
-						</span>
-					</div>
+						<div className="space-y-1.5">
+							<h3 className="line-clamp-2 text-base font-bold leading-tight group-hover:text-primary">
+								{report.title || "（タイトルなし）"}
+							</h3>
+							<p className="line-clamp-2 text-sm text-muted-foreground">
+								{report.description || report.url}
+							</p>
+						</div>
 
-					<div className="space-y-2">
-						<h3 className="line-clamp-2 text-base font-bold leading-tight group-hover:text-primary">
-							{report.title || "（タイトルなし）"}
-						</h3>
-						<p className="line-clamp-3 text-sm text-muted-foreground">
-							{report.description || report.url}
-						</p>
-					</div>
-
-					<div className="mt-auto flex items-center justify-between gap-3 pt-2">
-						<div
-							className={`inline-flex items-center gap-1 rounded-full border px-2.5 py-1 text-xs font-medium ${riskStyle(report.riskScore)}`}
-						>
-							<AlertTriangle className="h-3.5 w-3.5" />
-							<span>リスク {report.riskScore ?? 0}</span>
+						<div className="mt-auto flex items-center justify-between gap-3 pt-1">
+							<div
+								className={`inline-flex items-center gap-1 rounded-full border px-2.5 py-1 text-xs font-medium ${riskStyle(report.riskScore)}`}
+							>
+								<AlertTriangle className="h-3.5 w-3.5" />
+								<span>リスク {report.riskScore ?? 0}</span>
+							</div>
 						</div>
 					</div>
 				</CardContent>
@@ -329,14 +330,21 @@ export function HomeReportsGrid() {
 			</div>
 
 			{!hasLoadedInitial ? (
-				<div className="grid grid-cols-1 gap-5 sm:grid-cols-2 xl:grid-cols-3">
+				<div className="grid grid-cols-1 gap-4 md:grid-cols-2">
 					{INITIAL_SKELETON_IDS.map((id) => (
 						<Card key={id}>
-							<CardContent className="space-y-4 p-5">
-								<Skeleton className="aspect-video w-full rounded-xl" />
-								<Skeleton className="h-5 w-2/3" />
-								<Skeleton className="h-4 w-full" />
-								<Skeleton className="h-4 w-5/6" />
+							<CardContent className="flex items-start gap-4 p-4 sm:p-5">
+								<Skeleton className="h-24 w-36 shrink-0 rounded-lg sm:h-28 sm:w-44" />
+								<div className="flex min-w-0 flex-1 flex-col gap-3">
+									<div className="flex gap-2">
+										<Skeleton className="h-5 w-16 rounded-full" />
+										<Skeleton className="h-5 w-24 rounded-full" />
+									</div>
+									<Skeleton className="h-5 w-3/4" />
+									<Skeleton className="h-4 w-full" />
+									<Skeleton className="h-4 w-5/6" />
+									<Skeleton className="h-6 w-24 rounded-full" />
+								</div>
 							</CardContent>
 						</Card>
 					))}
@@ -355,7 +363,7 @@ export function HomeReportsGrid() {
 					) : null}
 
 					{reports.length > 0 ? (
-						<div className="grid grid-cols-1 gap-5 sm:grid-cols-2 xl:grid-cols-3">
+						<div className="grid grid-cols-1 gap-4 md:grid-cols-2">
 							{reports.map((report) => (
 								<ReportSummaryCard key={report.id} report={report} />
 							))}
