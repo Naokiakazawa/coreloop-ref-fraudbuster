@@ -34,6 +34,10 @@ const MAX_SUBMISSIONS_PER_WINDOW = 5;
 const MIN_SUBMISSION_INTERVAL_MS = 10 * 1000;
 const MIN_FORM_COMPLETION_MS = 6 * 1000;
 const rateLimitStore = new Map<string, number[]>();
+const PREVIEW_FETCH_TIMEOUT_MS = 6_000;
+const MAX_PREVIEW_CONTENT_LENGTH = 3_000_000;
+const PREVIEW_USER_AGENT =
+	"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/137.0.0.0 Safari/537.36";
 const TURNSTILE_VERIFY_ENDPOINT =
 	"https://challenges.cloudflare.com/turnstile/v0/siteverify";
 const createReportId = customAlphabet(
@@ -249,6 +253,41 @@ function parsePublicHttpUrl(value: string): URL | null {
 	}
 }
 
+function hasExplicitScheme(value: string): boolean {
+	return /^[a-zA-Z][a-zA-Z\d+\-.]*:/.test(value.trim());
+}
+
+function isHtmlLikeContentType(contentType: string): boolean {
+	const normalized = contentType.toLowerCase();
+	return (
+		normalized.includes("text/html") ||
+		normalized.includes("application/xhtml+xml")
+	);
+}
+
+function looksLikeHtmlDocument(html: string): boolean {
+	const headChunk = html.slice(0, 10_000);
+	return /<(html|head|title|meta)\b/i.test(headChunk);
+}
+
+function buildPreviewCandidateUrls(rawUrl: string): URL[] {
+	const primary = parsePublicHttpUrl(rawUrl);
+	if (!primary) return [];
+
+	const candidates = [primary];
+	if (!hasExplicitScheme(rawUrl) && primary.protocol === "https:") {
+		try {
+			const httpFallback = new URL(primary.toString());
+			httpFallback.protocol = "http:";
+			candidates.push(httpFallback);
+		} catch {
+			// Ignore malformed fallback URL and continue with the primary candidate only.
+		}
+	}
+
+	return candidates;
+}
+
 function resolveThumbnailUrl(candidate: string, baseUrl: URL): string | null {
 	try {
 		const normalized = new URL(candidate.replaceAll("&amp;", "&"), baseUrl);
@@ -290,7 +329,12 @@ function extractTitleFromHtml(html: string): string | null {
 			extractAttributeValue(tag, "name") ??
 			""
 		).toLowerCase();
-		if (key !== "og:title" && key !== "twitter:title" && key !== "title") {
+		if (
+			key !== "og:title" &&
+			key !== "twitter:title" &&
+			key !== "twitter:text:title" &&
+			key !== "title"
+		) {
 			continue;
 		}
 
@@ -321,6 +365,7 @@ function extractThumbnailFromHtml(html: string, pageUrl: URL): string | null {
 		if (
 			key !== "og:image" &&
 			key !== "og:image:url" &&
+			key !== "og:image:secure_url" &&
 			key !== "twitter:image" &&
 			key !== "twitter:image:src"
 		) {
@@ -357,14 +402,14 @@ function extractThumbnailFromHtml(html: string, pageUrl: URL): string | null {
 	return null;
 }
 
-async function fetchReportLinkPreview(
-	rawUrl: string,
-): Promise<ReportLinkPreview> {
-	const targetUrl = parsePublicHttpUrl(rawUrl);
-	if (!targetUrl) return { title: null, thumbnailUrl: null };
-
+async function fetchPreviewDocument(
+	targetUrl: URL,
+): Promise<{ html: string; finalUrl: URL } | null> {
 	const controller = new AbortController();
-	const timeoutId = setTimeout(() => controller.abort(), 3500);
+	const timeoutId = setTimeout(
+		() => controller.abort(),
+		PREVIEW_FETCH_TIMEOUT_MS,
+	);
 
 	try {
 		const response = await fetch(targetUrl.toString(), {
@@ -373,41 +418,75 @@ async function fetchReportLinkPreview(
 			signal: controller.signal,
 			cache: "no-store",
 			headers: {
-				Accept: "text/html,application/xhtml+xml",
-				"User-Agent": "AntiFraudBot/1.0 (+https://antifraud.local)",
+				Accept:
+					"text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
+				"Accept-Language": "ja,en-US;q=0.9,en;q=0.8",
+				"User-Agent": PREVIEW_USER_AGENT,
 			},
 		});
 
-		if (!response.ok) return { title: null, thumbnailUrl: null };
-		const contentType = (
-			response.headers.get("content-type") ?? ""
-		).toLowerCase();
-		if (!contentType.includes("text/html")) {
-			return { title: null, thumbnailUrl: null };
-		}
+		if (!response.ok) return null;
+
 		const contentLength = Number.parseInt(
 			response.headers.get("content-length") ?? "",
 			10,
 		);
-		if (!Number.isNaN(contentLength) && contentLength > 1_500_000) {
-			return { title: null, thumbnailUrl: null };
+		if (
+			!Number.isNaN(contentLength) &&
+			contentLength > MAX_PREVIEW_CONTENT_LENGTH
+		) {
+			return null;
 		}
 
 		const html = await response.text();
-		const finalUrl = parsePublicHttpUrl(response.url) ?? targetUrl;
+		const contentType = (
+			response.headers.get("content-type") ?? ""
+		).toLowerCase();
+		const isHtmlByHeader = isHtmlLikeContentType(contentType);
+		if (!isHtmlByHeader && !looksLikeHtmlDocument(html)) {
+			return null;
+		}
+
 		return {
-			title: extractTitleFromHtml(html),
-			thumbnailUrl: extractThumbnailFromHtml(html, finalUrl),
+			html,
+			finalUrl: parsePublicHttpUrl(response.url) ?? targetUrl,
 		};
 	} catch (error) {
 		if (error instanceof DOMException && error.name === "AbortError") {
-			return { title: null, thumbnailUrl: null };
+			return null;
 		}
-		console.error("Failed to fetch report preview:", error);
-		return { title: null, thumbnailUrl: null };
+		console.error("Failed to fetch report preview document:", error);
+		return null;
 	} finally {
 		clearTimeout(timeoutId);
 	}
+}
+
+async function fetchReportLinkPreview(
+	rawUrl: string,
+): Promise<ReportLinkPreview> {
+	const candidates = buildPreviewCandidateUrls(rawUrl);
+	if (candidates.length === 0) {
+		return { title: null, thumbnailUrl: null };
+	}
+
+	let title: string | null = null;
+	let thumbnailUrl: string | null = null;
+
+	for (const candidate of candidates) {
+		const previewDocument = await fetchPreviewDocument(candidate);
+		if (!previewDocument) continue;
+
+		title ??= extractTitleFromHtml(previewDocument.html);
+		thumbnailUrl ??= extractThumbnailFromHtml(
+			previewDocument.html,
+			previewDocument.finalUrl,
+		);
+
+		if (title && thumbnailUrl) break;
+	}
+
+	return { title, thumbnailUrl };
 }
 
 /**
