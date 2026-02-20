@@ -59,6 +59,17 @@ type WindowWithTurnstile = Window & { turnstile?: TurnstileApi };
 type Step = "basic" | "details" | "verify" | "complete";
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
+function RequiredAsterisk() {
+	return (
+		<>
+			<span aria-hidden="true" className="ml-1 text-destructive">
+				*
+			</span>
+			<span className="sr-only">必須</span>
+		</>
+	);
+}
+
 export default function NewReportPage() {
 	const turnstileSiteKey = process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY ?? "";
 	const router = useRouter();
@@ -89,6 +100,10 @@ export default function NewReportPage() {
 	}[step];
 	const email = formData.email.trim().toLowerCase();
 	const isEmailValid = EMAIL_PATTERN.test(email);
+	const isBasicInfoComplete =
+		formData.url.trim().length > 0 &&
+		formData.platformId.length > 0 &&
+		formData.categoryId.length > 0;
 
 	React.useEffect(() => {
 		if (step !== "verify") return;
@@ -133,6 +148,18 @@ export default function NewReportPage() {
 	}, [turnstileWidgetId]);
 
 	const handleSubmit = async () => {
+		if (!formData.url.trim()) {
+			toast.error("通報対象のURLを入力してください。");
+			return;
+		}
+		if (!formData.platformId) {
+			toast.error("プラットフォームを選択してください。");
+			return;
+		}
+		if (!formData.categoryId) {
+			toast.error("カテゴリーを選択してください。");
+			return;
+		}
 		if (!email) {
 			toast.error("メールアドレスを入力してください。");
 			return;
@@ -156,7 +183,7 @@ export default function NewReportPage() {
 				method: "POST",
 				headers: { "Content-Type": "application/json" },
 				body: JSON.stringify({
-					url: formData.url,
+					url: formData.url.trim(),
 					title: formData.title,
 					description: formData.description,
 					email,
@@ -194,9 +221,21 @@ export default function NewReportPage() {
 	};
 
 	const nextStep = () => {
-		if (step === "basic") setStep("details");
-		else if (step === "details") setStep("verify");
-		else if (step === "verify") handleSubmit();
+		if (step === "basic") {
+			if (!isBasicInfoComplete) {
+				toast.error("URL・プラットフォーム・カテゴリーは必須です。");
+				return;
+			}
+			setStep("details");
+			return;
+		}
+		if (step === "details") {
+			setStep("verify");
+			return;
+		}
+		if (step === "verify") {
+			handleSubmit();
+		}
 	};
 
 	const prevStep = () => {
@@ -253,7 +292,10 @@ export default function NewReportPage() {
 					</CardHeader>
 					<CardContent className="space-y-6">
 						<div className="space-y-2">
-							<Label htmlFor="url">通報対象のURL (必須)</Label>
+							<Label htmlFor="url">
+								通報対象のURL
+								<RequiredAsterisk />
+							</Label>
 							<Input
 								id="url"
 								placeholder="https://example.com/login"
@@ -269,7 +311,10 @@ export default function NewReportPage() {
 						</div>
 						<div className="grid grid-cols-2 gap-4">
 							<div className="space-y-2">
-								<Label>プラットフォーム</Label>
+								<Label>
+									プラットフォーム
+									<RequiredAsterisk />
+								</Label>
 								<Select
 									value={formData.platformId}
 									onValueChange={(v) =>
@@ -284,6 +329,7 @@ export default function NewReportPage() {
 										<SelectItem value="2">LINE</SelectItem>
 										<SelectItem value="3">Instagram</SelectItem>
 										<SelectItem value="4">Threads</SelectItem>
+										<SelectItem value="8">X</SelectItem>
 										<SelectItem value="5">Google</SelectItem>
 										<SelectItem value="6">TikTok</SelectItem>
 										<SelectItem value="7">その他 (Meta等)</SelectItem>
@@ -291,7 +337,10 @@ export default function NewReportPage() {
 								</Select>
 							</div>
 							<div className="space-y-2">
-								<Label>カテゴリー</Label>
+								<Label>
+									カテゴリー
+									<RequiredAsterisk />
+								</Label>
 								<Select
 									value={formData.categoryId}
 									onValueChange={(v) =>
@@ -317,7 +366,7 @@ export default function NewReportPage() {
 						<Button
 							className="w-full h-12 rounded-xl"
 							onClick={nextStep}
-							disabled={!formData.url}
+							disabled={!isBasicInfoComplete}
 						>
 							次へ進む
 							<ArrowRight className="ml-2 h-4 w-4" />
@@ -416,7 +465,10 @@ export default function NewReportPage() {
 						<Separator />
 
 						<div className="space-y-2">
-							<Label htmlFor="verifyEmail">連絡用メールアドレス (必須)</Label>
+							<Label htmlFor="verifyEmail">
+								連絡用メールアドレス
+								<RequiredAsterisk />
+							</Label>
 							<Input
 								id="verifyEmail"
 								type="email"
@@ -427,9 +479,7 @@ export default function NewReportPage() {
 									setFormData({ ...formData, email: e.target.value })
 								}
 							/>
-							<p className="text-xs text-muted-foreground">
-								内容確認のために連絡する場合があります。
-							</p>
+							<p className="text-xs text-muted-foreground"></p>
 						</div>
 
 						<div className="space-y-3">

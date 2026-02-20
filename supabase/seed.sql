@@ -36,6 +36,7 @@ INSERT INTO platforms (name, icon_url, is_active) VALUES
   ('LINE', '/icons/platforms/line.svg', TRUE),
   ('Instagram', '/icons/platforms/instagram.svg', TRUE),
   ('Threads', '/icons/platforms/threads.svg', TRUE),
+  ('X', '/icons/platforms/x.svg', TRUE),
   ('Google', '/icons/platforms/google.svg', TRUE),
   ('TikTok', '/icons/platforms/tiktok.svg', TRUE),
   ('Meta Audience Network', '/icons/platforms/meta-audience-network.svg', TRUE);

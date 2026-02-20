@@ -538,12 +538,12 @@ export async function POST(request: NextRequest) {
 			typeof body.email === "string" ? body.email.trim().toLowerCase() : "";
 		const platformId =
 			typeof body.platformId === "string" || typeof body.platformId === "number"
-				? String(body.platformId)
-				: null;
+				? parseOptionalInteger(String(body.platformId))
+				: undefined;
 		const categoryId =
 			typeof body.categoryId === "string" || typeof body.categoryId === "number"
-				? String(body.categoryId)
-				: null;
+				? parseOptionalInteger(String(body.categoryId))
+				: undefined;
 		const turnstileToken =
 			typeof body.turnstileToken === "string" ? body.turnstileToken.trim() : "";
 		const spamTrap =
@@ -558,6 +558,12 @@ export async function POST(request: NextRequest) {
 
 		if (!url) {
 			return badRequestResponse("URL is required");
+		}
+		if (!platformId) {
+			return badRequestResponse("プラットフォームは必須です");
+		}
+		if (!categoryId) {
+			return badRequestResponse("カテゴリーは必須です");
 		}
 		if (!email) {
 			return badRequestResponse("メールアドレスは必須です");
@@ -631,8 +637,8 @@ export async function POST(request: NextRequest) {
 				url,
 				title: reportPreview.title ?? title,
 				description,
-				platformId: platformId ? Number.parseInt(platformId) : undefined,
-				categoryId: categoryId ? Number.parseInt(categoryId) : undefined,
+				platformId,
+				categoryId,
 				statusId: 1, // Default to first status (usually 'Pending' or 'Investigating')
 				riskScore: 0,
 				reportCount: 1,

@@ -71,7 +71,6 @@ export default async function Home() {
 					<div className="space-y-6 text-center lg:text-left">
 						<h1 className="text-4xl md:text-6xl font-extrabold tracking-tight text-foreground">
 							あやしいオンライン広告を
-							<br className="hidden sm:block" />
 							<span className="text-primary italic">通報</span>
 						</h1>
 						<p className="text-lg text-muted-foreground max-w-2xl mx-auto lg:mx-0">
