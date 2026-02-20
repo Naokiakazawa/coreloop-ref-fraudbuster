@@ -217,6 +217,14 @@ export default async function ReportDetailPage({
 										const latestIndex = report.timelines.length - 1;
 										const isLatest = idx === latestIndex;
 										const isCompleted = idx < latestIndex;
+										const timelineActionLabel =
+											item.actionLabel === "プラットフォームへ通知"
+												? "関係各所で審査"
+												: item.actionLabel;
+										const timelineDescription =
+											item.actionLabel === "プラットフォームへ通知"
+												? "関係各所と連携し、通報内容の審査を進めています。"
+												: item.description;
 
 										return (
 											<div
@@ -240,14 +248,14 @@ export default async function ReportDetailPage({
 												<div className="space-y-1">
 													<div className="flex items-center gap-2">
 														<p className="text-sm font-bold">
-															{item.actionLabel}
+															{timelineActionLabel}
 														</p>
 														<span className="text-[10px] text-muted-foreground">
 															{formatDate(item.occurredAt, "ja-JP") ?? "不明"}
 														</span>
 													</div>
 													<p className="text-xs text-muted-foreground">
-														{item.description}
+														{timelineDescription}
 													</p>
 													{item.admin && (
 														<Badge

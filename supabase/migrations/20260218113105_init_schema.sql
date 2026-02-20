@@ -91,11 +91,11 @@ CREATE TABLE report_images (
 );
 
 -- 案件の進捗タイムライン（詳細画面の時系列表示用）
--- 例：「通報受付」→「分析中」→「Facebookへ通報済」
+-- 例：「通報受付」→「関係各所で審査」→「詐欺確定」
 CREATE TABLE report_timelines (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     report_id VARCHAR(64) NOT NULL REFERENCES reports(id) ON DELETE CASCADE,
-    action_label VARCHAR(100) NOT NULL, -- 例: "プラットフォームへ通知"
+    action_label VARCHAR(100) NOT NULL, -- 例: "関係各所で審査"
     description TEXT, -- 詳細
     created_by UUID REFERENCES admins(id), -- 操作した管理者（システム自動の場合はNULL）
     occurred_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP -- 実際の発生日時
