@@ -46,6 +46,11 @@ type TurnstileVerificationResult = {
 	errorCodes: string[];
 };
 
+type ReportLinkPreview = {
+	title: string | null;
+	thumbnailUrl: string | null;
+};
+
 function normalizeIp(value: string | null): string | null {
 	if (!value) return null;
 	const trimmed = value.trim();
@@ -259,6 +264,49 @@ function resolveThumbnailUrl(candidate: string, baseUrl: URL): string | null {
 	}
 }
 
+function decodeHtmlEntities(value: string): string {
+	return value
+		.replaceAll("&amp;", "&")
+		.replaceAll("&quot;", '"')
+		.replaceAll("&#39;", "'")
+		.replaceAll("&lt;", "<")
+		.replaceAll("&gt;", ">");
+}
+
+function normalizeTitle(value: string): string | null {
+	const decoded = decodeHtmlEntities(value).replace(/\s+/g, " ").trim();
+	if (!decoded) return null;
+	return decoded.slice(0, 255);
+}
+
+function extractTitleFromHtml(html: string): string | null {
+	const headChunk = html.slice(0, 250_000);
+	const metaTagPattern = /<meta\b[^>]*>/gi;
+	const metaTags = headChunk.match(metaTagPattern) ?? [];
+
+	for (const tag of metaTags) {
+		const key = (
+			extractAttributeValue(tag, "property") ??
+			extractAttributeValue(tag, "name") ??
+			""
+		).toLowerCase();
+		if (key !== "og:title" && key !== "twitter:title" && key !== "title") {
+			continue;
+		}
+
+		const content = extractAttributeValue(tag, "content");
+		if (!content) continue;
+
+		const normalized = normalizeTitle(content);
+		if (normalized) return normalized;
+	}
+
+	const titleTagMatch = headChunk.match(/<title\b[^>]*>([\s\S]*?)<\/title>/i);
+	if (!titleTagMatch?.[1]) return null;
+
+	return normalizeTitle(titleTagMatch[1]);
+}
+
 function extractThumbnailFromHtml(html: string, pageUrl: URL): string | null {
 	const headChunk = html.slice(0, 250_000);
 
@@ -309,9 +357,11 @@ function extractThumbnailFromHtml(html: string, pageUrl: URL): string | null {
 	return null;
 }
 
-async function fetchReportThumbnailUrl(rawUrl: string): Promise<string | null> {
+async function fetchReportLinkPreview(
+	rawUrl: string,
+): Promise<ReportLinkPreview> {
 	const targetUrl = parsePublicHttpUrl(rawUrl);
-	if (!targetUrl) return null;
+	if (!targetUrl) return { title: null, thumbnailUrl: null };
 
 	const controller = new AbortController();
 	const timeoutId = setTimeout(() => controller.abort(), 3500);
@@ -328,26 +378,33 @@ async function fetchReportThumbnailUrl(rawUrl: string): Promise<string | null> {
 			},
 		});
 
-		if (!response.ok) return null;
+		if (!response.ok) return { title: null, thumbnailUrl: null };
 		const contentType = (
 			response.headers.get("content-type") ?? ""
 		).toLowerCase();
-		if (!contentType.includes("text/html")) return null;
+		if (!contentType.includes("text/html")) {
+			return { title: null, thumbnailUrl: null };
+		}
 		const contentLength = Number.parseInt(
 			response.headers.get("content-length") ?? "",
 			10,
 		);
-		if (!Number.isNaN(contentLength) && contentLength > 1_500_000) return null;
+		if (!Number.isNaN(contentLength) && contentLength > 1_500_000) {
+			return { title: null, thumbnailUrl: null };
+		}
 
 		const html = await response.text();
 		const finalUrl = parsePublicHttpUrl(response.url) ?? targetUrl;
-		return extractThumbnailFromHtml(html, finalUrl);
+		return {
+			title: extractTitleFromHtml(html),
+			thumbnailUrl: extractThumbnailFromHtml(html, finalUrl),
+		};
 	} catch (error) {
 		if (error instanceof DOMException && error.name === "AbortError") {
-			return null;
+			return { title: null, thumbnailUrl: null };
 		}
-		console.error("Failed to fetch report thumbnail:", error);
-		return null;
+		console.error("Failed to fetch report preview:", error);
+		return { title: null, thumbnailUrl: null };
 	} finally {
 		clearTimeout(timeoutId);
 	}
@@ -472,7 +529,9 @@ export async function POST(request: NextRequest) {
 	try {
 		const body = await request.json();
 		const url = typeof body.url === "string" ? body.url.trim() : "";
-		const title = typeof body.title === "string" ? body.title : null;
+		const submittedTitle =
+			typeof body.title === "string" ? body.title.trim() : "";
+		const title = submittedTitle.length > 0 ? submittedTitle : null;
 		const description =
 			typeof body.description === "string" ? body.description : null;
 		const email =
@@ -558,7 +617,7 @@ export async function POST(request: NextRequest) {
 			);
 		}
 
-		const thumbnailUrl = await fetchReportThumbnailUrl(url);
+		const reportPreview = await fetchReportLinkPreview(url);
 		const user = await prisma.user.upsert({
 			where: { email },
 			update: { lastLoginAt: new Date() },
@@ -570,7 +629,7 @@ export async function POST(request: NextRequest) {
 				id: createReportId(),
 				userId: user.id,
 				url,
-				title,
+				title: reportPreview.title ?? title,
 				description,
 				platformId: platformId ? Number.parseInt(platformId) : undefined,
 				categoryId: categoryId ? Number.parseInt(categoryId) : undefined,
@@ -578,10 +637,10 @@ export async function POST(request: NextRequest) {
 				riskScore: 0,
 				reportCount: 1,
 				sourceIp: clientIp,
-				images: thumbnailUrl
+				images: reportPreview.thumbnailUrl
 					? {
 							create: {
-								imageUrl: thumbnailUrl,
+								imageUrl: reportPreview.thumbnailUrl,
 								displayOrder: 0,
 							},
 						}

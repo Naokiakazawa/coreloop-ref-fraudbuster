@@ -23,6 +23,14 @@ async function getReportById(id: string) {
 			platform: true,
 			category: true,
 			status: true,
+			images: {
+				select: {
+					id: true,
+					imageUrl: true,
+				},
+				take: 1,
+				orderBy: { displayOrder: "asc" as const },
+			},
 			timelines: {
 				orderBy: { occurredAt: "asc" as const },
 				include: { admin: { select: { name: true } } },
@@ -78,6 +86,7 @@ export default async function ReportDetailPage({
 	};
 	const riskScore = report.riskScore;
 	const shouldMaskRiskScore = riskScore === null || riskScore <= 0;
+	const ogpImageUrl = report.images[0]?.imageUrl ?? null;
 
 	return (
 		<div className="container py-10 space-y-10">
@@ -115,6 +124,27 @@ export default async function ReportDetailPage({
 						<h1 className="text-3xl font-bold tracking-tight">
 							{report.title || "（タイトルなし）"}
 						</h1>
+
+						<div className="space-y-2">
+							<label className="text-xs font-bold text-muted-foreground uppercase">
+								リンクのOGP画像
+							</label>
+							{ogpImageUrl ? (
+								<div className="overflow-hidden rounded-xl border bg-muted/20">
+									<img
+										src={ogpImageUrl}
+										alt={report.title || report.url}
+										loading="lazy"
+										referrerPolicy="no-referrer"
+										className="h-52 w-full object-cover sm:h-64"
+									/>
+								</div>
+							) : (
+								<div className="rounded-lg border bg-muted/40 px-4 py-6 text-sm text-muted-foreground">
+									OGP画像は取得されていません。
+								</div>
+							)}
+						</div>
 
 						<div className="flex items-center gap-4 p-4 rounded-xl bg-muted/30 border">
 							<div className="flex flex-col items-center justify-center px-4 border-r">
