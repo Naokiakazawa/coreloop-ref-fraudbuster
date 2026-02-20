@@ -24,4 +24,11 @@ VERCEL_ORG_ID
 VERCEL_PROJECT_ID
 ```
 
-Set runtime environment variables (e.g. `DATABASE_URL`, `NEXT_PUBLIC_TURNSTILE_SITE_KEY`, `TURNSTILE_SECRET_KEY`) in the Vercel Project settings.
+Set runtime environment variables in the Vercel Project settings.
+
+- `DATABASE_URL`
+- `NEXT_PUBLIC_TURNSTILE_SITE_KEY`
+- `TURNSTILE_SECRET_KEY`
+- `SUPABASE_URL` (or `NEXT_PUBLIC_SUPABASE_URL`)
+- `SUPABASE_SERVICE_ROLE_KEY`
+- `SUPABASE_REPORT_SCREENSHOT_BUCKET` (optional, default: `report-screenshots`)
