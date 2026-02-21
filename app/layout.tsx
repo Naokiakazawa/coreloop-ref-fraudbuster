@@ -4,7 +4,7 @@ import { Suspense } from "react";
 import "./globals.css";
 import { SiteFooter } from "@/components/site-footer";
 import { SiteHeader } from "@/components/site-header";
-import { SiteIntroductionModal } from "@/components/site-introduction-modal";
+// import { SiteIntroductionModal } from "@/components/site-introduction-modal";
 import { ThemeProvider } from "@/components/theme-provider";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Toaster } from "@/components/ui/sonner";
@@ -60,7 +60,7 @@ export default function RootLayout({
 						enableSystem
 						disableTransitionOnChange
 					>
-						<SiteIntroductionModal />
+						{/* <SiteIntroductionModal /> */}
 						<SiteHeader />
 						<main className="flex-1">{children}</main>
 						<SiteFooter />

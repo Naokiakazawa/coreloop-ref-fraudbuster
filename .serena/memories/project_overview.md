@@ -10,7 +10,7 @@ This project is a platform for collecting, sharing, and searching information ab
 - **Styling**: Tailwind CSS 4.1.18
 - **UI Components**: Radix UI, Lucide React, Embla Carousel, Recharts
 - **Forms & Validation**: React Hook Form, Zod
-- **Database**: PostgreSQL 17 (via Docker Compose)
+- **Database**: PostgreSQL 17 (via Docker Compose) with Prisma ORM
 - **Tooling**: Biome (Linting & Formatting), pnpm (Package Manager), ESLint
 
 ## Codebase Structure
