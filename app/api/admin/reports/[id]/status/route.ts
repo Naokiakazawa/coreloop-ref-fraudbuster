@@ -3,12 +3,14 @@ import { NextResponse, type NextRequest } from "next/server";
 import { getAdminSessionFromRequest } from "@/lib/admin-auth";
 import { prisma } from "@/lib/prisma";
 
+const REPORT_STATUSES_ADMIN_PATH = "/admin/report-statuses";
+
 function toAdminRedirect(
 	request: NextRequest,
 	messageType: "notice" | "error",
 	message: string,
 ): NextResponse {
-	const url = new URL("/admin", request.url);
+	const url = new URL(REPORT_STATUSES_ADMIN_PATH, request.url);
 	url.searchParams.set(messageType, message);
 	return NextResponse.redirect(url, { status: 303 });
 }
@@ -100,6 +102,7 @@ export async function POST(
 
 		revalidateTag("reports", "max");
 		revalidateTag("home-stats", "max");
+		revalidatePath(REPORT_STATUSES_ADMIN_PATH);
 		revalidatePath("/admin");
 		revalidatePath(`/reports/${reportId}`);
 		return toAdminRedirect(request, "notice", "通報ステータスを更新しました。");

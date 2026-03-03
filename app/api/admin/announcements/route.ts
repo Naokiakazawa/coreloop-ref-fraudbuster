@@ -3,13 +3,19 @@ import { NextResponse, type NextRequest } from "next/server";
 import { getAdminSessionFromRequest } from "@/lib/admin-auth";
 import { prisma } from "@/lib/prisma";
 
+const ANNOUNCEMENTS_ADMIN_PATH = "/admin/announcements";
+
 function toAdminRedirect(
 	request: NextRequest,
 	messageType: "notice" | "error",
 	message: string,
+	options?: { selected?: string },
 ): NextResponse {
-	const url = new URL("/admin", request.url);
+	const url = new URL(ANNOUNCEMENTS_ADMIN_PATH, request.url);
 	url.searchParams.set(messageType, message);
+	if (options?.selected) {
+		url.searchParams.set("selected", options.selected);
+	}
 	return NextResponse.redirect(url, { status: 303 });
 }
 
@@ -46,7 +52,7 @@ export async function POST(request: NextRequest) {
 			select: { id: true },
 		});
 
-		await prisma.announcement.create({
+		const announcement = await prisma.announcement.create({
 			data: {
 				title,
 				content,
@@ -58,8 +64,11 @@ export async function POST(request: NextRequest) {
 		});
 
 		revalidateTag("announcements", "max");
+		revalidatePath(ANNOUNCEMENTS_ADMIN_PATH);
 		revalidatePath("/admin");
-		return toAdminRedirect(request, "notice", "お知らせを作成しました。");
+		return toAdminRedirect(request, "notice", "お知らせを作成しました。", {
+			selected: announcement.id,
+		});
 	} catch (error) {
 		console.error("Failed to create announcement:", error);
 		return toAdminRedirect(request, "error", "お知らせの作成に失敗しました。");
