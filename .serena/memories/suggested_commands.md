@@ -7,6 +7,9 @@
 - `docker compose up -d`: Starts the PostgreSQL database container in the background.
 - `docker compose down`: Stops the database container.
 - `docker compose logs -f db`: Views the database logs.
+- `pnpx prisma db push`: Pushes the Prisma schema state to the database.
+- `pnpx prisma generate`: Generates the Prisma Client.
+- `pnpx prisma studio`: Opens the Prisma Studio to browse data.
 
 ## Code Quality
 - `pnpm format`: Runs `biome format --write` on `app`, `components`, `hooks`, and `lib`.

@@ -173,6 +173,39 @@ function ReportSummaryCard({ report }: { report: ReportSummary }) {
 	);
 }
 
+function ReportSummaryCardSkeleton() {
+	return (
+		<Card className="h-full overflow-hidden">
+			<CardContent className="flex h-full items-stretch gap-4 p-4 sm:p-5">
+				<div className="w-36 shrink-0 space-y-2 sm:w-44">
+					<Skeleton className="h-5 w-24 rounded-full" />
+					<Skeleton className="h-24 w-full rounded-lg sm:h-28" />
+				</div>
+				<div className="flex min-w-0 flex-1 flex-col gap-3 overflow-hidden">
+					<div className="space-y-1">
+						<Skeleton className="h-3 w-20" />
+						<div className="flex min-h-5 items-center gap-2 overflow-hidden">
+							<Skeleton className="h-5 w-16 rounded-full" />
+							<Skeleton className="h-5 w-24 rounded-full" />
+						</div>
+					</div>
+
+					<div className="space-y-1.5">
+						<div className="min-h-10 space-y-1.5">
+							<Skeleton className="h-5 w-full" />
+							<Skeleton className="h-5 w-5/6" />
+						</div>
+						<div className="min-h-10 space-y-1.5">
+							<Skeleton className="h-4 w-full" />
+							<Skeleton className="h-4 w-4/5" />
+						</div>
+					</div>
+				</div>
+			</CardContent>
+		</Card>
+	);
+}
+
 export function HomeReportsGrid() {
 	const [reports, setReports] = React.useState<ReportSummary[]>([]);
 	const [nextCursor, setNextCursor] = React.useState<string | null>(null);
@@ -350,21 +383,7 @@ export function HomeReportsGrid() {
 			{!hasLoadedInitial ? (
 				<div className="grid grid-cols-1 gap-4 md:grid-cols-2">
 					{INITIAL_SKELETON_IDS.map((id) => (
-						<Card key={id}>
-							<CardContent className="flex items-start gap-4 p-4 sm:p-5">
-								<Skeleton className="h-24 w-36 shrink-0 rounded-lg sm:h-28 sm:w-44" />
-								<div className="flex min-w-0 flex-1 flex-col gap-3">
-									<div className="flex gap-2">
-										<Skeleton className="h-5 w-16 rounded-full" />
-										<Skeleton className="h-5 w-24 rounded-full" />
-									</div>
-									<Skeleton className="h-5 w-3/4" />
-									<Skeleton className="h-4 w-full" />
-									<Skeleton className="h-4 w-5/6" />
-									<Skeleton className="h-6 w-24 rounded-full" />
-								</div>
-							</CardContent>
-						</Card>
+						<ReportSummaryCardSkeleton key={id} />
 					))}
 				</div>
 			) : (
