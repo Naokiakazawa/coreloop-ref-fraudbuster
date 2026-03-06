@@ -3,6 +3,7 @@ import {
 	badRequestResponse,
 	errorResponse,
 	successResponse,
+	getClientIp,
 	verifyReportSessionToken,
 } from "@/lib/api-utils";
 import { fileTypeFromBuffer } from "file-type";
@@ -19,6 +20,11 @@ import {
 	MAX_REPORT_IMAGE_FILE_SIZE_BYTES,
 	normalizeImageMimeType,
 } from "@/lib/report-image-upload";
+import {
+	checkAndRecordImageUploadRateLimit,
+	checkSessionUploadBudget,
+	recordSessionUploadSuccess,
+} from "@/lib/upload-abuse-guard";
 
 const DEFAULT_STORAGE_BUCKET = "report-screenshots";
 
@@ -157,6 +163,27 @@ export async function POST(request: Request) {
 		const bucket =
 			process.env.SUPABASE_REPORT_SCREENSHOT_BUCKET?.trim() ||
 			DEFAULT_STORAGE_BUCKET;
+		const clientIp = getClientIp(request);
+		const userAgent = request.headers.get("user-agent")?.trim() || "unknown";
+		const rateLimitKey = clientIp
+			? `ip:${clientIp}`
+			: `ua:${userAgent.slice(0, 160).toLowerCase()}`;
+		const rateLimit = checkAndRecordImageUploadRateLimit(rateLimitKey);
+
+		if (!rateLimit.allowed) {
+			return Response.json(
+				{
+					error:
+						"画像アップロードのリクエストが多すぎます。時間を空けて再試行してください。",
+				},
+				{
+					status: 429,
+					headers: {
+						"Retry-After": String(rateLimit.retryAfterSeconds ?? 60),
+					},
+				},
+			);
+		}
 
 		if (!supabaseUrl || !serviceRoleKey) {
 			return errorResponse(
@@ -195,6 +222,17 @@ export async function POST(request: Request) {
 				return badRequestResponse("ファイル形式が不正です。");
 			}
 			files.push(rawFile);
+		}
+		const incomingTotalBytes = files.reduce((sum, file) => sum + file.size, 0);
+		const budget = checkSessionUploadBudget(sessionPayload.sessionId, {
+			incomingFileCount: files.length,
+			incomingTotalBytes,
+		});
+		if (!budget.allowed) {
+			return Response.json(
+				{ error: budget.message ?? "画像アップロードの上限に達しました。" },
+				{ status: 429 },
+			);
 		}
 
 		const validatedFiles: Array<{
@@ -276,6 +314,14 @@ export async function POST(request: Request) {
 			});
 			throw uploadError;
 		}
+		const uploadedTotalBytes = uploadedFiles.reduce(
+			(sum, uploadedFile) => sum + uploadedFile.size,
+			0,
+		);
+		recordSessionUploadSuccess(sessionPayload.sessionId, {
+			uploadedFileCount: uploadedFiles.length,
+			uploadedTotalBytes,
+		});
 
 		return successResponse({ files: uploadedFiles }, 201);
 	} catch (error) {
