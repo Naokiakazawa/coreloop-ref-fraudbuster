@@ -7,8 +7,10 @@ import {
 	verifyReportSessionToken,
 } from "@/lib/api-utils";
 import { fileTypeFromBuffer } from "file-type";
+import sharp from "sharp";
 import {
 	ALLOWED_REPORT_IMAGE_FORMATS_LABEL,
+	type CanonicalImageExtension,
 	canonicalizeImageExtension,
 	canonicalizeImageMimeType,
 	extractFileExtension,
@@ -27,6 +29,9 @@ import {
 } from "@/lib/upload-abuse-guard";
 
 const DEFAULT_STORAGE_BUCKET = "report-screenshots";
+const MAX_REENCODE_INPUT_PIXELS = 40_000_000;
+const JPEG_REENCODE_QUALITY = 85;
+const WEBP_REENCODE_QUALITY = 85;
 
 type UploadedScreenshot = {
 	path: string;
@@ -77,14 +82,16 @@ async function readResponseText(response: Response): Promise<string> {
 }
 
 async function uploadToStorage({
-	file,
+	bytes,
+	size,
 	bucket,
 	serviceRoleKey,
 	supabaseUrl,
 	filePath,
 	contentType,
 }: {
-	file: File;
+	bytes: Buffer;
+	size: number;
 	bucket: string;
 	serviceRoleKey: string;
 	supabaseUrl: string;
@@ -100,6 +107,8 @@ async function uploadToStorage({
 	);
 
 	const uploadResponse = await fetch(uploadUrl, {
+		// `Buffer` を明示的に `ArrayBuffer` ベースへ変換し、fetch の BodyInit 型と整合させる
+		body: new Blob([Uint8Array.from(bytes)], { type: contentType }),
 		method: "POST",
 		headers: {
 			Authorization: `Bearer ${serviceRoleKey}`,
@@ -108,7 +117,6 @@ async function uploadToStorage({
 			"x-upsert": "false",
 			"cache-control": "3600",
 		},
-		body: file,
 		cache: "no-store",
 	});
 
@@ -123,7 +131,7 @@ async function uploadToStorage({
 		path: objectPath,
 		publicUrl: buildStorageObjectUrl(supabaseUrl, bucket, objectPath, true),
 		contentType,
-		size: file.size,
+		size,
 	};
 }
 
@@ -150,6 +158,57 @@ async function cleanupUploadedFiles({
 			}),
 		),
 	);
+}
+
+async function reencodeAndSanitizeImage({
+	inputBuffer,
+	targetExtension,
+}: {
+	inputBuffer: Buffer;
+	targetExtension: CanonicalImageExtension;
+}): Promise<{
+	buffer: Buffer;
+	contentType: string;
+	extension: CanonicalImageExtension;
+}> {
+	const image = sharp(inputBuffer, {
+		animated: true,
+		failOn: "error",
+		limitInputPixels: MAX_REENCODE_INPUT_PIXELS,
+	});
+	const normalized = image.rotate();
+
+	if (targetExtension === "jpg") {
+		return {
+			buffer: await normalized
+				.jpeg({ quality: JPEG_REENCODE_QUALITY, mozjpeg: true })
+				.toBuffer(),
+			contentType: "image/jpeg",
+			extension: "jpg",
+		};
+	}
+	if (targetExtension === "png") {
+		return {
+			buffer: await normalized.png({ compressionLevel: 9 }).toBuffer(),
+			contentType: "image/png",
+			extension: "png",
+		};
+	}
+	if (targetExtension === "webp") {
+		return {
+			buffer: await normalized
+				.webp({ quality: WEBP_REENCODE_QUALITY })
+				.toBuffer(),
+			contentType: "image/webp",
+			extension: "webp",
+		};
+	}
+
+	return {
+		buffer: await normalized.gif().toBuffer(),
+		contentType: "image/gif",
+		extension: "gif",
+	};
 }
 
 /**
@@ -236,9 +295,10 @@ export async function POST(request: Request) {
 		}
 
 		const validatedFiles: Array<{
-			file: File;
+			bytes: Buffer;
 			contentType: string;
 			extension: string;
+			size: number;
 		}> = [];
 
 		for (const file of files) {
@@ -262,8 +322,8 @@ export async function POST(request: Request) {
 			}
 
 			// Magic byte check
-			const buffer = await file.arrayBuffer();
-			const detectedType = await fileTypeFromBuffer(buffer);
+			const rawBuffer = Buffer.from(await file.arrayBuffer());
+			const detectedType = await fileTypeFromBuffer(rawBuffer);
 			const detectedMimeType = canonicalizeImageMimeType(detectedType?.mime);
 			if (!detectedMimeType) {
 				return badRequestResponse(
@@ -280,11 +340,37 @@ export async function POST(request: Request) {
 				getCanonicalImageExtensionFromMimeType(declaredCanonicalMimeType) ??
 				getCanonicalImageExtensionFromMimeType(detectedMimeType) ??
 				"jpg";
+			let sanitizedImage: {
+				buffer: Buffer;
+				contentType: string;
+				extension: CanonicalImageExtension;
+			};
+			try {
+				sanitizedImage = await reencodeAndSanitizeImage({
+					inputBuffer: rawBuffer,
+					targetExtension: extension,
+				});
+			} catch {
+				return badRequestResponse(
+					`${file.name} の画像処理に失敗しました。別の画像で再試行してください。`,
+				);
+			}
+			if (sanitizedImage.buffer.length <= 0) {
+				return badRequestResponse(
+					`${file.name} の画像処理結果が不正です。別の画像で再試行してください。`,
+				);
+			}
+			if (sanitizedImage.buffer.length > MAX_REPORT_IMAGE_FILE_SIZE_BYTES) {
+				return badRequestResponse(
+					`${file.name} は画像処理後に5MBを超えました。別の画像で再試行してください。`,
+				);
+			}
 
 			validatedFiles.push({
-				file,
-				contentType: detectedMimeType,
-				extension,
+				bytes: sanitizedImage.buffer,
+				contentType: sanitizedImage.contentType,
+				extension: sanitizedImage.extension,
+				size: sanitizedImage.buffer.length,
 			});
 		}
 
@@ -296,7 +382,8 @@ export async function POST(request: Request) {
 				const filePath = `reports/temp/${sessionPayload.sessionId}/${fileName}`;
 
 				const uploadedFile = await uploadToStorage({
-					file: validatedFile.file,
+					bytes: validatedFile.bytes,
+					size: validatedFile.size,
 					bucket,
 					serviceRoleKey,
 					supabaseUrl,
