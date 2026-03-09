@@ -1,21 +1,25 @@
 # Code Style and Conventions
 
-## General
+## General Rules
 - **Language**: TypeScript (v5.9.3)
-- **Framework**: Next.js 16 (App Router)
-- **Library**: React 19
-- **Formatting**: Managed by Biome. Indent style is tabs. Quotes are double quotes.
-- **Linting**: Biome recommended rules and ESLint.
+- **Identity**: Next.js 16 (App Router) + React 19.
+- **Indentation**: Tabs (configured in Biome).
+- **Quotes**: Double quotes for strings.
+- **Semicolons**: Mandatory.
 
-## Coding Rules (from coding-rules.md)
-- **API Router**: Use API Router for backend logic.
-- **Strict Typing**: No `any` type allowed. Thorough typing is mandatory.
-- **DRY Principle**: Adhere strictly to the "Don't Repeat Yourself" principle.
-- **Performance**: Implement Next.js best practices to ensure high performance.
-- **Maintainability**: Prioritize clarity and ease of understanding for third parties.
-- **Aesthetics**: The design should be premium, modern, and high-quality (vibrant colors, glassmorphism, animations).
+## Coding Standards (from coding-rules.md)
+- **Strict Typing**: NO `any` type allowed. Comprehensive TypeScript definitions are mandatory.
+- **DRY Principle**: Avoid logic duplication across the codebase.
+- **API Router**: Backend logic MUST be implemented in API Routes.
+- **Performance**: Optimize for Next.js 16 streaming and caching capabilities.
+- **Readability**: Ensure code is easily understandable for third-party developers (Reference Implementation).
 
-## Component Structure
-- Uses Next.js App Router conventions.
-- Components are functional components using hooks.
-- UI components are separated into `components/` directory, following a Radix-based design system.
+## UI/UX Guidelines
+- **Modern Aesthetics**: Premium design with vibrant colors, smooth transitions, and glassmorphism.
+- **Responsive**: Mobile-first responsive design.
+- **Accessibility**: Use semantic HTML and Radix UI primitives for accessibility.
+
+## File Naming
+- Components: PascalCase (e.g., `ReportList.tsx`).
+- Hooks/Utils: kebab-case (e.g., `use-debounce.ts`).
+- Pages/Layouts: Next.js conventions (`page.tsx`, `layout.tsx`).
