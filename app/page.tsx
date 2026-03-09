@@ -4,6 +4,7 @@ import Link from "next/link";
 import { connection } from "next/server";
 
 import { HomeReportsGrid } from "@/components/home-reports-grid";
+import { SiteIntroductionModal } from "@/components/site-introduction-modal";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { prisma } from "@/lib/prisma";
@@ -65,6 +66,7 @@ export default async function Home() {
 
 	return (
 		<div className="flex flex-col gap-12 pb-20">
+			<SiteIntroductionModal />
 			{/* Hero Section */}
 			<section className="relative overflow-hidden bg-primary/5 py-20 lg:py-32">
 				<div className="container relative z-10 grid gap-10 lg:grid-cols-2 lg:items-center">
