@@ -1,3 +1,8 @@
+import {
+	createSwaggerUnavailableResponse,
+	isSwaggerPubliclyAccessible,
+} from "@/lib/swagger/access";
+
 const SWAGGER_UI_CSS_URL = "https://unpkg.com/swagger-ui-dist@5/swagger-ui.css";
 const SWAGGER_UI_BUNDLE_URL =
 	"https://unpkg.com/swagger-ui-dist@5/swagger-ui-bundle.js";
@@ -56,6 +61,10 @@ function renderSwaggerHtml(openApiUrl: string): string {
  * Renders Swagger UI for local API documentation.
  */
 export async function GET(request: Request) {
+	if (!isSwaggerPubliclyAccessible()) {
+		return createSwaggerUnavailableResponse();
+	}
+
 	const { origin } = new URL(request.url);
 	const openApiUrl = `${origin}/api/openapi`;
 
