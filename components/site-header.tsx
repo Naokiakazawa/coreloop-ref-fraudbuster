@@ -1,11 +1,12 @@
 "use client";
 
-import { ShieldAlert } from "lucide-react";
+import { CircleHelp, ShieldAlert } from "lucide-react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import * as React from "react";
 
 import { ModeToggle } from "@/components/mode-toggle";
+import { OPEN_SITE_INTRODUCTION_MODAL_EVENT } from "@/components/site-introduction-modal";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
@@ -18,6 +19,10 @@ const NAV_ITEMS = [
 export function SiteHeader() {
 	const pathname = usePathname();
 	const router = useRouter();
+
+	const openIntroductionModal = React.useCallback(() => {
+		window.dispatchEvent(new Event(OPEN_SITE_INTRODUCTION_MODAL_EVENT));
+	}, []);
 
 	const isActive = (href: string) => {
 		if (href === "/") return pathname === "/";
@@ -71,6 +76,16 @@ export function SiteHeader() {
 						</Link>
 					</div>
 					<ModeToggle />
+					<Button
+						type="button"
+						variant="ghost"
+						size="icon"
+						className="rounded-full"
+						aria-label="このサイトについて"
+						onClick={openIntroductionModal}
+					>
+						<CircleHelp className="h-5 w-5" />
+					</Button>
 				</div>
 			</div>
 		</header>

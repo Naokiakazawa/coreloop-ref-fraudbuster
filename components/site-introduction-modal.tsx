@@ -1,9 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 import { Button } from "@/components/ui/button";
-import { Checkbox } from "@/components/ui/checkbox";
 import {
 	Dialog,
 	DialogContent,
@@ -11,62 +10,73 @@ import {
 	DialogHeader,
 	DialogTitle,
 } from "@/components/ui/dialog";
-import { Label } from "@/components/ui/label";
 
-const HIDE_MODAL_STORAGE_KEY = "hide-site-introduction-modal";
+export const OPEN_SITE_INTRODUCTION_MODAL_EVENT =
+	"open-site-introduction-modal";
 
 export function SiteIntroductionModal() {
-	const [open, setOpen] = useState(() => {
-		if (typeof window === "undefined") {
-			return false;
-		}
-		return localStorage.getItem(HIDE_MODAL_STORAGE_KEY) !== "true";
-	});
-	const [doNotShowAgain, setDoNotShowAgain] = useState(false);
+	const [open, setOpen] = useState(true);
 
-	const persistPreference = (hideModal: boolean) => {
-		if (hideModal) {
-			localStorage.setItem(HIDE_MODAL_STORAGE_KEY, "true");
-			return;
-		}
+	useEffect(() => {
+		const handleOpenRequest = () => {
+			setOpen(true);
+		};
 
-		localStorage.removeItem(HIDE_MODAL_STORAGE_KEY);
-	};
+		window.addEventListener(
+			OPEN_SITE_INTRODUCTION_MODAL_EVENT,
+			handleOpenRequest,
+		);
 
-	const handleOpenChange = (nextOpen: boolean) => {
-		if (!nextOpen) {
-			persistPreference(doNotShowAgain);
-		}
-		setOpen(nextOpen);
-	};
+		return () => {
+			window.removeEventListener(
+				OPEN_SITE_INTRODUCTION_MODAL_EVENT,
+				handleOpenRequest,
+			);
+		};
+	}, []);
 
 	return (
-		<Dialog open={open} onOpenChange={handleOpenChange}>
-			<DialogContent className="sm:max-w-xl">
+		<Dialog open={open} onOpenChange={setOpen}>
+			<DialogContent className="max-h-[calc(100dvh-2rem)] overflow-y-auto p-4 sm:max-w-xl sm:p-6">
 				<DialogHeader className="text-center">
-					<DialogTitle className="text-center">このサイトについて</DialogTitle>
+					<DialogTitle className="text-center">AntiFraudについて</DialogTitle>
 				</DialogHeader>
 
 				<ul className="list-disc space-y-2 pl-5 text-sm text-muted-foreground leading-relaxed">
-					<li>このサイトはProject Coreloopの一環で開発されたものです。</li>
-					<li>本サイトはリファレンス実装です。</li>
-					<li>詐欺広告と疑わしいリンクを通報できます。</li>
-					<li>通報しても、すぐに対応されるわけではない点にご留意ください。</li>
-					<li>DD2030で開発されています。</li>
+					<li>
+						このサイトはデジタル民主主義2030のProject
+						Coreloopの一環で開発されたリファレンス実装です。
+					</li>
+					<li>
+						詐欺広告と疑わしいリンクを通報できます。ただし、通報しても、すぐに対応されるわけではない点にご留意ください。
+					</li>
 				</ul>
 
+				<div className="space-y-2 rounded-lg border border-amber-200 bg-amber-50 p-4 text-sm leading-relaxed text-amber-900">
+					<p>
+						現在はベータ版（試験運用版）であり、審査や行政連携などのプロセスはまだ動いていません。
+					</p>
+					<p>
+						現時点でできることは、詐欺広告や疑わしいリンクに関する通報の登録のみです。この点をご理解のうえご利用ください。
+					</p>
+				</div>
+
+				<div className="space-y-3 rounded-lg border bg-muted/40 p-4 text-sm leading-relaxed text-muted-foreground">
+					<p>
+						なお、本プロジェクトは「行政対応の可視化と仕組みづくり」を目的としており、特定の個人・法人等に対する訴訟を教唆・支援するものではありません。
+					</p>
+					<p>
+						最終的な削除判断はプラットフォームや行政が行うものであり、本システムはその結果を保証しません。
+					</p>
+					<p>
+						今後の開発構想として、AIによる一次スクリーニングや詐欺広告の自動検知・通報機能の実装を検討しています。
+					</p>
+				</div>
+
 				<DialogFooter className="flex-row items-center justify-end gap-4">
-					<div className="flex items-center gap-2">
-						<Checkbox
-							id="hide-site-introduction-modal"
-							checked={doNotShowAgain}
-							onCheckedChange={(checked) => setDoNotShowAgain(checked === true)}
-						/>
-						<Label htmlFor="hide-site-introduction-modal">
-							次からは表示しない
-						</Label>
-					</div>
-					<Button onClick={() => handleOpenChange(false)}>閉じる</Button>
+					<Button className="w-full sm:w-auto" onClick={() => setOpen(false)}>
+						閉じる
+					</Button>
 				</DialogFooter>
 			</DialogContent>
 		</Dialog>
