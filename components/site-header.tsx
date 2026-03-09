@@ -91,7 +91,7 @@ export function SiteHeader() {
 			</div>
 			{isBetaBannerVisible ? (
 				<div className="border-t border-amber-300/80 bg-amber-100 text-amber-950">
-					<div className="container flex items-start gap-3 py-2 text-sm leading-relaxed sm:items-center">
+					<div className="container flex items-start gap-3 py-1 text-sm leading-relaxed sm:items-center">
 						<p className="flex-1">
 							現在はベータ版（試験運用版）であり、審査や行政連携などのプロセスはまだ動いていません。現時点でできることは、詐欺広告や疑わしいリンクに関する通報の登録のみです。この点をご理解のうえご利用ください。
 						</p>
@@ -99,7 +99,7 @@ export function SiteHeader() {
 							type="button"
 							variant="ghost"
 							size="icon"
-							className="mt-[-0.125rem] h-8 w-8 shrink-0 rounded-full text-amber-950 hover:bg-amber-200 hover:text-amber-950 sm:mt-0"
+							className="-mt-0.5 h-8 w-8 shrink-0 rounded-full text-amber-950 hover:bg-amber-200 hover:text-amber-950 sm:mt-0"
 							aria-label="ベータ版に関するお知らせを閉じる"
 							onClick={() => setIsBetaBannerVisible(false)}
 						>
