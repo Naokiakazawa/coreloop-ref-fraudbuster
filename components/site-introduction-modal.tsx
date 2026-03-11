@@ -42,10 +42,10 @@ export function SiteIntroductionModal() {
 					<DialogTitle className="text-center">AntiFraudについて</DialogTitle>
 				</DialogHeader>
 
-				<ul className="list-disc space-y-2 pl-5 text-sm text-muted-foreground leading-relaxed">
+				<ul className="list-disc space-y-2 pl-5 text-sm leading-relaxed text-muted-foreground">
 					<li>
-						このサイトはデジタル民主主義2030のProject
-						Coreloopの一環で開発されたリファレンス実装です。
+						このサイトはデジタル民主主義2030が開発した、市民が不審な広告を通報し、詐欺広告を社会全体で「見える化」する市民参加型の通報プラットフォームです。台湾の「Fraud
+						Buster」を参考に開発しました。
 					</li>
 					<li>
 						詐欺広告と疑わしいリンクを通報できます。ただし、通報しても、すぐに対応されるわけではない点にご留意ください。
@@ -54,16 +54,13 @@ export function SiteIntroductionModal() {
 
 				<div className="space-y-2 rounded-lg border border-amber-200 bg-amber-50 p-4 text-sm leading-relaxed text-amber-900">
 					<p>
-						現在はベータ版（試験運用版）であり、審査や行政連携などのプロセスはまだ動いていません。
-					</p>
-					<p>
-						現時点でできることは、詐欺広告や疑わしいリンクに関する通報の登録のみです。この点をご理解のうえご利用ください。
+						現在はベータ版（試験運用版）です。現時点でできることは、詐欺広告や疑わしいリンクに関する通報の登録のみです。この点をご理解のうえご利用ください。
 					</p>
 				</div>
 
 				<div className="space-y-3 rounded-lg border bg-muted/40 p-4 text-sm leading-relaxed text-muted-foreground">
 					<p>
-						なお、本プロジェクトは「行政対応の可視化と仕組みづくり」を目的としており、特定の個人・法人等に対する訴訟を教唆・支援するものではありません。
+						なお、本システムは、行政が詐欺広告対策を講じるための根拠となる通報データを市民の力で収集・蓄積することを目的としています。現時点では行政機関との直接的な連携は行われていませんが、蓄積されたデータを今後の政策立案や規制議論の基礎資料として活用することを目指しています。特定の個人・法人等に対する訴訟を教唆・支援するものではありません。
 					</p>
 					<p>
 						最終的な削除判断はプラットフォームや行政が行うものであり、本システムはその結果を保証しません。
