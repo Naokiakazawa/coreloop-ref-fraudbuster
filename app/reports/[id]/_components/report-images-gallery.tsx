@@ -77,7 +77,7 @@ export function ReportImagesGallery({
 			<div className="space-y-3">
 				<div className="flex flex-wrap items-center justify-between gap-3">
 					<p className="text-sm text-muted-foreground">
-						左右にスライドして複数画像を確認できます。画像をクリックすると拡大表示されます。
+						OGP画像やスクリーンショットなどの画像が確認できます。
 					</p>
 					{totalImages > 1 ? (
 						<SlideCounter current={currentIndex + 1} total={totalImages} />
@@ -97,7 +97,7 @@ export function ReportImagesGallery({
 									onClick={() => openLightbox(index)}
 									className="group relative block w-full overflow-hidden rounded-2xl border bg-muted/20 p-3 text-left transition hover:border-primary/40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
 								>
-									<div className="relative flex h-[420px] items-center justify-center overflow-hidden rounded-xl bg-gradient-to-b from-muted/50 to-background">
+									<div className="relative flex h-[420px] items-center justify-center overflow-hidden rounded-xl bg-linear-to-b from-muted/50 to-background">
 										<Image
 											src={image.imageUrl}
 											alt={`${title} の関連画像 ${index + 1}`}

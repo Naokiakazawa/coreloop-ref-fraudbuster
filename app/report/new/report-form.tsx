@@ -7,6 +7,7 @@ import {
 	ShieldAlert,
 	ShieldCheck,
 } from "lucide-react";
+import Link from "next/link";
 import Script from "next/script";
 import * as React from "react";
 import { toast } from "sonner";
@@ -392,6 +393,23 @@ export function ReportForm({ platforms }: ReportFormProps) {
 						>
 							{loading ? submissionStatus.buttonLabel : "通報する"}
 						</Button>
+						<p className="text-center text-xs leading-5 text-muted-foreground">
+							「通報する」をクリックすると、
+							<Link
+								href="/terms"
+								className="mx-1 underline underline-offset-4 transition-colors hover:text-foreground"
+							>
+								利用規約
+							</Link>
+							および
+							<Link
+								href="/privacy"
+								className="mx-1 underline underline-offset-4 transition-colors hover:text-foreground"
+							>
+								プライバシーポリシー
+							</Link>
+							に同意したものとみなします。
+						</p>
 
 						{loading ? (
 							<div

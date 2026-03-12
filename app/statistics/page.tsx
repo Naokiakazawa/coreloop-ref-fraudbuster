@@ -1,23 +1,13 @@
 "use client";
 
-import {
-	Activity,
-	AlertTriangle,
-	BarChart3,
-	PieChart as PieChartIcon,
-	TrendingUp,
-} from "lucide-react";
+import { Activity, BarChart3, TrendingUp } from "lucide-react";
 import * as React from "react";
 import {
 	Bar,
 	BarChart,
 	CartesianGrid,
-	Cell,
-	Legend,
 	Line,
 	LineChart,
-	Pie,
-	PieChart,
 	ResponsiveContainer,
 	Tooltip,
 	XAxis,
@@ -45,14 +35,6 @@ const FALLBACK_TREND_DATA = [
 	{ date: "02.12", count: 64 },
 	{ date: "02.13", count: 88 },
 	{ date: "02.14", count: 94 },
-];
-
-const CHART_COLORS = [
-	"oklch(0.55 0.2 250)",
-	"oklch(0.7 0.15 180)",
-	"oklch(0.8 0.12 60)",
-	"oklch(0.6 0.2 320)",
-	"oklch(0.5 0.25 0)",
 ];
 
 function ChartTooltipStyle() {
@@ -100,8 +82,6 @@ export default function StatisticsPage() {
 	}, []);
 
 	const trendData = stats?.trend.length ? stats.trend : FALLBACK_TREND_DATA;
-	const categoryData: StatisticsBreakdownItem[] =
-		stats?.breakdown.category ?? [];
 	const platformData: StatisticsBreakdownItem[] =
 		stats?.breakdown.platform ?? [];
 	const statusData: StatisticsBreakdownItem[] = stats?.breakdown.status ?? [];
@@ -120,7 +100,7 @@ export default function StatisticsPage() {
 					<Skeleton className="h-10 w-48" />
 					<Skeleton className="h-4 w-96" />
 				</div>
-				<div className="grid grid-cols-1 gap-6 md:grid-cols-3">
+				<div className="grid grid-cols-1 gap-6 md:grid-cols-2">
 					{[1, 2, 3].map((i) => (
 						<Skeleton key={i} className="h-32 w-full rounded-2xl" />
 					))}
@@ -147,7 +127,7 @@ export default function StatisticsPage() {
 				</Card>
 			) : null}
 
-			<div className="grid grid-cols-1 gap-6 md:grid-cols-3">
+			<div className="grid grid-cols-1 gap-6 md:grid-cols-2">
 				<Card className="border-primary/10 bg-primary/5">
 					<CardHeader className="pb-2">
 						<CardDescription className="text-xs font-bold tracking-wider uppercase">
@@ -176,22 +156,6 @@ export default function StatisticsPage() {
 					<CardContent>
 						<div className="flex items-center gap-1 text-xs text-muted-foreground">
 							<span>高リスク件数: {stats?.summary.highRiskReports ?? 0}</span>
-						</div>
-					</CardContent>
-				</Card>
-				<Card>
-					<CardHeader className="pb-2">
-						<CardDescription className="text-xs font-bold tracking-wider uppercase">
-							要注意プラットフォーム
-						</CardDescription>
-						<CardTitle className="text-3xl font-black text-destructive">
-							{stats?.summary.topPlatform ?? "データなし"}
-						</CardTitle>
-					</CardHeader>
-					<CardContent>
-						<div className="flex items-center gap-1 text-xs font-bold text-destructive">
-							<AlertTriangle className="h-3 w-3" />
-							<span>通報データから自動算出</span>
 						</div>
 					</CardContent>
 				</Card>
@@ -249,47 +213,7 @@ export default function StatisticsPage() {
 					</CardContent>
 				</Card>
 
-				<Card>
-					<CardHeader>
-						<CardTitle className="flex items-center gap-2">
-							<PieChartIcon className="h-5 w-5 text-primary" />
-							カテゴリー別内訳
-						</CardTitle>
-					</CardHeader>
-					<CardContent className="h-[300px]">
-						<ResponsiveContainer width="100%" height="100%">
-							<PieChart>
-								<Pie
-									data={categoryData}
-									cx="50%"
-									cy="50%"
-									innerRadius={60}
-									outerRadius={100}
-									paddingAngle={0}
-									stroke="none"
-									dataKey="count"
-									nameKey="label"
-								>
-									{categoryData.map((entry, index) => (
-										<Cell
-											key={`${entry.label}-${entry.id ?? index}`}
-											fill={CHART_COLORS[index % CHART_COLORS.length]}
-											stroke="none"
-										/>
-									))}
-								</Pie>
-								<Tooltip
-									contentStyle={ChartTooltipStyle()}
-									labelStyle={{ color: "var(--foreground)" }}
-									itemStyle={{ color: "var(--foreground)" }}
-								/>
-								<Legend verticalAlign="bottom" height={36} iconType="circle" />
-							</PieChart>
-						</ResponsiveContainer>
-					</CardContent>
-				</Card>
-
-				<Card>
+				<Card className="lg:col-span-2">
 					<CardHeader>
 						<CardTitle className="flex items-center gap-2">
 							<BarChart3 className="h-5 w-5 text-primary" />

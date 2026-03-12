@@ -15,7 +15,7 @@ async function getCurrentStatus() {
 	cacheTag("home-stats");
 	cacheLife({ revalidate: 60 });
 
-	const [totalReports, todayReports, categoryStats] = await Promise.all([
+	const [totalReports, todayReports] = await Promise.all([
 		prisma.report.count(),
 		prisma.report.count({
 			where: {
@@ -24,45 +24,17 @@ async function getCurrentStatus() {
 				},
 			},
 		}),
-		prisma.fraudCategory.findMany({
-			select: {
-				name: true,
-				_count: {
-					select: { reports: true },
-				},
-			},
-			orderBy: {
-				reports: {
-					_count: "desc",
-				},
-			},
-			take: 3,
-		}),
 	]);
-
-	const totalWithReports = categoryStats.reduce(
-		(acc, cat) => acc + cat._count.reports,
-		0,
-	);
-
-	const categories = categoryStats.map((cat) => ({
-		name: cat.name,
-		percentage:
-			totalWithReports > 0
-				? Math.round((cat._count.reports / totalWithReports) * 100)
-				: 0,
-	}));
 
 	return {
 		totalReports,
 		todayReports,
-		categories,
 	};
 }
 
 export default async function Home() {
 	await connection();
-	const { totalReports, todayReports, categories } = await getCurrentStatus();
+	const { totalReports, todayReports } = await getCurrentStatus();
 
 	return (
 		<div className="flex flex-col gap-12 pb-20">
@@ -94,7 +66,6 @@ export default async function Home() {
 						<CurrentStatusCard
 							totalReports={totalReports}
 							todayReports={todayReports}
-							categories={categories}
 						/>
 					</div>
 				</div>
@@ -117,14 +88,10 @@ export default async function Home() {
 function CurrentStatusCard({
 	totalReports,
 	todayReports,
-	categories,
 }: {
 	totalReports: number;
 	todayReports: number;
-	categories: { name: string; percentage: number }[];
 }) {
-	const topCategories = categories.slice(0, 3);
-
 	return (
 		<Card className="border-primary/10 bg-background/90 shadow-lg backdrop-blur-sm">
 			<CardHeader>
@@ -151,29 +118,6 @@ function CurrentStatusCard({
 							+{todayReports.toLocaleString()}
 						</p>
 					</div>
-				</div>
-				<div className="space-y-3 pt-4 border-t">
-					<p className="text-sm font-medium">カテゴリー別（上位3件）</p>
-					{topCategories.length > 0 ? (
-						topCategories.map((cat, i) => (
-							<div key={cat.name} className="space-y-2">
-								<div className="flex items-center justify-between text-sm">
-									<span className="text-muted-foreground">{cat.name}</span>
-									<span className="font-medium">{cat.percentage}%</span>
-								</div>
-								<div className="w-full h-2 bg-muted rounded-full overflow-hidden">
-									<div
-										className={`h-full ${i === 0 ? "bg-primary" : i === 1 ? "bg-blue-500" : "bg-orange-400"} transition-all duration-1000`}
-										style={{ width: `${cat.percentage}%` }}
-									/>
-								</div>
-							</div>
-						))
-					) : (
-						<p className="text-sm text-muted-foreground italic">
-							データがありません。
-						</p>
-					)}
 				</div>
 				<Link href="/statistics" className="block">
 					<Button variant="outline" className="w-full rounded-xl">

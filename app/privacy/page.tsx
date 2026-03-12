@@ -236,7 +236,7 @@ export default function PrivacyPage() {
 
 			<Card>
 				<CardHeader>
-					<CardTitle>個人情報保護方針</CardTitle>
+					<CardTitle>プライバシーポリシー</CardTitle>
 				</CardHeader>
 				<CardContent className="space-y-6 text-sm leading-7 text-muted-foreground">
 					{PRIVACY_SECTIONS.map((section) => (
