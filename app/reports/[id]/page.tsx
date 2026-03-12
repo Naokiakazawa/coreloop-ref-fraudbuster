@@ -1,10 +1,10 @@
 import { AlertTriangle, Calendar, CheckCircle2, Clock } from "lucide-react";
 import { cacheLife, cacheTag } from "next/cache";
 import { headers } from "next/headers";
-import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { connection } from "next/server";
+import { ReportImagesGallery } from "@/app/reports/[id]/_components/report-images-gallery";
 import { ReportShareDialog } from "@/components/report-share-dialog";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -213,26 +213,16 @@ export default async function ReportDetailPage({
 						<h2 className="text-xl font-bold">関連画像</h2>
 						<div className="rounded-2xl border bg-card p-6 shadow-sm">
 							{reportImages.length > 0 ? (
-								<div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-									{reportImages.map((image, index) => (
-										<div
-											key={image.id}
-											className="overflow-hidden rounded-xl border bg-muted/20"
-										>
-											<Image
-												src={image.imageUrl}
-												alt={`${report.title || report.url} の関連画像 ${index + 1}`}
-												width={1280}
-												height={960}
-												loading="lazy"
-												className="h-52 w-full object-cover sm:h-64"
-											/>
-										</div>
-									))}
-								</div>
+								<ReportImagesGallery
+									title={report.title || report.url}
+									images={reportImages}
+								/>
 							) : (
 								<div className="rounded-lg border bg-muted/40 px-4 py-6 text-sm text-muted-foreground">
-									画像は登録されていません。
+									<p>証拠画像が追加されたら表示されます。</p>
+									<p className="mt-2">
+										スクリーンショットなどの証拠画像がこの欄に追加されます。
+									</p>
 								</div>
 							)}
 						</div>

@@ -1,10 +1,5 @@
 import { randomUUID } from "node:crypto";
 import { fileTypeFromBuffer } from "file-type";
-import {
-	canonicalizeImageMimeType,
-	getCanonicalImageExtensionFromMimeType,
-	MAX_REPORT_IMAGE_FILE_SIZE_BYTES,
-} from "@/lib/report-image-upload";
 import { reencodeAndSanitizeImage } from "@/lib/report-image-sanitizer";
 import {
 	getReportImageStorageBucket,
@@ -12,6 +7,11 @@ import {
 	type StoredReportImage,
 	uploadReportImageToStorage,
 } from "@/lib/report-image-storage";
+import {
+	canonicalizeImageMimeType,
+	getCanonicalImageExtensionFromMimeType,
+	MAX_REPORT_IMAGE_FILE_SIZE_BYTES,
+} from "@/lib/report-image-upload";
 import { fetchSafeExternalImage } from "@/lib/report-link-preview";
 
 export async function mirrorReportPreviewThumbnail({

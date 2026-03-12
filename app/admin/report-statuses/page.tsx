@@ -14,6 +14,7 @@ import {
 import { requireAdminSession } from "@/lib/admin-auth";
 import { formatDate } from "@/lib/date";
 import { prisma } from "@/lib/prisma";
+import { getSafeReportImageProxyPath } from "@/lib/report-image-delivery";
 
 interface AdminReportStatusesPageProps {
 	searchParams: Promise<{ notice?: string; error?: string }>;
@@ -45,6 +46,14 @@ export default async function AdminReportStatusesPage({
 					select: {
 						images: true,
 					},
+				},
+				images: {
+					select: {
+						id: true,
+						imageUrl: true,
+						displayOrder: true,
+					},
+					orderBy: { displayOrder: "asc" },
 				},
 				status: {
 					select: {
@@ -151,6 +160,11 @@ export default async function AdminReportStatusesPage({
 															reportTitle={report.title}
 															reportUrl={report.url}
 															existingImageCount={report._count.images}
+															currentImages={report.images.map((image) => ({
+																id: image.id,
+																previewUrl: getSafeReportImageProxyPath(image),
+																displayOrder: image.displayOrder ?? null,
+															}))}
 														/>
 														<DeleteConfirmButton
 															action={`/api/admin/reports/${report.id}`}

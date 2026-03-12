@@ -3,6 +3,7 @@ ignoredBuiltDependencies:
   - unrs-resolver
 
 onlyBuiltDependencies:
+  - '@parcel/watcher'
   - '@prisma/engines'
   - esbuild
   - prisma

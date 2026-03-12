@@ -1,3 +1,4 @@
+import { Analytics } from "@vercel/analytics/next";
 import type { Metadata } from "next";
 import { Inter, Noto_Sans_JP } from "next/font/google";
 import { Suspense } from "react";
@@ -90,7 +91,10 @@ export default function RootLayout({
 						disableTransitionOnChange
 					>
 						<SiteHeader />
-						<main className="flex-1">{children}</main>
+						<main className="flex-1">
+							{children}
+							<Analytics />
+						</main>
 						<SiteFooter />
 						<Toaster position="top-center" />
 					</ThemeProvider>
