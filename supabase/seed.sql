@@ -37,9 +37,10 @@ INSERT INTO platforms (name, icon_url, is_active) VALUES
   ('Instagram', '/icons/platforms/instagram.svg', TRUE),
   ('Threads', '/icons/platforms/threads.svg', TRUE),
   ('X', '/icons/platforms/x.svg', TRUE),
-  ('Google', '/icons/platforms/google.svg', TRUE),
+  ('YouTube', NULL, TRUE),
+  ('Google検索', '/icons/platforms/google.svg', TRUE),
   ('TikTok', '/icons/platforms/tiktok.svg', TRUE),
-  ('Meta Audience Network', '/icons/platforms/meta-audience-network.svg', TRUE);
+  ('その他', '/icons/platforms/meta-audience-network.svg', TRUE);
 
 INSERT INTO report_statuses (status_code, label, badge_color) VALUES
   ('PENDING', '処理待ち', 'gray'),
@@ -191,7 +192,7 @@ INSERT INTO daily_statistics (
     14,
     5,
     4,
-    '{"LINE": 6, "Facebook": 4, "Instagram": 2, "Google": 2}'::jsonb,
+    '{"LINE": 6, "Facebook": 4, "Instagram": 2, "Google検索": 2}'::jsonb,
     '{"フィッシング": 5, "投資": 4, "求人": 2, "なりすまし": 3}'::jsonb,
     '{"PENDING": 1, "UNDER_REVIEW": 4, "HIGH_RISK": 5, "CONFIRMED_FRAUD": 4}'::jsonb,
     CURRENT_TIMESTAMP - INTERVAL '2 days'

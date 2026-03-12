@@ -135,7 +135,7 @@ export function createOpenApiDocument(origin: string): OpenApiDocument {
 					tags: ["Reports"],
 					summary: "新規通報を投稿",
 					description:
-						"Turnstile 検証・送信レート制限・リンクプレビュー抽出を実行して通報を作成します。",
+						"Turnstile 検証・送信レート制限・リンクプレビュー抽出を実行し、カテゴリを「なりすまし」として通報を作成します。",
 					requestBody: {
 						required: true,
 						content: {
@@ -485,21 +485,10 @@ export function createOpenApiDocument(origin: string): OpenApiDocument {
 				},
 				CreateReportRequest: {
 					type: "object",
-					required: [
-						"url",
-						"platformId",
-						"categoryId",
-						"email",
-						"turnstileToken",
-						"formStartedAt",
-					],
+					required: ["url", "platformId", "turnstileToken", "formStartedAt"],
 					properties: {
 						url: { type: "string", minLength: 1 },
-						title: { type: "string" },
-						description: { type: "string" },
 						platformId: { type: "integer", minimum: 1 },
-						categoryId: { type: "integer", minimum: 1 },
-						email: { type: "string", format: "email" },
 						turnstileToken: { type: "string", minLength: 1 },
 						spamTrap: {
 							type: "string",
@@ -509,11 +498,6 @@ export function createOpenApiDocument(origin: string): OpenApiDocument {
 							type: "number",
 							description:
 								"フォーム表示開始時刻の Unix epoch ミリ秒。送信間隔チェックに利用されます。",
-						},
-						screenshotUrls: {
-							type: "array",
-							maxItems: 5,
-							items: { type: "string", format: "uri" },
 						},
 					},
 				},

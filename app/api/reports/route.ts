@@ -7,13 +7,11 @@ import {
 	successResponse,
 	getClientIp,
 	verifyTurnstileToken,
-	verifyReportSessionToken,
 } from "@/lib/api-utils";
 import { getSafeReportImageAbsoluteUrl } from "@/lib/report-image-delivery";
 import {
 	cleanupStoredReportImages,
 	getReportImageStorageBucket,
-	isValidReportImageStorageUrl,
 	resolveSupabaseProjectOrigin,
 	type StoredReportImage,
 } from "@/lib/report-image-storage";
@@ -37,17 +35,12 @@ function parseSortOrder(value: string | null): ReportSortOrder {
 	return value === "popular" ? "popular" : "newest";
 }
 
-function isValidEmail(value: string): boolean {
-	return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
-}
-
 const SUBMISSION_WINDOW_MS = 10 * 60 * 1000;
 const MAX_SUBMISSIONS_PER_WINDOW = 5;
 const MIN_SUBMISSION_INTERVAL_MS = 10 * 1000;
 const MIN_FORM_COMPLETION_MS = 6 * 1000;
 const rateLimitStore = new Map<string, number[]>();
 
-const MAX_SCREENSHOT_COUNT = 5;
 const createReportId = customAlphabet(
 	"0123456789abcdefghijklmnopqrstuvwxyz",
 	12,
@@ -55,10 +48,6 @@ const createReportId = customAlphabet(
 
 function isPresent<T>(value: T | null): value is T {
 	return value !== null;
-}
-
-function isValidScreenshotPublicUrl(value: string): boolean {
-	return isValidReportImageStorageUrl(value);
 }
 
 function toSafeReportResponseImage(
@@ -260,15 +249,9 @@ export async function POST(request: NextRequest) {
 		const title = submittedTitle.length > 0 ? submittedTitle : null;
 		const description =
 			typeof body.description === "string" ? body.description : null;
-		const email =
-			typeof body.email === "string" ? body.email.trim().toLowerCase() : "";
 		const platformId =
 			typeof body.platformId === "string" || typeof body.platformId === "number"
 				? parseOptionalInteger(String(body.platformId))
-				: undefined;
-		const categoryId =
-			typeof body.categoryId === "string" || typeof body.categoryId === "number"
-				? parseOptionalInteger(String(body.categoryId))
 				: undefined;
 		const turnstileToken =
 			typeof body.turnstileToken === "string" ? body.turnstileToken.trim() : "";
@@ -276,39 +259,6 @@ export async function POST(request: NextRequest) {
 			typeof body.spamTrap === "string" ? body.spamTrap.trim() : "";
 		const formStartedAt =
 			typeof body.formStartedAt === "number" ? body.formStartedAt : Number.NaN;
-		const reportSessionToken =
-			typeof body.reportSessionToken === "string"
-				? body.reportSessionToken.trim()
-				: "";
-		const rawScreenshotUrls = body.screenshotUrls;
-		if (
-			typeof rawScreenshotUrls !== "undefined" &&
-			!Array.isArray(rawScreenshotUrls)
-		) {
-			return badRequestResponse("スクリーンショット情報が不正です");
-		}
-		const normalizedScreenshotUrls: string[] = [];
-		for (const screenshotUrl of rawScreenshotUrls ?? []) {
-			if (typeof screenshotUrl !== "string") {
-				return badRequestResponse("スクリーンショット情報が不正です");
-			}
-			const trimmedScreenshotUrl = screenshotUrl.trim();
-			if (!trimmedScreenshotUrl) {
-				return badRequestResponse("スクリーンショット情報が不正です");
-			}
-			normalizedScreenshotUrls.push(trimmedScreenshotUrl);
-		}
-		const screenshotUrls = Array.from(new Set(normalizedScreenshotUrls));
-		if (screenshotUrls.length > MAX_SCREENSHOT_COUNT) {
-			return badRequestResponse("スクリーンショットは最大5枚までです");
-		}
-		if (
-			screenshotUrls.some(
-				(screenshotUrl) => !isValidScreenshotPublicUrl(screenshotUrl),
-			)
-		) {
-			return badRequestResponse("スクリーンショットURLが不正です");
-		}
 		const clientIp = getClientIp(request);
 		const userAgent = request.headers.get("user-agent")?.trim() || "unknown";
 		const rateLimitKey = clientIp
@@ -321,15 +271,6 @@ export async function POST(request: NextRequest) {
 		if (!platformId) {
 			return badRequestResponse("プラットフォームは必須です");
 		}
-		if (!categoryId) {
-			return badRequestResponse("カテゴリーは必須です");
-		}
-		if (!email) {
-			return badRequestResponse("メールアドレスは必須です");
-		}
-		if (!isValidEmail(email)) {
-			return badRequestResponse("メールアドレスの形式が不正です");
-		}
 
 		if (spamTrap) {
 			return successResponse({ ignored: true }, 201);
@@ -337,19 +278,6 @@ export async function POST(request: NextRequest) {
 
 		if (!Number.isFinite(formStartedAt)) {
 			return badRequestResponse("送信情報が不足しています");
-		}
-
-		if (!reportSessionToken) {
-			return badRequestResponse("レポートセッショントークンが未指定です");
-		}
-
-		// Verify Report Session Token
-		const sessionPayload = verifyReportSessionToken(reportSessionToken);
-		if (!sessionPayload) {
-			return errorResponse(
-				"レポートセッションが無効、または期限切れです。フォームを再読み込みしてください。",
-				401,
-			);
 		}
 
 		if (!turnstileToken) {
@@ -394,6 +322,17 @@ export async function POST(request: NextRequest) {
 			);
 		}
 
+		const impersonationCategory = await prisma.fraudCategory.findUnique({
+			where: { name: "なりすまし" },
+			select: { id: true },
+		});
+		if (!impersonationCategory) {
+			return errorResponse(
+				"通報カテゴリの設定が見つかりません。管理者へお問い合わせください。",
+				503,
+			);
+		}
+
 		const reportId = createReportId();
 		const reportPreview = await fetchReportLinkPreview(url);
 		if (reportPreview.thumbnailUrl) {
@@ -410,40 +349,28 @@ export async function POST(request: NextRequest) {
 			}
 		}
 
-		const reportImageUrls = Array.from(
-			new Set([
-				...screenshotUrls,
-				...(mirroredThumbnail ? [mirroredThumbnail.publicUrl] : []),
-			]),
-		);
-		const user = await prisma.user.upsert({
-			where: { email },
-			update: { lastLoginAt: new Date() },
-			create: { email, lastLoginAt: new Date() },
-		});
-
 		const report = await prisma.report.create({
 			data: {
 				id: reportId,
-				userId: user.id,
 				url,
 				title: reportPreview.title ?? title,
 				description,
 				platformId,
-				categoryId,
+				categoryId: impersonationCategory.id,
 				statusId: 1, // Default to first status (usually 'Pending' or 'Investigating')
 				riskScore: 0,
 				reportCount: 1,
 				sourceIp: clientIp,
-				images:
-					reportImageUrls.length > 0
-						? {
-								create: reportImageUrls.map((imageUrl, index) => ({
-									imageUrl,
-									displayOrder: index,
-								})),
-							}
-						: undefined,
+				images: mirroredThumbnail
+					? {
+							create: [
+								{
+									imageUrl: mirroredThumbnail.publicUrl,
+									displayOrder: 0,
+								},
+							],
+						}
+					: undefined,
 			},
 			include: {
 				status: true,
