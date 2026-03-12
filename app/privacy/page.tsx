@@ -124,7 +124,8 @@ const PRIVACY_SECTIONS: PrivacySection[] = [
 				type: "list",
 				items: [
 					<>
-						スパム対策（Cloudflare）、利用状況分析（Google Analytics）、データ保管（Supabase）等のため、各サービスの規約に基づき情報が送信されることがあります。その他、本サービスの円滑な運営、セキュリティ確保、または本プロジェクトの目的達成のために必要な範囲で、情報の外部への送信を行う場合があります。
+						スパム対策（Cloudflare）、利用状況分析（Google
+						Analytics）、データ保管（Supabase）等のため、各サービスの規約に基づき情報が送信されることがあります。その他、本サービスの円滑な運営、セキュリティ確保、または本プロジェクトの目的達成のために必要な範囲で、情報の外部への送信を行う場合があります。
 					</>,
 					"利用者は、ブラウザ設定による Cookie の無効化または Google が提供するオプトアウト手段により、Google Analytics による情報収集を制限できます。",
 				],
@@ -247,15 +248,16 @@ export default function PrivacyPage() {
 								{section.content.map((block, blockIndex) => {
 									if (block.type === "paragraph") {
 										return (
-											<p key={`${section.title}-${blockIndex}`}>
-												{block.body}
-											</p>
+											<p key={`${section.title}-${blockIndex}`}>{block.body}</p>
 										);
 									}
 
 									if (block.type === "nested-list") {
 										return (
-											<div key={`${section.title}-${blockIndex}`} className="space-y-2">
+											<div
+												key={`${section.title}-${blockIndex}`}
+												className="space-y-2"
+											>
 												<ul className="list-disc pl-5 space-y-1">
 													<li>{block.body}</li>
 												</ul>
