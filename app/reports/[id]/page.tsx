@@ -1,6 +1,7 @@
 import { AlertTriangle, Calendar, CheckCircle2, Clock } from "lucide-react";
 import { cacheLife, cacheTag } from "next/cache";
 import { headers } from "next/headers";
+import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { connection } from "next/server";
@@ -13,6 +14,7 @@ import { Separator } from "@/components/ui/separator";
 import { formatDate } from "@/lib/date";
 import { prisma } from "@/lib/prisma";
 import { getSafeReportImageProxyPath } from "@/lib/report-image-delivery";
+import { getSiteUrl } from "@/lib/site-url";
 
 async function getReportById(id: string) {
 	"use cache";
@@ -44,6 +46,16 @@ interface ReportDetailPageProps {
 	params: Promise<{ id: string }>;
 }
 
+type ReportDetail = NonNullable<Awaited<ReturnType<typeof getReportById>>>;
+
+function truncateText(text: string, maxLength: number) {
+	if (text.length <= maxLength) {
+		return text;
+	}
+
+	return `${text.slice(0, maxLength - 1)}…`;
+}
+
 function maskReportUrl(url: string) {
 	const trimmedUrl = url.trim();
 
@@ -52,6 +64,83 @@ function maskReportUrl(url: string) {
 	}
 
 	return `${trimmedUrl.slice(0, 16)}...${trimmedUrl.slice(-8)}`;
+}
+
+function buildReportMetadataTitle(report: ReportDetail) {
+	return `【注意喚起】${report.title?.trim() || maskReportUrl(report.url)} | AntiFraud`;
+}
+
+function buildReportMetadataDescription(report: ReportDetail) {
+	const summary = report.description?.trim().replace(/\s+/g, " ");
+	const metadataParts = [
+		report.category?.name,
+		report.platform?.name,
+		report.status?.label,
+		report.riskScore && report.riskScore > 0
+			? `リスクスコア ${report.riskScore}`
+			: null,
+	];
+	const fallbackSummary = `${maskReportUrl(report.url)} に関する通報詳細ページです。`;
+	const description = [
+		metadataParts.filter(Boolean).join(" / "),
+		summary || fallbackSummary,
+	]
+		.filter(Boolean)
+		.join(" | ");
+
+	return truncateText(description, 160);
+}
+
+export async function generateMetadata({
+	params,
+}: ReportDetailPageProps): Promise<Metadata> {
+	const { id } = await params;
+	const report = await getReportById(id);
+
+	if (!report) {
+		return {
+			title: "通報が見つかりません | AntiFraud",
+			description: "指定された通報は見つかりませんでした。",
+			robots: {
+				index: false,
+				follow: false,
+			},
+		};
+	}
+
+	const siteUrl = getSiteUrl();
+	const pageUrl = new URL(`/reports/${report.id}`, siteUrl).toString();
+	const imageUrl = new URL("/ogp.png", siteUrl).toString();
+	const title = buildReportMetadataTitle(report);
+	const description = buildReportMetadataDescription(report);
+
+	return {
+		title,
+		description,
+		alternates: {
+			canonical: pageUrl,
+		},
+		openGraph: {
+			title,
+			description,
+			url: pageUrl,
+			type: "article",
+			locale: "ja_JP",
+			siteName: "AntiFraud",
+			images: [
+				{
+					url: imageUrl,
+					alt: report.title?.trim() || "AntiFraud 通報詳細",
+				},
+			],
+		},
+		twitter: {
+			card: "summary_large_image",
+			title,
+			description,
+			images: [imageUrl],
+		},
+	};
 }
 
 export default async function ReportDetailPage({

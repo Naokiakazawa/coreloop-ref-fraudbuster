@@ -8,12 +8,9 @@ import { SiteHeader } from "@/components/site-header";
 import { ThemeProvider } from "@/components/theme-provider";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Toaster } from "@/components/ui/sonner";
+import { getSiteUrl } from "@/lib/site-url";
 
-const siteUrl =
-	process.env.NEXT_PUBLIC_SITE_URL ??
-	process.env.NEXT_PUBLIC_APP_URL ??
-	(process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : null) ??
-	"http://localhost:3000";
+const siteUrl = getSiteUrl();
 
 const inter = Inter({
 	subsets: ["latin"],
