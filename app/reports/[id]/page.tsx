@@ -366,7 +366,14 @@ export default async function ReportDetailPage({
 															{timelineActionLabel}
 														</p>
 														<span className="text-[10px] text-muted-foreground">
-															{formatDate(item.occurredAt, "ja-JP") ?? "不明"}
+															{formatDate(item.occurredAt, "ja-JP", {
+																year: "numeric",
+																month: "2-digit",
+																day: "2-digit",
+																hour: "2-digit",
+																minute: "2-digit",
+																hour12: false,
+															}) ?? "不明"}
 														</span>
 													</div>
 													<p className="text-xs text-muted-foreground">

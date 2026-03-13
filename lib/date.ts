@@ -21,5 +21,5 @@ export function formatDate(
 ): string | null {
 	const date = parseDate(value);
 	if (!date) return null;
-	return date.toLocaleDateString(locale, options);
+	return new Intl.DateTimeFormat(locale, options).format(date);
 }
