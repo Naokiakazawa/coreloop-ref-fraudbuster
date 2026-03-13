@@ -373,6 +373,7 @@ export default async function ReportDetailPage({
 																hour: "2-digit",
 																minute: "2-digit",
 																hour12: false,
+																timeZone: "Asia/Tokyo",
 															}) ?? "不明"}
 														</span>
 													</div>
