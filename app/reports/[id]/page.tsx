@@ -227,9 +227,6 @@ export default async function ReportDetailPage({
 					{/* Header Info */}
 					<section className="space-y-6">
 						<div className="flex flex-wrap items-center gap-3">
-							<Badge variant="secondary" className="px-3 py-1 text-sm">
-								{report.category?.name || "未分類"}
-							</Badge>
 							<Badge variant="outline" className="px-3 py-1 text-sm">
 								{report.platform?.name || "不明なプラットフォーム"}
 							</Badge>

@@ -185,9 +185,6 @@ function ReportSummaryCard({ report }: { report: ReportSummary }) {
 								{formatDate(report.createdAt)}
 							</p>
 							<div className="flex min-h-5 items-center gap-2 overflow-hidden">
-								<Badge variant="secondary" className="shrink-0">
-									{report.category?.name || "未分類"}
-								</Badge>
 								{report.status?.label ? (
 									<Badge variant="outline" className="shrink-0">
 										{report.status.label}
