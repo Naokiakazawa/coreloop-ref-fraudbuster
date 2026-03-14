@@ -1,5 +1,5 @@
 import sharp from "sharp";
-import type { CanonicalImageExtension } from "@/lib/report-image-upload";
+import type { CanonicalImageExtension } from "./report-image-upload.ts";
 
 const MAX_REENCODE_INPUT_PIXELS = 40_000_000;
 const JPEG_REENCODE_QUALITY = 85;

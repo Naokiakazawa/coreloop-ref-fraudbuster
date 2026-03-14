@@ -4,18 +4,25 @@ import type { NextRequest } from "next/server";
 import {
 	badRequestResponse,
 	errorResponse,
-	successResponse,
 	getClientIp,
+	successResponse,
 	verifyTurnstileToken,
 } from "@/lib/api-utils";
+import { prisma } from "@/lib/prisma";
 import { getSafeReportImageAbsoluteUrl } from "@/lib/report-image-delivery";
+import {
+	ReportImageUploadValidationError,
+	readReportImageFiles,
+	storePreparedReportImages,
+	validateAndPrepareReportImages,
+} from "@/lib/report-image-ingest";
 import {
 	cleanupStoredReportImages,
 	getReportImageStorageBucket,
 	resolveSupabaseProjectOrigin,
 	type StoredReportImage,
 } from "@/lib/report-image-storage";
-import { prisma } from "@/lib/prisma";
+import { PUBLIC_REPORT_IMAGE_UPLOAD_LIMITS } from "@/lib/report-image-upload";
 import { fetchReportLinkPreview } from "@/lib/report-link-preview";
 import { mirrorReportPreviewThumbnail } from "@/lib/report-thumbnail-ingest";
 import type {
@@ -33,6 +40,76 @@ function parseOptionalInteger(value: string | null): number | undefined {
 
 function parseSortOrder(value: string | null): ReportSortOrder {
 	return value === "popular" ? "popular" : "newest";
+}
+
+type CreateReportSubmission = {
+	url: string;
+	title: string | null;
+	description: string | null;
+	platformId: number | undefined;
+	turnstileToken: string;
+	spamTrap: string;
+	formStartedAt: number;
+	imageFiles: File[];
+};
+
+function getTrimmedFormDataValue(formData: FormData, key: string): string {
+	const value = formData.get(key);
+	return typeof value === "string" ? value.trim() : "";
+}
+
+function getNullableFormDataValue(
+	formData: FormData,
+	key: string,
+): string | null {
+	const value = formData.get(key);
+	return typeof value === "string" ? value : null;
+}
+
+async function parseCreateReportSubmission(
+	request: NextRequest,
+): Promise<CreateReportSubmission> {
+	const contentType = request.headers.get("content-type")?.toLowerCase() ?? "";
+	if (contentType.includes("multipart/form-data")) {
+		const formData = await request.formData();
+		const submittedTitle = getTrimmedFormDataValue(formData, "title");
+
+		return {
+			url: getTrimmedFormDataValue(formData, "url"),
+			title: submittedTitle.length > 0 ? submittedTitle : null,
+			description: getNullableFormDataValue(formData, "description"),
+			platformId: parseOptionalInteger(
+				getTrimmedFormDataValue(formData, "platformId"),
+			),
+			turnstileToken: getTrimmedFormDataValue(formData, "turnstileToken"),
+			spamTrap: getTrimmedFormDataValue(formData, "spamTrap"),
+			formStartedAt: Number(getTrimmedFormDataValue(formData, "formStartedAt")),
+			imageFiles: readReportImageFiles(formData, "files", {
+				...PUBLIC_REPORT_IMAGE_UPLOAD_LIMITS,
+				required: false,
+			}),
+		};
+	}
+
+	const body = await request.json();
+	const submittedTitle =
+		typeof body.title === "string" ? body.title.trim() : "";
+
+	return {
+		url: typeof body.url === "string" ? body.url.trim() : "",
+		title: submittedTitle.length > 0 ? submittedTitle : null,
+		description: typeof body.description === "string" ? body.description : null,
+		platformId:
+			typeof body.platformId === "string" || typeof body.platformId === "number"
+				? parseOptionalInteger(String(body.platformId))
+				: undefined,
+		turnstileToken:
+			typeof body.turnstileToken === "string" ? body.turnstileToken.trim() : "",
+		spamTrap: typeof body.spamTrap === "string" ? body.spamTrap.trim() : "",
+		formStartedAt:
+			typeof body.formStartedAt === "number" ? body.formStartedAt : Number.NaN,
+		imageFiles: [],
+	};
 }
 
 const SUBMISSION_WINDOW_MS = 10 * 60 * 1000;
@@ -228,26 +305,23 @@ export async function GET(request: NextRequest) {
  */
 export async function POST(request: NextRequest) {
 	let mirroredThumbnail: StoredReportImage | null = null;
+	let uploadedImages: StoredReportImage[] = [];
 	let reportCreated = false;
+	const bucket = getReportImageStorageBucket();
+	const supabaseOrigin = resolveSupabaseProjectOrigin();
+	const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY?.trim() ?? "";
 
 	try {
-		const body = await request.json();
-		const url = typeof body.url === "string" ? body.url.trim() : "";
-		const submittedTitle =
-			typeof body.title === "string" ? body.title.trim() : "";
-		const title = submittedTitle.length > 0 ? submittedTitle : null;
-		const description =
-			typeof body.description === "string" ? body.description : null;
-		const platformId =
-			typeof body.platformId === "string" || typeof body.platformId === "number"
-				? parseOptionalInteger(String(body.platformId))
-				: undefined;
-		const turnstileToken =
-			typeof body.turnstileToken === "string" ? body.turnstileToken.trim() : "";
-		const spamTrap =
-			typeof body.spamTrap === "string" ? body.spamTrap.trim() : "";
-		const formStartedAt =
-			typeof body.formStartedAt === "number" ? body.formStartedAt : Number.NaN;
+		const {
+			url,
+			title,
+			description,
+			platformId,
+			turnstileToken,
+			spamTrap,
+			formStartedAt,
+			imageFiles,
+		} = await parseCreateReportSubmission(request);
 		const clientIp = getClientIp(request);
 		const userAgent = request.headers.get("user-agent")?.trim() || "unknown";
 		const rateLimitKey = clientIp
@@ -323,6 +397,27 @@ export async function POST(request: NextRequest) {
 		}
 
 		const reportId = createReportId();
+		if (imageFiles.length > 0) {
+			if (!supabaseOrigin || !serviceRoleKey) {
+				return errorResponse(
+					"画像アップロード設定が不足しています。管理者へお問い合わせください。",
+					503,
+				);
+			}
+
+			const preparedImages = await validateAndPrepareReportImages(
+				imageFiles,
+				PUBLIC_REPORT_IMAGE_UPLOAD_LIMITS,
+			);
+			uploadedImages = await storePreparedReportImages({
+				files: preparedImages,
+				bucket,
+				serviceRoleKey,
+				supabaseOrigin,
+				storagePrefix: `reports/${reportId}/user`,
+			});
+		}
+
 		const reportPreview = await fetchReportLinkPreview(url);
 		if (reportPreview.thumbnailUrl) {
 			try {
@@ -338,51 +433,68 @@ export async function POST(request: NextRequest) {
 			}
 		}
 
-		const report = await prisma.report.create({
-			data: {
-				id: reportId,
-				url,
-				title: reportPreview.title ?? title,
-				description,
-				platformId,
-				categoryId: impersonationCategory.id,
-				statusId: 1, // Default to first status (usually 'Pending' or 'Investigating')
-				riskScore: 0,
-				reportCount: 1,
-				sourceIp: clientIp,
-				images: mirroredThumbnail
-					? {
-							create: [
-								{
-									imageUrl: mirroredThumbnail.publicUrl,
-									displayOrder: 0,
-								},
-							],
-						}
-					: undefined,
-			},
-			include: {
-				status: true,
-				images: {
-					select: {
-						id: true,
-						imageUrl: true,
-					},
-					take: 1,
-					orderBy: { displayOrder: "asc" as const },
+		const createdImages = [
+			...(mirroredThumbnail
+				? [
+						{
+							imageUrl: mirroredThumbnail.publicUrl,
+							displayOrder: 0,
+						},
+					]
+				: []),
+			...uploadedImages.map((file, index) => ({
+				imageUrl: file.publicUrl,
+				displayOrder: index + (mirroredThumbnail ? 1 : 0),
+			})),
+		];
+
+		const report = await prisma.$transaction(async (tx) => {
+			const createdReport = await tx.report.create({
+				data: {
+					id: reportId,
+					url,
+					title: reportPreview.title ?? title,
+					description,
+					platformId,
+					categoryId: impersonationCategory.id,
+					statusId: 1, // Default to first status (usually 'Pending' or 'Investigating')
+					riskScore: 0,
+					reportCount: 1,
+					sourceIp: clientIp,
+					images:
+						createdImages.length > 0
+							? {
+									createMany: {
+										data: createdImages,
+									},
+								}
+							: undefined,
 				},
-			},
+				include: {
+					status: true,
+					images: {
+						select: {
+							id: true,
+							imageUrl: true,
+						},
+						take: 1,
+						orderBy: { displayOrder: "asc" as const },
+					},
+				},
+			});
+
+			// Create an initial timeline entry
+			await tx.reportTimeline.create({
+				data: {
+					reportId: createdReport.id,
+					actionLabel: "通報受領",
+					description: "システムによる自動受付完了",
+				},
+			});
+
+			return createdReport;
 		});
 		reportCreated = true;
-
-		// Create an initial timeline entry
-		await prisma.reportTimeline.create({
-			data: {
-				reportId: report.id,
-				actionLabel: "通報受領",
-				description: "システムによる自動受付完了",
-			},
-		});
 
 		try {
 			revalidateTag("reports", "max");
@@ -401,19 +513,26 @@ export async function POST(request: NextRequest) {
 			201,
 		);
 	} catch (error) {
-		if (mirroredThumbnail && !reportCreated) {
-			const supabaseOrigin = resolveSupabaseProjectOrigin();
-			const serviceRoleKey =
-				process.env.SUPABASE_SERVICE_ROLE_KEY?.trim() ?? "";
+		if (error instanceof ReportImageUploadValidationError) {
+			return badRequestResponse(error.message);
+		}
 
-			if (supabaseOrigin && serviceRoleKey) {
-				await cleanupStoredReportImages({
-					files: [mirroredThumbnail],
-					bucket: getReportImageStorageBucket(),
-					serviceRoleKey,
-					supabaseOrigin,
-				});
-			}
+		const filesToCleanup = [
+			...(mirroredThumbnail ? [mirroredThumbnail] : []),
+			...uploadedImages,
+		];
+		if (
+			!reportCreated &&
+			filesToCleanup.length > 0 &&
+			supabaseOrigin &&
+			serviceRoleKey
+		) {
+			await cleanupStoredReportImages({
+				files: filesToCleanup,
+				bucket,
+				serviceRoleKey,
+				supabaseOrigin,
+			});
 		}
 
 		console.error("Failed to create report:", error);

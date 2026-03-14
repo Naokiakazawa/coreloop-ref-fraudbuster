@@ -3,6 +3,7 @@
 import {
 	AlertCircle,
 	CheckCircle2,
+	ImagePlus,
 	LoaderCircle,
 	ShieldAlert,
 	ShieldCheck,
@@ -30,6 +31,13 @@ import {
 	SelectTrigger,
 	SelectValue,
 } from "@/components/ui/select";
+import {
+	ALLOWED_REPORT_IMAGE_FORMATS_LABEL,
+	formatReportImageFileSize,
+	MAX_PUBLIC_REPORT_IMAGE_FILE_COUNT,
+	MAX_PUBLIC_REPORT_IMAGE_FILE_SIZE_BYTES,
+	REPORT_IMAGE_INPUT_ACCEPT,
+} from "@/lib/report-image-upload";
 
 type TurnstileRenderOptions = {
 	sitekey: string;
@@ -104,7 +112,9 @@ export function ReportForm({ platforms }: ReportFormProps) {
 	const [submissionElapsedSeconds, setSubmissionElapsedSeconds] =
 		React.useState(0);
 	const [submissionSucceeded, setSubmissionSucceeded] = React.useState(false);
+	const [files, setFiles] = React.useState<File[]>([]);
 	const turnstileContainerRef = React.useRef<HTMLDivElement | null>(null);
+	const fileInputRef = React.useRef<HTMLInputElement | null>(null);
 	const formStartedAtRef = React.useRef(Date.now());
 
 	const isFormComplete =
@@ -168,13 +178,52 @@ export function ReportForm({ platforms }: ReportFormProps) {
 		turnstile.reset(turnstileWidgetId);
 	}, [turnstileWidgetId]);
 
+	const resetSelectedFiles = React.useCallback(() => {
+		setFiles([]);
+		if (fileInputRef.current) {
+			fileInputRef.current.value = "";
+		}
+	}, []);
+
 	const resetForm = React.useCallback(() => {
 		setFormData(getInitialFormData());
+		resetSelectedFiles();
 		setSubmissionSucceeded(true);
 		setSubmissionStartedAt(null);
 		setLoading(false);
+		formStartedAtRef.current = Date.now();
 		resetTurnstile();
-	}, [resetTurnstile]);
+	}, [resetSelectedFiles, resetTurnstile]);
+
+	const handleFileChange = React.useCallback(
+		(event: React.ChangeEvent<HTMLInputElement>) => {
+			const selectedFiles = Array.from(event.target.files ?? []);
+			if (selectedFiles.length > MAX_PUBLIC_REPORT_IMAGE_FILE_COUNT) {
+				toast.error(
+					`画像は最大${MAX_PUBLIC_REPORT_IMAGE_FILE_COUNT}枚まで添付できます。`,
+				);
+				resetSelectedFiles();
+				return;
+			}
+
+			const oversizedFile = selectedFiles.find(
+				(file) => file.size > MAX_PUBLIC_REPORT_IMAGE_FILE_SIZE_BYTES,
+			);
+			if (oversizedFile) {
+				toast.error(
+					`${oversizedFile.name} は${Math.floor(
+						MAX_PUBLIC_REPORT_IMAGE_FILE_SIZE_BYTES / 1024 / 1024,
+					)}MB以下にしてください。`,
+				);
+				resetSelectedFiles();
+				return;
+			}
+
+			setSubmissionSucceeded(false);
+			setFiles(selectedFiles);
+		},
+		[resetSelectedFiles],
+	);
 
 	const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
 		event.preventDefault();
@@ -200,16 +249,19 @@ export function ReportForm({ platforms }: ReportFormProps) {
 		setSubmissionStartedAt(Date.now());
 
 		try {
+			const requestBody = new FormData();
+			requestBody.set("url", formData.url.trim());
+			requestBody.set("platformId", formData.platformId);
+			requestBody.set("formStartedAt", String(formStartedAtRef.current));
+			requestBody.set("turnstileToken", turnstileToken);
+			requestBody.set("spamTrap", formData.spamTrap);
+			for (const file of files) {
+				requestBody.append("files", file);
+			}
+
 			const response = await fetch("/api/reports", {
 				method: "POST",
-				headers: { "Content-Type": "application/json" },
-				body: JSON.stringify({
-					url: formData.url.trim(),
-					platformId: formData.platformId,
-					formStartedAt: formStartedAtRef.current,
-					turnstileToken,
-					spamTrap: formData.spamTrap,
-				}),
+				body: requestBody,
 			});
 
 			if (!response.ok) {
@@ -255,7 +307,6 @@ export function ReportForm({ platforms }: ReportFormProps) {
 
 			{submissionSucceeded ? (
 				<div
-					role="status"
 					aria-live="polite"
 					className="rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-emerald-900"
 				>
@@ -338,6 +389,61 @@ export function ReportForm({ platforms }: ReportFormProps) {
 							) : null}
 						</div>
 
+						<div className="space-y-4 rounded-xl border p-4">
+							<div className="space-y-1">
+								<div className="flex items-center gap-2">
+									<ImagePlus className="h-4 w-4 text-primary" />
+									<p className="text-sm font-medium">
+										（任意）スクリーンショット等の証拠画像
+									</p>
+								</div>
+								<p className="text-xs text-muted-foreground">
+									任意で添付できます。{ALLOWED_REPORT_IMAGE_FORMATS_LABEL}{" "}
+									を利用でき、 最大{MAX_PUBLIC_REPORT_IMAGE_FILE_COUNT}枚・各
+									{Math.floor(
+										MAX_PUBLIC_REPORT_IMAGE_FILE_SIZE_BYTES / 1024 / 1024,
+									)}
+									MBまでです。
+								</p>
+							</div>
+							<div className="space-y-2">
+								<Label htmlFor="report-images">添付画像</Label>
+								<Input
+									id="report-images"
+									ref={fileInputRef}
+									type="file"
+									multiple
+									accept={REPORT_IMAGE_INPUT_ACCEPT}
+									onChange={handleFileChange}
+									disabled={loading}
+								/>
+							</div>
+							{files.length > 0 ? (
+								<div className="rounded-lg border bg-background/70 p-3">
+									<p className="text-sm font-medium">
+										選択中の画像 {files.length}枚
+									</p>
+									<div className="mt-2 space-y-2">
+										{files.map((file) => (
+											<div
+												key={`${file.name}-${file.lastModified}`}
+												className="flex items-center justify-between gap-3 text-sm"
+											>
+												<span className="truncate">{file.name}</span>
+												<span className="shrink-0 text-xs text-muted-foreground">
+													{formatReportImageFileSize(file.size)}
+												</span>
+											</div>
+										))}
+									</div>
+								</div>
+							) : (
+								<p className="text-xs text-muted-foreground">
+									画像を添付しない場合も、そのまま通報できます。
+								</p>
+							)}
+						</div>
+
 						<div className="space-y-3 rounded-xl border bg-muted/30 p-4">
 							<div className="flex items-center gap-2">
 								<ShieldCheck className="h-4 w-4 text-primary" />
@@ -412,7 +518,6 @@ export function ReportForm({ platforms }: ReportFormProps) {
 
 						{loading ? (
 							<div
-								role="status"
 								aria-live="polite"
 								className="rounded-xl border border-primary/15 bg-primary/5 px-4 py-3"
 							>

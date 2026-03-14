@@ -131,12 +131,17 @@ export function createOpenApiDocument(origin: string): OpenApiDocument {
 					tags: ["Reports"],
 					summary: "新規通報を投稿",
 					description:
-						"Turnstile 検証・送信レート制限・リンクプレビュー抽出を実行し、カテゴリを「なりすまし」として通報を作成します。",
+						"Turnstile 検証・送信レート制限・リンクプレビュー抽出を実行し、カテゴリを「なりすまし」として通報を作成します。任意で証拠画像を3枚まで添付でき、各画像は4MB以下です。",
 					requestBody: {
 						required: true,
 						content: {
 							"application/json": {
 								schema: { $ref: "#/components/schemas/CreateReportRequest" },
+							},
+							"multipart/form-data": {
+								schema: {
+									$ref: "#/components/schemas/CreateReportMultipartRequest",
+								},
 							},
 						},
 					},
@@ -432,6 +437,36 @@ export function createOpenApiDocument(origin: string): OpenApiDocument {
 							type: "number",
 							description:
 								"フォーム表示開始時刻の Unix epoch ミリ秒。送信間隔チェックに利用されます。",
+						},
+					},
+				},
+				CreateReportMultipartRequest: {
+					type: "object",
+					required: ["url", "platformId", "turnstileToken", "formStartedAt"],
+					properties: {
+						url: { type: "string", minLength: 1 },
+						platformId: {
+							type: "string",
+							pattern: "^[1-9][0-9]*$",
+						},
+						turnstileToken: { type: "string", minLength: 1 },
+						spamTrap: {
+							type: "string",
+							description: "ボット検知用のハニーポット。空文字を送る想定です。",
+						},
+						formStartedAt: {
+							type: "string",
+							description:
+								"フォーム表示開始時刻の Unix epoch ミリ秒。送信間隔チェックに利用されます。",
+						},
+						files: {
+							type: "array",
+							maxItems: 3,
+							items: {
+								type: "string",
+								format: "binary",
+							},
+							description: "任意の添付画像。各ファイルは4MB以下です。",
 						},
 					},
 				},

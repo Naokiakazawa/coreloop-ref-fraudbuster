@@ -25,8 +25,29 @@ const CANONICAL_MIME_BY_EXTENSION = {
 	webp: "image/webp",
 } as const;
 
-export const MAX_REPORT_IMAGE_FILE_COUNT = 5;
-export const MAX_REPORT_IMAGE_FILE_SIZE_BYTES = 10 * 1024 * 1024;
+export type ReportImageUploadLimits = {
+	maxFileCount: number;
+	maxFileSizeBytes: number;
+};
+
+export const ADMIN_REPORT_IMAGE_UPLOAD_LIMITS: ReportImageUploadLimits = {
+	maxFileCount: 5,
+	maxFileSizeBytes: 10 * 1024 * 1024,
+};
+
+export const PUBLIC_REPORT_IMAGE_UPLOAD_LIMITS: ReportImageUploadLimits = {
+	maxFileCount: 3,
+	maxFileSizeBytes: 4 * 1024 * 1024,
+};
+
+export const MAX_REPORT_IMAGE_FILE_COUNT =
+	ADMIN_REPORT_IMAGE_UPLOAD_LIMITS.maxFileCount;
+export const MAX_REPORT_IMAGE_FILE_SIZE_BYTES =
+	ADMIN_REPORT_IMAGE_UPLOAD_LIMITS.maxFileSizeBytes;
+export const MAX_PUBLIC_REPORT_IMAGE_FILE_COUNT =
+	PUBLIC_REPORT_IMAGE_UPLOAD_LIMITS.maxFileCount;
+export const MAX_PUBLIC_REPORT_IMAGE_FILE_SIZE_BYTES =
+	PUBLIC_REPORT_IMAGE_UPLOAD_LIMITS.maxFileSizeBytes;
 export const ALLOWED_REPORT_IMAGE_FORMATS_LABEL =
 	"JPG / JPEG / PNG / GIF / WEBP";
 export const REPORT_IMAGE_INPUT_ACCEPT = [
@@ -113,4 +134,12 @@ export function getCanonicalImageExtensionFromMimeType(
 	if (canonicalMimeType === "image/webp") return "webp";
 
 	return null;
+}
+
+export function formatReportImageFileSize(bytes: number): string {
+	if (bytes < 1024 * 1024) {
+		return `${Math.max(1, Math.round(bytes / 1024))}KB`;
+	}
+
+	return `${(bytes / 1024 / 1024).toFixed(1)}MB`;
 }

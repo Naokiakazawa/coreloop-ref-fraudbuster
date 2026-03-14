@@ -30,6 +30,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import {
 	ALLOWED_REPORT_IMAGE_FORMATS_LABEL,
+	formatReportImageFileSize,
 	MAX_REPORT_IMAGE_FILE_COUNT,
 	MAX_REPORT_IMAGE_FILE_SIZE_BYTES,
 	REPORT_IMAGE_INPUT_ACCEPT,
@@ -55,14 +56,6 @@ type UploadResponse = {
 	uploadedCount?: number;
 	totalImageCount?: number;
 };
-
-function formatFileSize(bytes: number): string {
-	if (bytes < 1024 * 1024) {
-		return `${Math.max(1, Math.round(bytes / 1024))}KB`;
-	}
-
-	return `${(bytes / 1024 / 1024).toFixed(1)}MB`;
-}
 
 export function ReportImageUploadDialog({
 	reportId,
@@ -110,7 +103,7 @@ export function ReportImageUploadDialog({
 				resetSelection();
 			}
 		},
-		[isPending, resetSelection],
+		[isPending, resetSelection, setOpen],
 	);
 
 	const handleFileChange = React.useCallback(
@@ -181,7 +174,7 @@ export function ReportImageUploadDialog({
 				setIsUploading(false);
 			}
 		},
-		[existingImageCount, files, reportId, resetSelection, router],
+		[existingImageCount, files, reportId, resetSelection, router, setOpen],
 	);
 
 	return (
@@ -326,7 +319,7 @@ export function ReportImageUploadDialog({
 										>
 											<span className="truncate">{file.name}</span>
 											<span className="shrink-0 text-xs text-muted-foreground">
-												{formatFileSize(file.size)}
+												{formatReportImageFileSize(file.size)}
 											</span>
 										</div>
 									))}

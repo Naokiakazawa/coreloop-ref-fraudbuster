@@ -1,11 +1,11 @@
 import { randomUUID } from "node:crypto";
 import { fileTypeFromBuffer } from "file-type";
-import { reencodeAndSanitizeImage } from "@/lib/report-image-sanitizer";
+import { reencodeAndSanitizeImage } from "./report-image-sanitizer.ts";
 import {
 	cleanupStoredReportImages,
 	type StoredReportImage,
 	uploadReportImageToStorage,
-} from "@/lib/report-image-storage";
+} from "./report-image-storage.ts";
 import {
 	ALLOWED_REPORT_IMAGE_FORMATS_LABEL,
 	type CanonicalImageExtension,
@@ -19,7 +19,8 @@ import {
 	MAX_REPORT_IMAGE_FILE_COUNT,
 	MAX_REPORT_IMAGE_FILE_SIZE_BYTES,
 	normalizeImageMimeType,
-} from "@/lib/report-image-upload";
+	type ReportImageUploadLimits,
+} from "./report-image-upload.ts";
 
 export class ReportImageUploadValidationError extends Error {
 	constructor(message: string) {
@@ -35,20 +36,41 @@ export type PreparedReportImage = {
 	size: number;
 };
 
+type ReadReportImageFilesOptions = Partial<ReportImageUploadLimits> & {
+	required?: boolean;
+};
+
+type ValidateReportImageFilesOptions = Partial<ReportImageUploadLimits>;
+
+function resolveReportImageUploadLimits(
+	options: Partial<ReportImageUploadLimits> | undefined,
+): ReportImageUploadLimits {
+	return {
+		maxFileCount: options?.maxFileCount ?? MAX_REPORT_IMAGE_FILE_COUNT,
+		maxFileSizeBytes:
+			options?.maxFileSizeBytes ?? MAX_REPORT_IMAGE_FILE_SIZE_BYTES,
+	};
+}
+
 export function readReportImageFiles(
 	formData: FormData,
 	fieldName = "files",
+	options?: ReadReportImageFilesOptions,
 ): File[] {
+	const { maxFileCount } = resolveReportImageUploadLimits(options);
 	const rawFiles = formData.getAll(fieldName);
 
 	if (rawFiles.length === 0) {
+		if (options?.required === false) {
+			return [];
+		}
 		throw new ReportImageUploadValidationError(
 			"アップロードする画像を選択してください。",
 		);
 	}
-	if (rawFiles.length > MAX_REPORT_IMAGE_FILE_COUNT) {
+	if (rawFiles.length > maxFileCount) {
 		throw new ReportImageUploadValidationError(
-			`画像は最大${MAX_REPORT_IMAGE_FILE_COUNT}枚までです。`,
+			`画像は最大${maxFileCount}枚までです。`,
 		);
 	}
 
@@ -65,8 +87,17 @@ export function readReportImageFiles(
 
 export async function validateAndPrepareReportImages(
 	files: File[],
+	options?: ValidateReportImageFilesOptions,
 ): Promise<PreparedReportImage[]> {
+	const { maxFileCount, maxFileSizeBytes } =
+		resolveReportImageUploadLimits(options);
 	const validatedFiles: PreparedReportImage[] = [];
+
+	if (files.length > maxFileCount) {
+		throw new ReportImageUploadValidationError(
+			`画像は最大${maxFileCount}枚までです。`,
+		);
+	}
 
 	for (const file of files) {
 		const normalizedMimeType = normalizeImageMimeType(file.type);
@@ -86,9 +117,9 @@ export async function validateAndPrepareReportImages(
 				"空のファイルはアップロードできません。",
 			);
 		}
-		if (file.size > MAX_REPORT_IMAGE_FILE_SIZE_BYTES) {
+		if (file.size > maxFileSizeBytes) {
 			throw new ReportImageUploadValidationError(
-				`各ファイルは${Math.floor(MAX_REPORT_IMAGE_FILE_SIZE_BYTES / 1024 / 1024)}MB以下にしてください。`,
+				`各ファイルは${Math.floor(maxFileSizeBytes / 1024 / 1024)}MB以下にしてください。`,
 			);
 		}
 
@@ -132,10 +163,10 @@ export async function validateAndPrepareReportImages(
 				`${file.name} の画像処理結果が不正です。別の画像で再試行してください。`,
 			);
 		}
-		if (sanitizedImage.buffer.length > MAX_REPORT_IMAGE_FILE_SIZE_BYTES) {
+		if (sanitizedImage.buffer.length > maxFileSizeBytes) {
 			throw new ReportImageUploadValidationError(
 				`${file.name} は画像処理後に${Math.floor(
-					MAX_REPORT_IMAGE_FILE_SIZE_BYTES / 1024 / 1024,
+					maxFileSizeBytes / 1024 / 1024,
 				)}MBを超えました。別の画像で再試行してください。`,
 			);
 		}
