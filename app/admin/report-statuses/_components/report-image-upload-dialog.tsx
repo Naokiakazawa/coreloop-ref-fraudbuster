@@ -45,6 +45,9 @@ type ReportImageUploadDialogProps = {
 		previewUrl: string | null;
 		displayOrder: number | null;
 	}>;
+	open?: boolean;
+	onOpenChange?: (open: boolean) => void;
+	hideTrigger?: boolean;
 };
 
 type UploadResponse = {
@@ -67,15 +70,30 @@ export function ReportImageUploadDialog({
 	reportUrl,
 	existingImageCount,
 	currentImages,
+	open: openProp,
+	onOpenChange,
+	hideTrigger = false,
 }: ReportImageUploadDialogProps) {
 	const router = useRouter();
-	const [open, setOpen] = React.useState(false);
+	const [uncontrolledOpen, setUncontrolledOpen] = React.useState(false);
 	const [files, setFiles] = React.useState<File[]>([]);
 	const [isUploading, setIsUploading] = React.useState(false);
 	const [isRefreshing, startTransition] = React.useTransition();
 	const isPending = isUploading || isRefreshing;
 	const displayTitle = reportTitle?.trim() || "（タイトル未設定）";
 	const inputId = `report-image-upload-${reportId}`;
+	const open = openProp ?? uncontrolledOpen;
+
+	const setOpen = React.useCallback(
+		(nextOpen: boolean) => {
+			if (openProp === undefined) {
+				setUncontrolledOpen(nextOpen);
+			}
+
+			onOpenChange?.(nextOpen);
+		},
+		[onOpenChange, openProp],
+	);
 
 	const resetSelection = React.useCallback(() => {
 		setFiles([]);
@@ -168,12 +186,14 @@ export function ReportImageUploadDialog({
 
 	return (
 		<Dialog open={open} onOpenChange={handleOpenChange}>
-			<DialogTrigger asChild>
-				<Button type="button" size="sm" variant="outline">
-					<ImagePlus className="mr-2 h-4 w-4" />
-					画像を追加
-				</Button>
-			</DialogTrigger>
+			{hideTrigger ? null : (
+				<DialogTrigger asChild>
+					<Button type="button" size="sm" variant="outline">
+						<ImagePlus className="mr-2 h-4 w-4" />
+						画像を追加
+					</Button>
+				</DialogTrigger>
+			)}
 			<DialogContent>
 				<DialogHeader>
 					<DialogTitle>通報画像を追加</DialogTitle>
