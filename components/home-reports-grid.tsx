@@ -142,15 +142,22 @@ function ReportSummaryCard({ report }: { report: ReportSummary }) {
 				<CardContent className="flex h-full items-stretch gap-4 p-4 sm:p-5">
 					<div className="w-36 shrink-0 space-y-2 sm:w-44">
 						<div className="flex min-h-5 flex-wrap items-center gap-2 overflow-hidden">
-							{visibleLabels.map((label) => (
+							{report.status?.label ? (
 								<Badge
-									key={label}
 									variant="outline"
-									className={`shrink-0 ${REPORT_LABEL_BADGE_CLASS_NAME}`}
+									className={statusMeta?.badgeClassName ?? undefined}
 								>
-									{label}
+									{report.status.label}
 								</Badge>
-							))}
+							) : null}
+							{report.verdict?.label ? (
+								<Badge
+									variant="outline"
+									className={verdictMeta?.badgeClassName ?? undefined}
+								>
+									{report.verdict.label}
+								</Badge>
+							) : null}
 						</div>
 						<div className="h-24 overflow-hidden rounded-lg bg-muted/70 sm:h-28">
 							{thumbnailUrl && !hasThumbnailError ? (
@@ -176,22 +183,15 @@ function ReportSummaryCard({ report }: { report: ReportSummary }) {
 								{formatDate(report.createdAt)}
 							</p>
 							<div className="flex min-h-5 flex-wrap items-center gap-2 overflow-hidden">
-								{report.status?.label ? (
+								{visibleLabels.map((label) => (
 									<Badge
+										key={label}
 										variant="outline"
-										className={statusMeta?.badgeClassName ?? undefined}
+										className={`shrink-0 ${REPORT_LABEL_BADGE_CLASS_NAME}`}
 									>
-										{report.status.label}
+										{label}
 									</Badge>
-								) : null}
-								{report.verdict?.label ? (
-									<Badge
-										variant="outline"
-										className={verdictMeta?.badgeClassName ?? undefined}
-									>
-										{report.verdict.label}
-									</Badge>
-								) : null}
+								))}
 							</div>
 						</div>
 
