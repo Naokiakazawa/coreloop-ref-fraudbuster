@@ -64,10 +64,10 @@ export default async function AdminPage() {
 					<CardHeader>
 						<CardTitle className="flex items-center gap-2">
 							<ShieldCheck className="h-5 w-5" />
-							通報ステータス管理
+							通報管理
 						</CardTitle>
 						<CardDescription>
-							通報ごとのステータスを更新し、詳細画面とタイムラインに反映します。
+							ラベル、ステータス、判定結果を更新し、公開画面とタイムラインに反映します。
 						</CardDescription>
 					</CardHeader>
 					<CardContent className="space-y-3">
@@ -75,9 +75,7 @@ export default async function AdminPage() {
 							管理対象の通報: {reportCount}件
 						</p>
 						<Button asChild>
-							<Link href="/admin/report-statuses">
-								通報ステータス管理へ移動
-							</Link>
+							<Link href="/admin/report-statuses">通報管理へ移動</Link>
 						</Button>
 					</CardContent>
 				</Card>

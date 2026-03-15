@@ -10,7 +10,7 @@ const ADMIN_NAV_ITEMS = [
 	{
 		id: "report-statuses",
 		href: "/admin/report-statuses",
-		label: "通報ステータス管理",
+		label: "通報管理",
 	},
 	{ id: "inquiries", href: "/admin/inquiries", label: "お問い合わせ管理" },
 ] as const;

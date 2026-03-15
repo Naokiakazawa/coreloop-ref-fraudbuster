@@ -4,6 +4,8 @@ BEGIN;
 TRUNCATE TABLE
   announcement_tag_relations,
   announcement_tags,
+  report_label_relations,
+  report_labels,
   report_images,
   report_timelines,
   announcements,
@@ -44,11 +46,14 @@ INSERT INTO platforms (name, icon_url, is_active) VALUES
 
 INSERT INTO report_statuses (status_code, label, badge_color) VALUES
   ('PENDING', '処理待ち', 'gray'),
-  ('UNDER_REVIEW', '調査中', 'blue'),
-  ('HIGH_RISK', '高リスク', 'orange'),
-  ('CONFIRMED_FRAUD', '詐欺確定', 'red'),
-  ('SAFE', '安全', 'green'),
-  ('INSUFFICIENT_INFO', '判断不能', 'zinc');
+  ('INVESTIGATING', '調査中', 'blue'),
+  ('COMPLETED', '完了', 'emerald');
+
+INSERT INTO report_labels (name) VALUES
+  ('なりすまし'),
+  ('美容系'),
+  ('投資系'),
+  ('オンラインカジノ');
 
 -- =============================================
 -- 2) Users & admins
@@ -68,7 +73,7 @@ INSERT INTO users (id, email, created_at, last_login_at) VALUES
 -- =============================================
 
 INSERT INTO reports (
-  id, user_id, url, title, description, platform_id, category_id, status_id,
+  id, user_id, url, title, description, platform_id, category_id, status_id, verdict,
   risk_score, view_count, report_count, source_ip, privacy_policy_agreed_at, created_at, updated_at
 ) VALUES
   (
@@ -79,7 +84,8 @@ INSERT INTO reports (
     'LINEアカウント凍結を装うメッセージ経由で偽ログインページへ誘導される事例。',
     (SELECT id FROM platforms WHERE name = 'LINE'),
     (SELECT id FROM fraud_categories WHERE name = 'フィッシング'),
-    (SELECT id FROM report_statuses WHERE status_code = 'CONFIRMED_FRAUD'),
+    (SELECT id FROM report_statuses WHERE status_code = 'COMPLETED'),
+    'CONFIRMED_FRAUD',
     92, 1450, 12, '203.0.113.10',
     CURRENT_TIMESTAMP - INTERVAL '9 days',
     CURRENT_TIMESTAMP - INTERVAL '9 days',
@@ -93,7 +99,8 @@ INSERT INTO reports (
     'SNS広告から外部チャットへ誘導され、保証付き高収益を強調して入金を迫る。',
     (SELECT id FROM platforms WHERE name = 'Facebook'),
     (SELECT id FROM fraud_categories WHERE name = '投資'),
-    (SELECT id FROM report_statuses WHERE status_code = 'HIGH_RISK'),
+    (SELECT id FROM report_statuses WHERE status_code = 'COMPLETED'),
+    'HIGH_RISK',
     84, 980, 7, '198.51.100.27',
     CURRENT_TIMESTAMP - INTERVAL '6 days',
     CURRENT_TIMESTAMP - INTERVAL '6 days',
@@ -107,12 +114,18 @@ INSERT INTO reports (
     '応募直後に本人確認名目で身分証画像の提出を求められる。現時点では調査中。',
     (SELECT id FROM platforms WHERE name = 'Instagram'),
     (SELECT id FROM fraud_categories WHERE name = '求人'),
-    (SELECT id FROM report_statuses WHERE status_code = 'UNDER_REVIEW'),
+    (SELECT id FROM report_statuses WHERE status_code = 'INVESTIGATING'),
+    NULL,
     66, 430, 3, '192.0.2.55',
     CURRENT_TIMESTAMP - INTERVAL '3 days',
     CURRENT_TIMESTAMP - INTERVAL '3 days',
     CURRENT_TIMESTAMP - INTERVAL '6 hours'
   );
+
+INSERT INTO report_label_relations (report_id, label_id) VALUES
+  ('rpt8k2m1xq9v', (SELECT id FROM report_labels WHERE name = 'なりすまし')),
+  ('rpt4d7n3b6ty', (SELECT id FROM report_labels WHERE name = '投資系')),
+  ('rpt1z5c8w2hj', (SELECT id FROM report_labels WHERE name = '美容系'));
 
 INSERT INTO report_images (id, report_id, image_url, display_order, created_at) VALUES
   ('31000000-0000-4000-8000-000000000001', 'rpt8k2m1xq9v', 'https://cdn.example.com/reports/line-phishing-01.png', 1, CURRENT_TIMESTAMP - INTERVAL '9 days'),
@@ -194,7 +207,7 @@ INSERT INTO daily_statistics (
     4,
     '{"LINE": 6, "Facebook": 4, "Instagram": 2, "Google検索": 2}'::jsonb,
     '{"フィッシング": 5, "投資": 4, "求人": 2, "なりすまし": 3}'::jsonb,
-    '{"PENDING": 1, "UNDER_REVIEW": 4, "HIGH_RISK": 5, "CONFIRMED_FRAUD": 4}'::jsonb,
+    '{"PENDING": 1, "INVESTIGATING": 4, "COMPLETED": 9}'::jsonb,
     CURRENT_TIMESTAMP - INTERVAL '2 days'
   ),
   (
@@ -204,7 +217,7 @@ INSERT INTO daily_statistics (
     7,
     '{"LINE": 7, "Facebook": 5, "Instagram": 3, "TikTok": 3}'::jsonb,
     '{"フィッシング": 6, "投資": 6, "求人": 3, "ロマンス": 3}'::jsonb,
-    '{"PENDING": 2, "UNDER_REVIEW": 3, "HIGH_RISK": 6, "CONFIRMED_FRAUD": 7}'::jsonb,
+    '{"PENDING": 2, "INVESTIGATING": 3, "COMPLETED": 13}'::jsonb,
     CURRENT_TIMESTAMP - INTERVAL '1 day'
   ),
   (
@@ -214,7 +227,7 @@ INSERT INTO daily_statistics (
     2,
     '{"LINE": 3, "Facebook": 3, "Instagram": 1, "Threads": 2}'::jsonb,
     '{"フィッシング": 3, "投資": 2, "求人": 2, "寄付詐欺": 2}'::jsonb,
-    '{"PENDING": 2, "UNDER_REVIEW": 2, "HIGH_RISK": 3, "CONFIRMED_FRAUD": 2}'::jsonb,
+    '{"PENDING": 2, "INVESTIGATING": 2, "COMPLETED": 5}'::jsonb,
     CURRENT_TIMESTAMP
   );
 

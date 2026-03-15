@@ -15,6 +15,8 @@ export type * from "./models/Admin.ts";
 export type * from "./models/Report.ts";
 export type * from "./models/ReportImage.ts";
 export type * from "./models/ReportTimeline.ts";
+export type * from "./models/ReportLabel.ts";
+export type * from "./models/ReportLabelRelation.ts";
 export type * from "./models/Announcement.ts";
 export type * from "./models/AnnouncementTag.ts";
 export type * from "./models/AnnouncementTagRelation.ts";

@@ -247,6 +247,25 @@ export type UuidNullableFilter<$PrismaModel = never> = {
 	not?: Prisma.NestedUuidNullableFilter<$PrismaModel> | string | null;
 };
 
+export type EnumReportVerdictNullableFilter<$PrismaModel = never> = {
+	equals?:
+		| $Enums.ReportVerdict
+		| Prisma.EnumReportVerdictFieldRefInput<$PrismaModel>
+		| null;
+	in?:
+		| $Enums.ReportVerdict[]
+		| Prisma.ListEnumReportVerdictFieldRefInput<$PrismaModel>
+		| null;
+	notIn?:
+		| $Enums.ReportVerdict[]
+		| Prisma.ListEnumReportVerdictFieldRefInput<$PrismaModel>
+		| null;
+	not?:
+		| Prisma.NestedEnumReportVerdictNullableFilter<$PrismaModel>
+		| $Enums.ReportVerdict
+		| null;
+};
+
 export type DateTimeFilter<$PrismaModel = never> = {
 	equals?: Date | string | Prisma.DateTimeFieldRefInput<$PrismaModel>;
 	in?: Date[] | string[] | Prisma.ListDateTimeFieldRefInput<$PrismaModel>;
@@ -274,6 +293,30 @@ export type UuidNullableWithAggregatesFilter<$PrismaModel = never> = {
 	_count?: Prisma.NestedIntNullableFilter<$PrismaModel>;
 	_min?: Prisma.NestedStringNullableFilter<$PrismaModel>;
 	_max?: Prisma.NestedStringNullableFilter<$PrismaModel>;
+};
+
+export type EnumReportVerdictNullableWithAggregatesFilter<
+	$PrismaModel = never,
+> = {
+	equals?:
+		| $Enums.ReportVerdict
+		| Prisma.EnumReportVerdictFieldRefInput<$PrismaModel>
+		| null;
+	in?:
+		| $Enums.ReportVerdict[]
+		| Prisma.ListEnumReportVerdictFieldRefInput<$PrismaModel>
+		| null;
+	notIn?:
+		| $Enums.ReportVerdict[]
+		| Prisma.ListEnumReportVerdictFieldRefInput<$PrismaModel>
+		| null;
+	not?:
+		| Prisma.NestedEnumReportVerdictNullableWithAggregatesFilter<$PrismaModel>
+		| $Enums.ReportVerdict
+		| null;
+	_count?: Prisma.NestedIntNullableFilter<$PrismaModel>;
+	_min?: Prisma.NestedEnumReportVerdictNullableFilter<$PrismaModel>;
+	_max?: Prisma.NestedEnumReportVerdictNullableFilter<$PrismaModel>;
 };
 
 export type DateTimeWithAggregatesFilter<$PrismaModel = never> = {
@@ -640,6 +683,25 @@ export type NestedUuidNullableFilter<$PrismaModel = never> = {
 	not?: Prisma.NestedUuidNullableFilter<$PrismaModel> | string | null;
 };
 
+export type NestedEnumReportVerdictNullableFilter<$PrismaModel = never> = {
+	equals?:
+		| $Enums.ReportVerdict
+		| Prisma.EnumReportVerdictFieldRefInput<$PrismaModel>
+		| null;
+	in?:
+		| $Enums.ReportVerdict[]
+		| Prisma.ListEnumReportVerdictFieldRefInput<$PrismaModel>
+		| null;
+	notIn?:
+		| $Enums.ReportVerdict[]
+		| Prisma.ListEnumReportVerdictFieldRefInput<$PrismaModel>
+		| null;
+	not?:
+		| Prisma.NestedEnumReportVerdictNullableFilter<$PrismaModel>
+		| $Enums.ReportVerdict
+		| null;
+};
+
 export type NestedDateTimeFilter<$PrismaModel = never> = {
 	equals?: Date | string | Prisma.DateTimeFieldRefInput<$PrismaModel>;
 	in?: Date[] | string[] | Prisma.ListDateTimeFieldRefInput<$PrismaModel>;
@@ -666,6 +728,30 @@ export type NestedUuidNullableWithAggregatesFilter<$PrismaModel = never> = {
 	_count?: Prisma.NestedIntNullableFilter<$PrismaModel>;
 	_min?: Prisma.NestedStringNullableFilter<$PrismaModel>;
 	_max?: Prisma.NestedStringNullableFilter<$PrismaModel>;
+};
+
+export type NestedEnumReportVerdictNullableWithAggregatesFilter<
+	$PrismaModel = never,
+> = {
+	equals?:
+		| $Enums.ReportVerdict
+		| Prisma.EnumReportVerdictFieldRefInput<$PrismaModel>
+		| null;
+	in?:
+		| $Enums.ReportVerdict[]
+		| Prisma.ListEnumReportVerdictFieldRefInput<$PrismaModel>
+		| null;
+	notIn?:
+		| $Enums.ReportVerdict[]
+		| Prisma.ListEnumReportVerdictFieldRefInput<$PrismaModel>
+		| null;
+	not?:
+		| Prisma.NestedEnumReportVerdictNullableWithAggregatesFilter<$PrismaModel>
+		| $Enums.ReportVerdict
+		| null;
+	_count?: Prisma.NestedIntNullableFilter<$PrismaModel>;
+	_min?: Prisma.NestedEnumReportVerdictNullableFilter<$PrismaModel>;
+	_max?: Prisma.NestedEnumReportVerdictNullableFilter<$PrismaModel>;
 };
 
 export type NestedDateTimeWithAggregatesFilter<$PrismaModel = never> = {

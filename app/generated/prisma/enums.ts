@@ -8,5 +8,11 @@
  * 🟢 You can import this file directly.
  */
 
-// This file is empty because there are no enums in the schema.
-export {};
+export const ReportVerdict = {
+	CONFIRMED_FRAUD: "CONFIRMED_FRAUD",
+	HIGH_RISK: "HIGH_RISK",
+	SAFE: "SAFE",
+	UNKNOWN: "UNKNOWN",
+} as const;
+
+export type ReportVerdict = (typeof ReportVerdict)[keyof typeof ReportVerdict];

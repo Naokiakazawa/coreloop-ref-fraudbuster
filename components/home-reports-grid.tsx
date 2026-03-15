@@ -1,6 +1,6 @@
 "use client";
 
-import { AlertTriangle, Clock3, Search, ShieldAlert } from "lucide-react";
+import { Clock3, Search, ShieldAlert } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import * as React from "react";
@@ -11,6 +11,12 @@ import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Spinner } from "@/components/ui/spinner";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import {
+	getReportStatusMeta,
+	getReportVerdictMeta,
+	isCompletedReportStatus,
+	REPORT_LABEL_BADGE_CLASS_NAME,
+} from "@/lib/report-metadata";
 import { maskReportUrl } from "@/lib/report-url";
 import type {
 	ReportDetailResponse,
@@ -61,6 +67,8 @@ function toPinnedReportSummary(
 		platform: report.platform,
 		category: report.category,
 		status: report.status,
+		verdict: report.verdict,
+		labels: report.labels,
 		images: report.images.map((image) => ({
 			id: image.id,
 			imageUrl: image.imageUrl,
@@ -94,26 +102,8 @@ function formatDate(value: string | null) {
 	return Number.isNaN(date.getTime()) ? "日付不明" : dateFormatter.format(date);
 }
 
-function riskStyle(score: number | null) {
-	if (score === null) {
-		return "bg-muted text-muted-foreground border-border";
-	}
-	if (score >= 80) {
-		return "bg-destructive/10 text-destructive border-destructive/20";
-	}
-	if (score >= 50) {
-		return "bg-orange-500/10 text-orange-600 border-orange-500/20";
-	}
-	return "bg-green-500/10 text-green-700 border-green-500/20";
-}
-
 function isUnderReviewStatus(report: ReportSummary) {
-	const label = report.status?.label ?? "";
-	return (
-		report.status?.id === 1 ||
-		label.includes("審査中") ||
-		label.includes("調査中")
-	);
+	return !isCompletedReportStatus(report.status?.code);
 }
 
 function ReportSummaryCard({ report }: { report: ReportSummary }) {
@@ -122,15 +112,9 @@ function ReportSummaryCard({ report }: { report: ReportSummary }) {
 	const [hasThumbnailError, setHasThumbnailError] = React.useState(false);
 	const router = useRouter();
 	const href = `/reports/${report.id}`;
-	const maskRiskScore = isUnderReviewStatus(report);
-	const riskDisplay = maskRiskScore
-		? "-"
-		: report.riskScore === null
-			? "-"
-			: report.riskScore;
-	const riskClassName = maskRiskScore
-		? "bg-muted text-muted-foreground border-border"
-		: riskStyle(report.riskScore);
+	const statusMeta = getReportStatusMeta(report.status?.code);
+	const verdictMeta = getReportVerdictMeta(report.verdict?.code);
+	const visibleLabels = report.labels.slice(0, 2);
 
 	React.useEffect(() => {
 		if (!thumbnailUrl) {
@@ -157,11 +141,16 @@ function ReportSummaryCard({ report }: { report: ReportSummary }) {
 			<Card className="group h-full overflow-hidden transition-all hover:-translate-y-0.5 hover:shadow-md">
 				<CardContent className="flex h-full items-stretch gap-4 p-4 sm:p-5">
 					<div className="w-36 shrink-0 space-y-2 sm:w-44">
-						<div
-							className={`inline-flex items-center gap-1 rounded-full border px-2 py-0.5 text-[11px] font-medium ${riskClassName}`}
-						>
-							<AlertTriangle className="h-3 w-3" />
-							<span>リスク {riskDisplay}</span>
+						<div className="flex min-h-5 flex-wrap items-center gap-2 overflow-hidden">
+							{visibleLabels.map((label) => (
+								<Badge
+									key={label}
+									variant="outline"
+									className={`shrink-0 ${REPORT_LABEL_BADGE_CLASS_NAME}`}
+								>
+									{label}
+								</Badge>
+							))}
 						</div>
 						<div className="h-24 overflow-hidden rounded-lg bg-muted/70 sm:h-28">
 							{thumbnailUrl && !hasThumbnailError ? (
@@ -186,10 +175,21 @@ function ReportSummaryCard({ report }: { report: ReportSummary }) {
 							<p className="text-xs text-muted-foreground">
 								{formatDate(report.createdAt)}
 							</p>
-							<div className="flex min-h-5 items-center gap-2 overflow-hidden">
+							<div className="flex min-h-5 flex-wrap items-center gap-2 overflow-hidden">
 								{report.status?.label ? (
-									<Badge variant="outline" className="shrink-0">
+									<Badge
+										variant="outline"
+										className={statusMeta?.badgeClassName ?? undefined}
+									>
 										{report.status.label}
+									</Badge>
+								) : null}
+								{report.verdict?.label ? (
+									<Badge
+										variant="outline"
+										className={verdictMeta?.badgeClassName ?? undefined}
+									>
+										{report.verdict.label}
 									</Badge>
 								) : null}
 							</div>

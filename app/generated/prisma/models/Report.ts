@@ -53,6 +53,7 @@ export type ReportMinAggregateOutputType = {
 	platformId: number | null;
 	categoryId: number | null;
 	statusId: number | null;
+	verdict: $Enums.ReportVerdict | null;
 	riskScore: number | null;
 	viewCount: number | null;
 	reportCount: number | null;
@@ -71,6 +72,7 @@ export type ReportMaxAggregateOutputType = {
 	platformId: number | null;
 	categoryId: number | null;
 	statusId: number | null;
+	verdict: $Enums.ReportVerdict | null;
 	riskScore: number | null;
 	viewCount: number | null;
 	reportCount: number | null;
@@ -89,6 +91,7 @@ export type ReportCountAggregateOutputType = {
 	platformId: number;
 	categoryId: number;
 	statusId: number;
+	verdict: number;
 	riskScore: number;
 	viewCount: number;
 	reportCount: number;
@@ -126,6 +129,7 @@ export type ReportMinAggregateInputType = {
 	platformId?: true;
 	categoryId?: true;
 	statusId?: true;
+	verdict?: true;
 	riskScore?: true;
 	viewCount?: true;
 	reportCount?: true;
@@ -144,6 +148,7 @@ export type ReportMaxAggregateInputType = {
 	platformId?: true;
 	categoryId?: true;
 	statusId?: true;
+	verdict?: true;
 	riskScore?: true;
 	viewCount?: true;
 	reportCount?: true;
@@ -162,6 +167,7 @@ export type ReportCountAggregateInputType = {
 	platformId?: true;
 	categoryId?: true;
 	statusId?: true;
+	verdict?: true;
 	riskScore?: true;
 	viewCount?: true;
 	reportCount?: true;
@@ -274,6 +280,7 @@ export type ReportGroupByOutputType = {
 	platformId: number | null;
 	categoryId: number | null;
 	statusId: number | null;
+	verdict: $Enums.ReportVerdict | null;
 	riskScore: number | null;
 	viewCount: number | null;
 	reportCount: number | null;
@@ -313,6 +320,10 @@ export type ReportWhereInput = {
 	platformId?: Prisma.IntNullableFilter<"Report"> | number | null;
 	categoryId?: Prisma.IntNullableFilter<"Report"> | number | null;
 	statusId?: Prisma.IntNullableFilter<"Report"> | number | null;
+	verdict?:
+		| Prisma.EnumReportVerdictNullableFilter<"Report">
+		| $Enums.ReportVerdict
+		| null;
 	riskScore?: Prisma.IntNullableFilter<"Report"> | number | null;
 	viewCount?: Prisma.IntNullableFilter<"Report"> | number | null;
 	reportCount?: Prisma.IntNullableFilter<"Report"> | number | null;
@@ -336,6 +347,7 @@ export type ReportWhereInput = {
 		Prisma.ReportStatusNullableScalarRelationFilter,
 		Prisma.ReportStatusWhereInput
 	> | null;
+	reportLabels?: Prisma.ReportLabelRelationListRelationFilter;
 	images?: Prisma.ReportImageListRelationFilter;
 	timelines?: Prisma.ReportTimelineListRelationFilter;
 };
@@ -349,6 +361,7 @@ export type ReportOrderByWithRelationInput = {
 	platformId?: Prisma.SortOrderInput | Prisma.SortOrder;
 	categoryId?: Prisma.SortOrderInput | Prisma.SortOrder;
 	statusId?: Prisma.SortOrderInput | Prisma.SortOrder;
+	verdict?: Prisma.SortOrderInput | Prisma.SortOrder;
 	riskScore?: Prisma.SortOrderInput | Prisma.SortOrder;
 	viewCount?: Prisma.SortOrderInput | Prisma.SortOrder;
 	reportCount?: Prisma.SortOrderInput | Prisma.SortOrder;
@@ -360,6 +373,7 @@ export type ReportOrderByWithRelationInput = {
 	platform?: Prisma.PlatformOrderByWithRelationInput;
 	category?: Prisma.FraudCategoryOrderByWithRelationInput;
 	status?: Prisma.ReportStatusOrderByWithRelationInput;
+	reportLabels?: Prisma.ReportLabelRelationOrderByRelationAggregateInput;
 	images?: Prisma.ReportImageOrderByRelationAggregateInput;
 	timelines?: Prisma.ReportTimelineOrderByRelationAggregateInput;
 };
@@ -377,6 +391,10 @@ export type ReportWhereUniqueInput = Prisma.AtLeast<
 		platformId?: Prisma.IntNullableFilter<"Report"> | number | null;
 		categoryId?: Prisma.IntNullableFilter<"Report"> | number | null;
 		statusId?: Prisma.IntNullableFilter<"Report"> | number | null;
+		verdict?:
+			| Prisma.EnumReportVerdictNullableFilter<"Report">
+			| $Enums.ReportVerdict
+			| null;
 		riskScore?: Prisma.IntNullableFilter<"Report"> | number | null;
 		viewCount?: Prisma.IntNullableFilter<"Report"> | number | null;
 		reportCount?: Prisma.IntNullableFilter<"Report"> | number | null;
@@ -400,6 +418,7 @@ export type ReportWhereUniqueInput = Prisma.AtLeast<
 			Prisma.ReportStatusNullableScalarRelationFilter,
 			Prisma.ReportStatusWhereInput
 		> | null;
+		reportLabels?: Prisma.ReportLabelRelationListRelationFilter;
 		images?: Prisma.ReportImageListRelationFilter;
 		timelines?: Prisma.ReportTimelineListRelationFilter;
 	},
@@ -415,6 +434,7 @@ export type ReportOrderByWithAggregationInput = {
 	platformId?: Prisma.SortOrderInput | Prisma.SortOrder;
 	categoryId?: Prisma.SortOrderInput | Prisma.SortOrder;
 	statusId?: Prisma.SortOrderInput | Prisma.SortOrder;
+	verdict?: Prisma.SortOrderInput | Prisma.SortOrder;
 	riskScore?: Prisma.SortOrderInput | Prisma.SortOrder;
 	viewCount?: Prisma.SortOrderInput | Prisma.SortOrder;
 	reportCount?: Prisma.SortOrderInput | Prisma.SortOrder;
@@ -448,6 +468,10 @@ export type ReportScalarWhereWithAggregatesInput = {
 	platformId?: Prisma.IntNullableWithAggregatesFilter<"Report"> | number | null;
 	categoryId?: Prisma.IntNullableWithAggregatesFilter<"Report"> | number | null;
 	statusId?: Prisma.IntNullableWithAggregatesFilter<"Report"> | number | null;
+	verdict?:
+		| Prisma.EnumReportVerdictNullableWithAggregatesFilter<"Report">
+		| $Enums.ReportVerdict
+		| null;
 	riskScore?: Prisma.IntNullableWithAggregatesFilter<"Report"> | number | null;
 	viewCount?: Prisma.IntNullableWithAggregatesFilter<"Report"> | number | null;
 	reportCount?:
@@ -479,6 +503,7 @@ export type ReportCreateInput = {
 	url: string;
 	title?: string | null;
 	description?: string | null;
+	verdict?: $Enums.ReportVerdict | null;
 	riskScore?: number | null;
 	viewCount?: number | null;
 	reportCount?: number | null;
@@ -490,6 +515,7 @@ export type ReportCreateInput = {
 	platform?: Prisma.PlatformCreateNestedOneWithoutReportsInput;
 	category?: Prisma.FraudCategoryCreateNestedOneWithoutReportsInput;
 	status?: Prisma.ReportStatusCreateNestedOneWithoutReportsInput;
+	reportLabels?: Prisma.ReportLabelRelationCreateNestedManyWithoutReportInput;
 	images?: Prisma.ReportImageCreateNestedManyWithoutReportInput;
 	timelines?: Prisma.ReportTimelineCreateNestedManyWithoutReportInput;
 };
@@ -503,6 +529,7 @@ export type ReportUncheckedCreateInput = {
 	platformId?: number | null;
 	categoryId?: number | null;
 	statusId?: number | null;
+	verdict?: $Enums.ReportVerdict | null;
 	riskScore?: number | null;
 	viewCount?: number | null;
 	reportCount?: number | null;
@@ -510,6 +537,7 @@ export type ReportUncheckedCreateInput = {
 	privacyPolicyAgreedAt?: Date | string;
 	createdAt?: Date | string | null;
 	updatedAt?: Date | string | null;
+	reportLabels?: Prisma.ReportLabelRelationUncheckedCreateNestedManyWithoutReportInput;
 	images?: Prisma.ReportImageUncheckedCreateNestedManyWithoutReportInput;
 	timelines?: Prisma.ReportTimelineUncheckedCreateNestedManyWithoutReportInput;
 };
@@ -519,6 +547,10 @@ export type ReportUpdateInput = {
 	url?: Prisma.StringFieldUpdateOperationsInput | string;
 	title?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
 	description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+	verdict?:
+		| Prisma.NullableEnumReportVerdictFieldUpdateOperationsInput
+		| $Enums.ReportVerdict
+		| null;
 	riskScore?: Prisma.NullableIntFieldUpdateOperationsInput | number | null;
 	viewCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null;
 	reportCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null;
@@ -541,6 +573,7 @@ export type ReportUpdateInput = {
 	platform?: Prisma.PlatformUpdateOneWithoutReportsNestedInput;
 	category?: Prisma.FraudCategoryUpdateOneWithoutReportsNestedInput;
 	status?: Prisma.ReportStatusUpdateOneWithoutReportsNestedInput;
+	reportLabels?: Prisma.ReportLabelRelationUpdateManyWithoutReportNestedInput;
 	images?: Prisma.ReportImageUpdateManyWithoutReportNestedInput;
 	timelines?: Prisma.ReportTimelineUpdateManyWithoutReportNestedInput;
 };
@@ -554,6 +587,10 @@ export type ReportUncheckedUpdateInput = {
 	platformId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null;
 	categoryId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null;
 	statusId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null;
+	verdict?:
+		| Prisma.NullableEnumReportVerdictFieldUpdateOperationsInput
+		| $Enums.ReportVerdict
+		| null;
 	riskScore?: Prisma.NullableIntFieldUpdateOperationsInput | number | null;
 	viewCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null;
 	reportCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null;
@@ -572,6 +609,7 @@ export type ReportUncheckedUpdateInput = {
 		| Date
 		| string
 		| null;
+	reportLabels?: Prisma.ReportLabelRelationUncheckedUpdateManyWithoutReportNestedInput;
 	images?: Prisma.ReportImageUncheckedUpdateManyWithoutReportNestedInput;
 	timelines?: Prisma.ReportTimelineUncheckedUpdateManyWithoutReportNestedInput;
 };
@@ -585,6 +623,7 @@ export type ReportCreateManyInput = {
 	platformId?: number | null;
 	categoryId?: number | null;
 	statusId?: number | null;
+	verdict?: $Enums.ReportVerdict | null;
 	riskScore?: number | null;
 	viewCount?: number | null;
 	reportCount?: number | null;
@@ -599,6 +638,10 @@ export type ReportUpdateManyMutationInput = {
 	url?: Prisma.StringFieldUpdateOperationsInput | string;
 	title?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
 	description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+	verdict?:
+		| Prisma.NullableEnumReportVerdictFieldUpdateOperationsInput
+		| $Enums.ReportVerdict
+		| null;
 	riskScore?: Prisma.NullableIntFieldUpdateOperationsInput | number | null;
 	viewCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null;
 	reportCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null;
@@ -628,6 +671,10 @@ export type ReportUncheckedUpdateManyInput = {
 	platformId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null;
 	categoryId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null;
 	statusId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null;
+	verdict?:
+		| Prisma.NullableEnumReportVerdictFieldUpdateOperationsInput
+		| $Enums.ReportVerdict
+		| null;
 	riskScore?: Prisma.NullableIntFieldUpdateOperationsInput | number | null;
 	viewCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null;
 	reportCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null;
@@ -667,6 +714,7 @@ export type ReportCountOrderByAggregateInput = {
 	platformId?: Prisma.SortOrder;
 	categoryId?: Prisma.SortOrder;
 	statusId?: Prisma.SortOrder;
+	verdict?: Prisma.SortOrder;
 	riskScore?: Prisma.SortOrder;
 	viewCount?: Prisma.SortOrder;
 	reportCount?: Prisma.SortOrder;
@@ -694,6 +742,7 @@ export type ReportMaxOrderByAggregateInput = {
 	platformId?: Prisma.SortOrder;
 	categoryId?: Prisma.SortOrder;
 	statusId?: Prisma.SortOrder;
+	verdict?: Prisma.SortOrder;
 	riskScore?: Prisma.SortOrder;
 	viewCount?: Prisma.SortOrder;
 	reportCount?: Prisma.SortOrder;
@@ -712,6 +761,7 @@ export type ReportMinOrderByAggregateInput = {
 	platformId?: Prisma.SortOrder;
 	categoryId?: Prisma.SortOrder;
 	statusId?: Prisma.SortOrder;
+	verdict?: Prisma.SortOrder;
 	riskScore?: Prisma.SortOrder;
 	viewCount?: Prisma.SortOrder;
 	reportCount?: Prisma.SortOrder;
@@ -1079,6 +1129,10 @@ export type ReportUncheckedUpdateManyWithoutUserNestedInput = {
 	deleteMany?: Prisma.ReportScalarWhereInput | Prisma.ReportScalarWhereInput[];
 };
 
+export type NullableEnumReportVerdictFieldUpdateOperationsInput = {
+	set?: $Enums.ReportVerdict | null;
+};
+
 export type DateTimeFieldUpdateOperationsInput = {
 	set?: Date | string;
 };
@@ -1135,11 +1189,38 @@ export type ReportUpdateOneRequiredWithoutTimelinesNestedInput = {
 	>;
 };
 
+export type ReportCreateNestedOneWithoutReportLabelsInput = {
+	create?: Prisma.XOR<
+		Prisma.ReportCreateWithoutReportLabelsInput,
+		Prisma.ReportUncheckedCreateWithoutReportLabelsInput
+	>;
+	connectOrCreate?: Prisma.ReportCreateOrConnectWithoutReportLabelsInput;
+	connect?: Prisma.ReportWhereUniqueInput;
+};
+
+export type ReportUpdateOneRequiredWithoutReportLabelsNestedInput = {
+	create?: Prisma.XOR<
+		Prisma.ReportCreateWithoutReportLabelsInput,
+		Prisma.ReportUncheckedCreateWithoutReportLabelsInput
+	>;
+	connectOrCreate?: Prisma.ReportCreateOrConnectWithoutReportLabelsInput;
+	upsert?: Prisma.ReportUpsertWithoutReportLabelsInput;
+	connect?: Prisma.ReportWhereUniqueInput;
+	update?: Prisma.XOR<
+		Prisma.XOR<
+			Prisma.ReportUpdateToOneWithWhereWithoutReportLabelsInput,
+			Prisma.ReportUpdateWithoutReportLabelsInput
+		>,
+		Prisma.ReportUncheckedUpdateWithoutReportLabelsInput
+	>;
+};
+
 export type ReportCreateWithoutCategoryInput = {
 	id: string;
 	url: string;
 	title?: string | null;
 	description?: string | null;
+	verdict?: $Enums.ReportVerdict | null;
 	riskScore?: number | null;
 	viewCount?: number | null;
 	reportCount?: number | null;
@@ -1150,6 +1231,7 @@ export type ReportCreateWithoutCategoryInput = {
 	user?: Prisma.UserCreateNestedOneWithoutReportsInput;
 	platform?: Prisma.PlatformCreateNestedOneWithoutReportsInput;
 	status?: Prisma.ReportStatusCreateNestedOneWithoutReportsInput;
+	reportLabels?: Prisma.ReportLabelRelationCreateNestedManyWithoutReportInput;
 	images?: Prisma.ReportImageCreateNestedManyWithoutReportInput;
 	timelines?: Prisma.ReportTimelineCreateNestedManyWithoutReportInput;
 };
@@ -1162,6 +1244,7 @@ export type ReportUncheckedCreateWithoutCategoryInput = {
 	description?: string | null;
 	platformId?: number | null;
 	statusId?: number | null;
+	verdict?: $Enums.ReportVerdict | null;
 	riskScore?: number | null;
 	viewCount?: number | null;
 	reportCount?: number | null;
@@ -1169,6 +1252,7 @@ export type ReportUncheckedCreateWithoutCategoryInput = {
 	privacyPolicyAgreedAt?: Date | string;
 	createdAt?: Date | string | null;
 	updatedAt?: Date | string | null;
+	reportLabels?: Prisma.ReportLabelRelationUncheckedCreateNestedManyWithoutReportInput;
 	images?: Prisma.ReportImageUncheckedCreateNestedManyWithoutReportInput;
 	timelines?: Prisma.ReportTimelineUncheckedCreateNestedManyWithoutReportInput;
 };
@@ -1228,6 +1312,10 @@ export type ReportScalarWhereInput = {
 	platformId?: Prisma.IntNullableFilter<"Report"> | number | null;
 	categoryId?: Prisma.IntNullableFilter<"Report"> | number | null;
 	statusId?: Prisma.IntNullableFilter<"Report"> | number | null;
+	verdict?:
+		| Prisma.EnumReportVerdictNullableFilter<"Report">
+		| $Enums.ReportVerdict
+		| null;
 	riskScore?: Prisma.IntNullableFilter<"Report"> | number | null;
 	viewCount?: Prisma.IntNullableFilter<"Report"> | number | null;
 	reportCount?: Prisma.IntNullableFilter<"Report"> | number | null;
@@ -1242,6 +1330,7 @@ export type ReportCreateWithoutPlatformInput = {
 	url: string;
 	title?: string | null;
 	description?: string | null;
+	verdict?: $Enums.ReportVerdict | null;
 	riskScore?: number | null;
 	viewCount?: number | null;
 	reportCount?: number | null;
@@ -1252,6 +1341,7 @@ export type ReportCreateWithoutPlatformInput = {
 	user?: Prisma.UserCreateNestedOneWithoutReportsInput;
 	category?: Prisma.FraudCategoryCreateNestedOneWithoutReportsInput;
 	status?: Prisma.ReportStatusCreateNestedOneWithoutReportsInput;
+	reportLabels?: Prisma.ReportLabelRelationCreateNestedManyWithoutReportInput;
 	images?: Prisma.ReportImageCreateNestedManyWithoutReportInput;
 	timelines?: Prisma.ReportTimelineCreateNestedManyWithoutReportInput;
 };
@@ -1264,6 +1354,7 @@ export type ReportUncheckedCreateWithoutPlatformInput = {
 	description?: string | null;
 	categoryId?: number | null;
 	statusId?: number | null;
+	verdict?: $Enums.ReportVerdict | null;
 	riskScore?: number | null;
 	viewCount?: number | null;
 	reportCount?: number | null;
@@ -1271,6 +1362,7 @@ export type ReportUncheckedCreateWithoutPlatformInput = {
 	privacyPolicyAgreedAt?: Date | string;
 	createdAt?: Date | string | null;
 	updatedAt?: Date | string | null;
+	reportLabels?: Prisma.ReportLabelRelationUncheckedCreateNestedManyWithoutReportInput;
 	images?: Prisma.ReportImageUncheckedCreateNestedManyWithoutReportInput;
 	timelines?: Prisma.ReportTimelineUncheckedCreateNestedManyWithoutReportInput;
 };
@@ -1323,6 +1415,7 @@ export type ReportCreateWithoutStatusInput = {
 	url: string;
 	title?: string | null;
 	description?: string | null;
+	verdict?: $Enums.ReportVerdict | null;
 	riskScore?: number | null;
 	viewCount?: number | null;
 	reportCount?: number | null;
@@ -1333,6 +1426,7 @@ export type ReportCreateWithoutStatusInput = {
 	user?: Prisma.UserCreateNestedOneWithoutReportsInput;
 	platform?: Prisma.PlatformCreateNestedOneWithoutReportsInput;
 	category?: Prisma.FraudCategoryCreateNestedOneWithoutReportsInput;
+	reportLabels?: Prisma.ReportLabelRelationCreateNestedManyWithoutReportInput;
 	images?: Prisma.ReportImageCreateNestedManyWithoutReportInput;
 	timelines?: Prisma.ReportTimelineCreateNestedManyWithoutReportInput;
 };
@@ -1345,6 +1439,7 @@ export type ReportUncheckedCreateWithoutStatusInput = {
 	description?: string | null;
 	platformId?: number | null;
 	categoryId?: number | null;
+	verdict?: $Enums.ReportVerdict | null;
 	riskScore?: number | null;
 	viewCount?: number | null;
 	reportCount?: number | null;
@@ -1352,6 +1447,7 @@ export type ReportUncheckedCreateWithoutStatusInput = {
 	privacyPolicyAgreedAt?: Date | string;
 	createdAt?: Date | string | null;
 	updatedAt?: Date | string | null;
+	reportLabels?: Prisma.ReportLabelRelationUncheckedCreateNestedManyWithoutReportInput;
 	images?: Prisma.ReportImageUncheckedCreateNestedManyWithoutReportInput;
 	timelines?: Prisma.ReportTimelineUncheckedCreateNestedManyWithoutReportInput;
 };
@@ -1404,6 +1500,7 @@ export type ReportCreateWithoutUserInput = {
 	url: string;
 	title?: string | null;
 	description?: string | null;
+	verdict?: $Enums.ReportVerdict | null;
 	riskScore?: number | null;
 	viewCount?: number | null;
 	reportCount?: number | null;
@@ -1414,6 +1511,7 @@ export type ReportCreateWithoutUserInput = {
 	platform?: Prisma.PlatformCreateNestedOneWithoutReportsInput;
 	category?: Prisma.FraudCategoryCreateNestedOneWithoutReportsInput;
 	status?: Prisma.ReportStatusCreateNestedOneWithoutReportsInput;
+	reportLabels?: Prisma.ReportLabelRelationCreateNestedManyWithoutReportInput;
 	images?: Prisma.ReportImageCreateNestedManyWithoutReportInput;
 	timelines?: Prisma.ReportTimelineCreateNestedManyWithoutReportInput;
 };
@@ -1426,6 +1524,7 @@ export type ReportUncheckedCreateWithoutUserInput = {
 	platformId?: number | null;
 	categoryId?: number | null;
 	statusId?: number | null;
+	verdict?: $Enums.ReportVerdict | null;
 	riskScore?: number | null;
 	viewCount?: number | null;
 	reportCount?: number | null;
@@ -1433,6 +1532,7 @@ export type ReportUncheckedCreateWithoutUserInput = {
 	privacyPolicyAgreedAt?: Date | string;
 	createdAt?: Date | string | null;
 	updatedAt?: Date | string | null;
+	reportLabels?: Prisma.ReportLabelRelationUncheckedCreateNestedManyWithoutReportInput;
 	images?: Prisma.ReportImageUncheckedCreateNestedManyWithoutReportInput;
 	timelines?: Prisma.ReportTimelineUncheckedCreateNestedManyWithoutReportInput;
 };
@@ -1483,6 +1583,7 @@ export type ReportCreateWithoutImagesInput = {
 	url: string;
 	title?: string | null;
 	description?: string | null;
+	verdict?: $Enums.ReportVerdict | null;
 	riskScore?: number | null;
 	viewCount?: number | null;
 	reportCount?: number | null;
@@ -1494,6 +1595,7 @@ export type ReportCreateWithoutImagesInput = {
 	platform?: Prisma.PlatformCreateNestedOneWithoutReportsInput;
 	category?: Prisma.FraudCategoryCreateNestedOneWithoutReportsInput;
 	status?: Prisma.ReportStatusCreateNestedOneWithoutReportsInput;
+	reportLabels?: Prisma.ReportLabelRelationCreateNestedManyWithoutReportInput;
 	timelines?: Prisma.ReportTimelineCreateNestedManyWithoutReportInput;
 };
 
@@ -1506,6 +1608,7 @@ export type ReportUncheckedCreateWithoutImagesInput = {
 	platformId?: number | null;
 	categoryId?: number | null;
 	statusId?: number | null;
+	verdict?: $Enums.ReportVerdict | null;
 	riskScore?: number | null;
 	viewCount?: number | null;
 	reportCount?: number | null;
@@ -1513,6 +1616,7 @@ export type ReportUncheckedCreateWithoutImagesInput = {
 	privacyPolicyAgreedAt?: Date | string;
 	createdAt?: Date | string | null;
 	updatedAt?: Date | string | null;
+	reportLabels?: Prisma.ReportLabelRelationUncheckedCreateNestedManyWithoutReportInput;
 	timelines?: Prisma.ReportTimelineUncheckedCreateNestedManyWithoutReportInput;
 };
 
@@ -1549,6 +1653,10 @@ export type ReportUpdateWithoutImagesInput = {
 	url?: Prisma.StringFieldUpdateOperationsInput | string;
 	title?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
 	description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+	verdict?:
+		| Prisma.NullableEnumReportVerdictFieldUpdateOperationsInput
+		| $Enums.ReportVerdict
+		| null;
 	riskScore?: Prisma.NullableIntFieldUpdateOperationsInput | number | null;
 	viewCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null;
 	reportCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null;
@@ -1571,6 +1679,7 @@ export type ReportUpdateWithoutImagesInput = {
 	platform?: Prisma.PlatformUpdateOneWithoutReportsNestedInput;
 	category?: Prisma.FraudCategoryUpdateOneWithoutReportsNestedInput;
 	status?: Prisma.ReportStatusUpdateOneWithoutReportsNestedInput;
+	reportLabels?: Prisma.ReportLabelRelationUpdateManyWithoutReportNestedInput;
 	timelines?: Prisma.ReportTimelineUpdateManyWithoutReportNestedInput;
 };
 
@@ -1583,6 +1692,10 @@ export type ReportUncheckedUpdateWithoutImagesInput = {
 	platformId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null;
 	categoryId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null;
 	statusId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null;
+	verdict?:
+		| Prisma.NullableEnumReportVerdictFieldUpdateOperationsInput
+		| $Enums.ReportVerdict
+		| null;
 	riskScore?: Prisma.NullableIntFieldUpdateOperationsInput | number | null;
 	viewCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null;
 	reportCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null;
@@ -1601,6 +1714,7 @@ export type ReportUncheckedUpdateWithoutImagesInput = {
 		| Date
 		| string
 		| null;
+	reportLabels?: Prisma.ReportLabelRelationUncheckedUpdateManyWithoutReportNestedInput;
 	timelines?: Prisma.ReportTimelineUncheckedUpdateManyWithoutReportNestedInput;
 };
 
@@ -1609,6 +1723,7 @@ export type ReportCreateWithoutTimelinesInput = {
 	url: string;
 	title?: string | null;
 	description?: string | null;
+	verdict?: $Enums.ReportVerdict | null;
 	riskScore?: number | null;
 	viewCount?: number | null;
 	reportCount?: number | null;
@@ -1620,6 +1735,7 @@ export type ReportCreateWithoutTimelinesInput = {
 	platform?: Prisma.PlatformCreateNestedOneWithoutReportsInput;
 	category?: Prisma.FraudCategoryCreateNestedOneWithoutReportsInput;
 	status?: Prisma.ReportStatusCreateNestedOneWithoutReportsInput;
+	reportLabels?: Prisma.ReportLabelRelationCreateNestedManyWithoutReportInput;
 	images?: Prisma.ReportImageCreateNestedManyWithoutReportInput;
 };
 
@@ -1632,6 +1748,7 @@ export type ReportUncheckedCreateWithoutTimelinesInput = {
 	platformId?: number | null;
 	categoryId?: number | null;
 	statusId?: number | null;
+	verdict?: $Enums.ReportVerdict | null;
 	riskScore?: number | null;
 	viewCount?: number | null;
 	reportCount?: number | null;
@@ -1639,6 +1756,7 @@ export type ReportUncheckedCreateWithoutTimelinesInput = {
 	privacyPolicyAgreedAt?: Date | string;
 	createdAt?: Date | string | null;
 	updatedAt?: Date | string | null;
+	reportLabels?: Prisma.ReportLabelRelationUncheckedCreateNestedManyWithoutReportInput;
 	images?: Prisma.ReportImageUncheckedCreateNestedManyWithoutReportInput;
 };
 
@@ -1675,6 +1793,150 @@ export type ReportUpdateWithoutTimelinesInput = {
 	url?: Prisma.StringFieldUpdateOperationsInput | string;
 	title?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
 	description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+	verdict?:
+		| Prisma.NullableEnumReportVerdictFieldUpdateOperationsInput
+		| $Enums.ReportVerdict
+		| null;
+	riskScore?: Prisma.NullableIntFieldUpdateOperationsInput | number | null;
+	viewCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null;
+	reportCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null;
+	sourceIp?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+	privacyPolicyAgreedAt?:
+		| Prisma.DateTimeFieldUpdateOperationsInput
+		| Date
+		| string;
+	createdAt?:
+		| Prisma.NullableDateTimeFieldUpdateOperationsInput
+		| Date
+		| string
+		| null;
+	updatedAt?:
+		| Prisma.NullableDateTimeFieldUpdateOperationsInput
+		| Date
+		| string
+		| null;
+	user?: Prisma.UserUpdateOneWithoutReportsNestedInput;
+	platform?: Prisma.PlatformUpdateOneWithoutReportsNestedInput;
+	category?: Prisma.FraudCategoryUpdateOneWithoutReportsNestedInput;
+	status?: Prisma.ReportStatusUpdateOneWithoutReportsNestedInput;
+	reportLabels?: Prisma.ReportLabelRelationUpdateManyWithoutReportNestedInput;
+	images?: Prisma.ReportImageUpdateManyWithoutReportNestedInput;
+};
+
+export type ReportUncheckedUpdateWithoutTimelinesInput = {
+	id?: Prisma.StringFieldUpdateOperationsInput | string;
+	userId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+	url?: Prisma.StringFieldUpdateOperationsInput | string;
+	title?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+	description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+	platformId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null;
+	categoryId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null;
+	statusId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null;
+	verdict?:
+		| Prisma.NullableEnumReportVerdictFieldUpdateOperationsInput
+		| $Enums.ReportVerdict
+		| null;
+	riskScore?: Prisma.NullableIntFieldUpdateOperationsInput | number | null;
+	viewCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null;
+	reportCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null;
+	sourceIp?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+	privacyPolicyAgreedAt?:
+		| Prisma.DateTimeFieldUpdateOperationsInput
+		| Date
+		| string;
+	createdAt?:
+		| Prisma.NullableDateTimeFieldUpdateOperationsInput
+		| Date
+		| string
+		| null;
+	updatedAt?:
+		| Prisma.NullableDateTimeFieldUpdateOperationsInput
+		| Date
+		| string
+		| null;
+	reportLabels?: Prisma.ReportLabelRelationUncheckedUpdateManyWithoutReportNestedInput;
+	images?: Prisma.ReportImageUncheckedUpdateManyWithoutReportNestedInput;
+};
+
+export type ReportCreateWithoutReportLabelsInput = {
+	id: string;
+	url: string;
+	title?: string | null;
+	description?: string | null;
+	verdict?: $Enums.ReportVerdict | null;
+	riskScore?: number | null;
+	viewCount?: number | null;
+	reportCount?: number | null;
+	sourceIp?: string | null;
+	privacyPolicyAgreedAt?: Date | string;
+	createdAt?: Date | string | null;
+	updatedAt?: Date | string | null;
+	user?: Prisma.UserCreateNestedOneWithoutReportsInput;
+	platform?: Prisma.PlatformCreateNestedOneWithoutReportsInput;
+	category?: Prisma.FraudCategoryCreateNestedOneWithoutReportsInput;
+	status?: Prisma.ReportStatusCreateNestedOneWithoutReportsInput;
+	images?: Prisma.ReportImageCreateNestedManyWithoutReportInput;
+	timelines?: Prisma.ReportTimelineCreateNestedManyWithoutReportInput;
+};
+
+export type ReportUncheckedCreateWithoutReportLabelsInput = {
+	id: string;
+	userId?: string | null;
+	url: string;
+	title?: string | null;
+	description?: string | null;
+	platformId?: number | null;
+	categoryId?: number | null;
+	statusId?: number | null;
+	verdict?: $Enums.ReportVerdict | null;
+	riskScore?: number | null;
+	viewCount?: number | null;
+	reportCount?: number | null;
+	sourceIp?: string | null;
+	privacyPolicyAgreedAt?: Date | string;
+	createdAt?: Date | string | null;
+	updatedAt?: Date | string | null;
+	images?: Prisma.ReportImageUncheckedCreateNestedManyWithoutReportInput;
+	timelines?: Prisma.ReportTimelineUncheckedCreateNestedManyWithoutReportInput;
+};
+
+export type ReportCreateOrConnectWithoutReportLabelsInput = {
+	where: Prisma.ReportWhereUniqueInput;
+	create: Prisma.XOR<
+		Prisma.ReportCreateWithoutReportLabelsInput,
+		Prisma.ReportUncheckedCreateWithoutReportLabelsInput
+	>;
+};
+
+export type ReportUpsertWithoutReportLabelsInput = {
+	update: Prisma.XOR<
+		Prisma.ReportUpdateWithoutReportLabelsInput,
+		Prisma.ReportUncheckedUpdateWithoutReportLabelsInput
+	>;
+	create: Prisma.XOR<
+		Prisma.ReportCreateWithoutReportLabelsInput,
+		Prisma.ReportUncheckedCreateWithoutReportLabelsInput
+	>;
+	where?: Prisma.ReportWhereInput;
+};
+
+export type ReportUpdateToOneWithWhereWithoutReportLabelsInput = {
+	where?: Prisma.ReportWhereInput;
+	data: Prisma.XOR<
+		Prisma.ReportUpdateWithoutReportLabelsInput,
+		Prisma.ReportUncheckedUpdateWithoutReportLabelsInput
+	>;
+};
+
+export type ReportUpdateWithoutReportLabelsInput = {
+	id?: Prisma.StringFieldUpdateOperationsInput | string;
+	url?: Prisma.StringFieldUpdateOperationsInput | string;
+	title?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+	description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+	verdict?:
+		| Prisma.NullableEnumReportVerdictFieldUpdateOperationsInput
+		| $Enums.ReportVerdict
+		| null;
 	riskScore?: Prisma.NullableIntFieldUpdateOperationsInput | number | null;
 	viewCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null;
 	reportCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null;
@@ -1698,9 +1960,10 @@ export type ReportUpdateWithoutTimelinesInput = {
 	category?: Prisma.FraudCategoryUpdateOneWithoutReportsNestedInput;
 	status?: Prisma.ReportStatusUpdateOneWithoutReportsNestedInput;
 	images?: Prisma.ReportImageUpdateManyWithoutReportNestedInput;
+	timelines?: Prisma.ReportTimelineUpdateManyWithoutReportNestedInput;
 };
 
-export type ReportUncheckedUpdateWithoutTimelinesInput = {
+export type ReportUncheckedUpdateWithoutReportLabelsInput = {
 	id?: Prisma.StringFieldUpdateOperationsInput | string;
 	userId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
 	url?: Prisma.StringFieldUpdateOperationsInput | string;
@@ -1709,82 +1972,10 @@ export type ReportUncheckedUpdateWithoutTimelinesInput = {
 	platformId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null;
 	categoryId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null;
 	statusId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null;
-	riskScore?: Prisma.NullableIntFieldUpdateOperationsInput | number | null;
-	viewCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null;
-	reportCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null;
-	sourceIp?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
-	privacyPolicyAgreedAt?:
-		| Prisma.DateTimeFieldUpdateOperationsInput
-		| Date
-		| string;
-	createdAt?:
-		| Prisma.NullableDateTimeFieldUpdateOperationsInput
-		| Date
-		| string
+	verdict?:
+		| Prisma.NullableEnumReportVerdictFieldUpdateOperationsInput
+		| $Enums.ReportVerdict
 		| null;
-	updatedAt?:
-		| Prisma.NullableDateTimeFieldUpdateOperationsInput
-		| Date
-		| string
-		| null;
-	images?: Prisma.ReportImageUncheckedUpdateManyWithoutReportNestedInput;
-};
-
-export type ReportCreateManyCategoryInput = {
-	id: string;
-	userId?: string | null;
-	url: string;
-	title?: string | null;
-	description?: string | null;
-	platformId?: number | null;
-	statusId?: number | null;
-	riskScore?: number | null;
-	viewCount?: number | null;
-	reportCount?: number | null;
-	sourceIp?: string | null;
-	privacyPolicyAgreedAt?: Date | string;
-	createdAt?: Date | string | null;
-	updatedAt?: Date | string | null;
-};
-
-export type ReportUpdateWithoutCategoryInput = {
-	id?: Prisma.StringFieldUpdateOperationsInput | string;
-	url?: Prisma.StringFieldUpdateOperationsInput | string;
-	title?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
-	description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
-	riskScore?: Prisma.NullableIntFieldUpdateOperationsInput | number | null;
-	viewCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null;
-	reportCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null;
-	sourceIp?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
-	privacyPolicyAgreedAt?:
-		| Prisma.DateTimeFieldUpdateOperationsInput
-		| Date
-		| string;
-	createdAt?:
-		| Prisma.NullableDateTimeFieldUpdateOperationsInput
-		| Date
-		| string
-		| null;
-	updatedAt?:
-		| Prisma.NullableDateTimeFieldUpdateOperationsInput
-		| Date
-		| string
-		| null;
-	user?: Prisma.UserUpdateOneWithoutReportsNestedInput;
-	platform?: Prisma.PlatformUpdateOneWithoutReportsNestedInput;
-	status?: Prisma.ReportStatusUpdateOneWithoutReportsNestedInput;
-	images?: Prisma.ReportImageUpdateManyWithoutReportNestedInput;
-	timelines?: Prisma.ReportTimelineUpdateManyWithoutReportNestedInput;
-};
-
-export type ReportUncheckedUpdateWithoutCategoryInput = {
-	id?: Prisma.StringFieldUpdateOperationsInput | string;
-	userId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
-	url?: Prisma.StringFieldUpdateOperationsInput | string;
-	title?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
-	description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
-	platformId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null;
-	statusId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null;
 	riskScore?: Prisma.NullableIntFieldUpdateOperationsInput | number | null;
 	viewCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null;
 	reportCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null;
@@ -1807,6 +1998,94 @@ export type ReportUncheckedUpdateWithoutCategoryInput = {
 	timelines?: Prisma.ReportTimelineUncheckedUpdateManyWithoutReportNestedInput;
 };
 
+export type ReportCreateManyCategoryInput = {
+	id: string;
+	userId?: string | null;
+	url: string;
+	title?: string | null;
+	description?: string | null;
+	platformId?: number | null;
+	statusId?: number | null;
+	verdict?: $Enums.ReportVerdict | null;
+	riskScore?: number | null;
+	viewCount?: number | null;
+	reportCount?: number | null;
+	sourceIp?: string | null;
+	privacyPolicyAgreedAt?: Date | string;
+	createdAt?: Date | string | null;
+	updatedAt?: Date | string | null;
+};
+
+export type ReportUpdateWithoutCategoryInput = {
+	id?: Prisma.StringFieldUpdateOperationsInput | string;
+	url?: Prisma.StringFieldUpdateOperationsInput | string;
+	title?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+	description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+	verdict?:
+		| Prisma.NullableEnumReportVerdictFieldUpdateOperationsInput
+		| $Enums.ReportVerdict
+		| null;
+	riskScore?: Prisma.NullableIntFieldUpdateOperationsInput | number | null;
+	viewCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null;
+	reportCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null;
+	sourceIp?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+	privacyPolicyAgreedAt?:
+		| Prisma.DateTimeFieldUpdateOperationsInput
+		| Date
+		| string;
+	createdAt?:
+		| Prisma.NullableDateTimeFieldUpdateOperationsInput
+		| Date
+		| string
+		| null;
+	updatedAt?:
+		| Prisma.NullableDateTimeFieldUpdateOperationsInput
+		| Date
+		| string
+		| null;
+	user?: Prisma.UserUpdateOneWithoutReportsNestedInput;
+	platform?: Prisma.PlatformUpdateOneWithoutReportsNestedInput;
+	status?: Prisma.ReportStatusUpdateOneWithoutReportsNestedInput;
+	reportLabels?: Prisma.ReportLabelRelationUpdateManyWithoutReportNestedInput;
+	images?: Prisma.ReportImageUpdateManyWithoutReportNestedInput;
+	timelines?: Prisma.ReportTimelineUpdateManyWithoutReportNestedInput;
+};
+
+export type ReportUncheckedUpdateWithoutCategoryInput = {
+	id?: Prisma.StringFieldUpdateOperationsInput | string;
+	userId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+	url?: Prisma.StringFieldUpdateOperationsInput | string;
+	title?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+	description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+	platformId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null;
+	statusId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null;
+	verdict?:
+		| Prisma.NullableEnumReportVerdictFieldUpdateOperationsInput
+		| $Enums.ReportVerdict
+		| null;
+	riskScore?: Prisma.NullableIntFieldUpdateOperationsInput | number | null;
+	viewCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null;
+	reportCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null;
+	sourceIp?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+	privacyPolicyAgreedAt?:
+		| Prisma.DateTimeFieldUpdateOperationsInput
+		| Date
+		| string;
+	createdAt?:
+		| Prisma.NullableDateTimeFieldUpdateOperationsInput
+		| Date
+		| string
+		| null;
+	updatedAt?:
+		| Prisma.NullableDateTimeFieldUpdateOperationsInput
+		| Date
+		| string
+		| null;
+	reportLabels?: Prisma.ReportLabelRelationUncheckedUpdateManyWithoutReportNestedInput;
+	images?: Prisma.ReportImageUncheckedUpdateManyWithoutReportNestedInput;
+	timelines?: Prisma.ReportTimelineUncheckedUpdateManyWithoutReportNestedInput;
+};
+
 export type ReportUncheckedUpdateManyWithoutCategoryInput = {
 	id?: Prisma.StringFieldUpdateOperationsInput | string;
 	userId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
@@ -1815,6 +2094,10 @@ export type ReportUncheckedUpdateManyWithoutCategoryInput = {
 	description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
 	platformId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null;
 	statusId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null;
+	verdict?:
+		| Prisma.NullableEnumReportVerdictFieldUpdateOperationsInput
+		| $Enums.ReportVerdict
+		| null;
 	riskScore?: Prisma.NullableIntFieldUpdateOperationsInput | number | null;
 	viewCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null;
 	reportCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null;
@@ -1843,6 +2126,7 @@ export type ReportCreateManyPlatformInput = {
 	description?: string | null;
 	categoryId?: number | null;
 	statusId?: number | null;
+	verdict?: $Enums.ReportVerdict | null;
 	riskScore?: number | null;
 	viewCount?: number | null;
 	reportCount?: number | null;
@@ -1857,6 +2141,10 @@ export type ReportUpdateWithoutPlatformInput = {
 	url?: Prisma.StringFieldUpdateOperationsInput | string;
 	title?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
 	description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+	verdict?:
+		| Prisma.NullableEnumReportVerdictFieldUpdateOperationsInput
+		| $Enums.ReportVerdict
+		| null;
 	riskScore?: Prisma.NullableIntFieldUpdateOperationsInput | number | null;
 	viewCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null;
 	reportCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null;
@@ -1878,6 +2166,7 @@ export type ReportUpdateWithoutPlatformInput = {
 	user?: Prisma.UserUpdateOneWithoutReportsNestedInput;
 	category?: Prisma.FraudCategoryUpdateOneWithoutReportsNestedInput;
 	status?: Prisma.ReportStatusUpdateOneWithoutReportsNestedInput;
+	reportLabels?: Prisma.ReportLabelRelationUpdateManyWithoutReportNestedInput;
 	images?: Prisma.ReportImageUpdateManyWithoutReportNestedInput;
 	timelines?: Prisma.ReportTimelineUpdateManyWithoutReportNestedInput;
 };
@@ -1890,6 +2179,10 @@ export type ReportUncheckedUpdateWithoutPlatformInput = {
 	description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
 	categoryId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null;
 	statusId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null;
+	verdict?:
+		| Prisma.NullableEnumReportVerdictFieldUpdateOperationsInput
+		| $Enums.ReportVerdict
+		| null;
 	riskScore?: Prisma.NullableIntFieldUpdateOperationsInput | number | null;
 	viewCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null;
 	reportCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null;
@@ -1908,6 +2201,7 @@ export type ReportUncheckedUpdateWithoutPlatformInput = {
 		| Date
 		| string
 		| null;
+	reportLabels?: Prisma.ReportLabelRelationUncheckedUpdateManyWithoutReportNestedInput;
 	images?: Prisma.ReportImageUncheckedUpdateManyWithoutReportNestedInput;
 	timelines?: Prisma.ReportTimelineUncheckedUpdateManyWithoutReportNestedInput;
 };
@@ -1920,6 +2214,10 @@ export type ReportUncheckedUpdateManyWithoutPlatformInput = {
 	description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
 	categoryId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null;
 	statusId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null;
+	verdict?:
+		| Prisma.NullableEnumReportVerdictFieldUpdateOperationsInput
+		| $Enums.ReportVerdict
+		| null;
 	riskScore?: Prisma.NullableIntFieldUpdateOperationsInput | number | null;
 	viewCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null;
 	reportCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null;
@@ -1948,6 +2246,7 @@ export type ReportCreateManyStatusInput = {
 	description?: string | null;
 	platformId?: number | null;
 	categoryId?: number | null;
+	verdict?: $Enums.ReportVerdict | null;
 	riskScore?: number | null;
 	viewCount?: number | null;
 	reportCount?: number | null;
@@ -1962,6 +2261,10 @@ export type ReportUpdateWithoutStatusInput = {
 	url?: Prisma.StringFieldUpdateOperationsInput | string;
 	title?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
 	description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+	verdict?:
+		| Prisma.NullableEnumReportVerdictFieldUpdateOperationsInput
+		| $Enums.ReportVerdict
+		| null;
 	riskScore?: Prisma.NullableIntFieldUpdateOperationsInput | number | null;
 	viewCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null;
 	reportCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null;
@@ -1983,6 +2286,7 @@ export type ReportUpdateWithoutStatusInput = {
 	user?: Prisma.UserUpdateOneWithoutReportsNestedInput;
 	platform?: Prisma.PlatformUpdateOneWithoutReportsNestedInput;
 	category?: Prisma.FraudCategoryUpdateOneWithoutReportsNestedInput;
+	reportLabels?: Prisma.ReportLabelRelationUpdateManyWithoutReportNestedInput;
 	images?: Prisma.ReportImageUpdateManyWithoutReportNestedInput;
 	timelines?: Prisma.ReportTimelineUpdateManyWithoutReportNestedInput;
 };
@@ -1995,6 +2299,10 @@ export type ReportUncheckedUpdateWithoutStatusInput = {
 	description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
 	platformId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null;
 	categoryId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null;
+	verdict?:
+		| Prisma.NullableEnumReportVerdictFieldUpdateOperationsInput
+		| $Enums.ReportVerdict
+		| null;
 	riskScore?: Prisma.NullableIntFieldUpdateOperationsInput | number | null;
 	viewCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null;
 	reportCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null;
@@ -2013,6 +2321,7 @@ export type ReportUncheckedUpdateWithoutStatusInput = {
 		| Date
 		| string
 		| null;
+	reportLabels?: Prisma.ReportLabelRelationUncheckedUpdateManyWithoutReportNestedInput;
 	images?: Prisma.ReportImageUncheckedUpdateManyWithoutReportNestedInput;
 	timelines?: Prisma.ReportTimelineUncheckedUpdateManyWithoutReportNestedInput;
 };
@@ -2025,6 +2334,10 @@ export type ReportUncheckedUpdateManyWithoutStatusInput = {
 	description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
 	platformId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null;
 	categoryId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null;
+	verdict?:
+		| Prisma.NullableEnumReportVerdictFieldUpdateOperationsInput
+		| $Enums.ReportVerdict
+		| null;
 	riskScore?: Prisma.NullableIntFieldUpdateOperationsInput | number | null;
 	viewCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null;
 	reportCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null;
@@ -2053,6 +2366,7 @@ export type ReportCreateManyUserInput = {
 	platformId?: number | null;
 	categoryId?: number | null;
 	statusId?: number | null;
+	verdict?: $Enums.ReportVerdict | null;
 	riskScore?: number | null;
 	viewCount?: number | null;
 	reportCount?: number | null;
@@ -2067,6 +2381,10 @@ export type ReportUpdateWithoutUserInput = {
 	url?: Prisma.StringFieldUpdateOperationsInput | string;
 	title?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
 	description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+	verdict?:
+		| Prisma.NullableEnumReportVerdictFieldUpdateOperationsInput
+		| $Enums.ReportVerdict
+		| null;
 	riskScore?: Prisma.NullableIntFieldUpdateOperationsInput | number | null;
 	viewCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null;
 	reportCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null;
@@ -2088,6 +2406,7 @@ export type ReportUpdateWithoutUserInput = {
 	platform?: Prisma.PlatformUpdateOneWithoutReportsNestedInput;
 	category?: Prisma.FraudCategoryUpdateOneWithoutReportsNestedInput;
 	status?: Prisma.ReportStatusUpdateOneWithoutReportsNestedInput;
+	reportLabels?: Prisma.ReportLabelRelationUpdateManyWithoutReportNestedInput;
 	images?: Prisma.ReportImageUpdateManyWithoutReportNestedInput;
 	timelines?: Prisma.ReportTimelineUpdateManyWithoutReportNestedInput;
 };
@@ -2100,6 +2419,10 @@ export type ReportUncheckedUpdateWithoutUserInput = {
 	platformId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null;
 	categoryId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null;
 	statusId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null;
+	verdict?:
+		| Prisma.NullableEnumReportVerdictFieldUpdateOperationsInput
+		| $Enums.ReportVerdict
+		| null;
 	riskScore?: Prisma.NullableIntFieldUpdateOperationsInput | number | null;
 	viewCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null;
 	reportCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null;
@@ -2118,6 +2441,7 @@ export type ReportUncheckedUpdateWithoutUserInput = {
 		| Date
 		| string
 		| null;
+	reportLabels?: Prisma.ReportLabelRelationUncheckedUpdateManyWithoutReportNestedInput;
 	images?: Prisma.ReportImageUncheckedUpdateManyWithoutReportNestedInput;
 	timelines?: Prisma.ReportTimelineUncheckedUpdateManyWithoutReportNestedInput;
 };
@@ -2130,6 +2454,10 @@ export type ReportUncheckedUpdateManyWithoutUserInput = {
 	platformId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null;
 	categoryId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null;
 	statusId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null;
+	verdict?:
+		| Prisma.NullableEnumReportVerdictFieldUpdateOperationsInput
+		| $Enums.ReportVerdict
+		| null;
 	riskScore?: Prisma.NullableIntFieldUpdateOperationsInput | number | null;
 	viewCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null;
 	reportCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null;
@@ -2155,6 +2483,7 @@ export type ReportUncheckedUpdateManyWithoutUserInput = {
  */
 
 export type ReportCountOutputType = {
+	reportLabels: number;
 	images: number;
 	timelines: number;
 };
@@ -2163,6 +2492,7 @@ export type ReportCountOutputTypeSelect<
 	ExtArgs extends
 		runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs,
 > = {
+	reportLabels?: boolean | ReportCountOutputTypeCountReportLabelsArgs;
 	images?: boolean | ReportCountOutputTypeCountImagesArgs;
 	timelines?: boolean | ReportCountOutputTypeCountTimelinesArgs;
 };
@@ -2178,6 +2508,16 @@ export type ReportCountOutputTypeDefaultArgs<
 	 * Select specific fields to fetch from the ReportCountOutputType
 	 */
 	select?: Prisma.ReportCountOutputTypeSelect<ExtArgs> | null;
+};
+
+/**
+ * ReportCountOutputType without action
+ */
+export type ReportCountOutputTypeCountReportLabelsArgs<
+	ExtArgs extends
+		runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs,
+> = {
+	where?: Prisma.ReportLabelRelationWhereInput;
 };
 
 /**
@@ -2213,6 +2553,7 @@ export type ReportSelect<
 		platformId?: boolean;
 		categoryId?: boolean;
 		statusId?: boolean;
+		verdict?: boolean;
 		riskScore?: boolean;
 		viewCount?: boolean;
 		reportCount?: boolean;
@@ -2224,6 +2565,7 @@ export type ReportSelect<
 		platform?: boolean | Prisma.Report$platformArgs<ExtArgs>;
 		category?: boolean | Prisma.Report$categoryArgs<ExtArgs>;
 		status?: boolean | Prisma.Report$statusArgs<ExtArgs>;
+		reportLabels?: boolean | Prisma.Report$reportLabelsArgs<ExtArgs>;
 		images?: boolean | Prisma.Report$imagesArgs<ExtArgs>;
 		timelines?: boolean | Prisma.Report$timelinesArgs<ExtArgs>;
 		_count?: boolean | Prisma.ReportCountOutputTypeDefaultArgs<ExtArgs>;
@@ -2244,6 +2586,7 @@ export type ReportSelectCreateManyAndReturn<
 		platformId?: boolean;
 		categoryId?: boolean;
 		statusId?: boolean;
+		verdict?: boolean;
 		riskScore?: boolean;
 		viewCount?: boolean;
 		reportCount?: boolean;
@@ -2272,6 +2615,7 @@ export type ReportSelectUpdateManyAndReturn<
 		platformId?: boolean;
 		categoryId?: boolean;
 		statusId?: boolean;
+		verdict?: boolean;
 		riskScore?: boolean;
 		viewCount?: boolean;
 		reportCount?: boolean;
@@ -2296,6 +2640,7 @@ export type ReportSelectScalar = {
 	platformId?: boolean;
 	categoryId?: boolean;
 	statusId?: boolean;
+	verdict?: boolean;
 	riskScore?: boolean;
 	viewCount?: boolean;
 	reportCount?: boolean;
@@ -2317,6 +2662,7 @@ export type ReportOmit<
 	| "platformId"
 	| "categoryId"
 	| "statusId"
+	| "verdict"
 	| "riskScore"
 	| "viewCount"
 	| "reportCount"
@@ -2334,6 +2680,7 @@ export type ReportInclude<
 	platform?: boolean | Prisma.Report$platformArgs<ExtArgs>;
 	category?: boolean | Prisma.Report$categoryArgs<ExtArgs>;
 	status?: boolean | Prisma.Report$statusArgs<ExtArgs>;
+	reportLabels?: boolean | Prisma.Report$reportLabelsArgs<ExtArgs>;
 	images?: boolean | Prisma.Report$imagesArgs<ExtArgs>;
 	timelines?: boolean | Prisma.Report$timelinesArgs<ExtArgs>;
 	_count?: boolean | Prisma.ReportCountOutputTypeDefaultArgs<ExtArgs>;
@@ -2367,6 +2714,7 @@ export type $ReportPayload<
 		platform: Prisma.$PlatformPayload<ExtArgs> | null;
 		category: Prisma.$FraudCategoryPayload<ExtArgs> | null;
 		status: Prisma.$ReportStatusPayload<ExtArgs> | null;
+		reportLabels: Prisma.$ReportLabelRelationPayload<ExtArgs>[];
 		images: Prisma.$ReportImagePayload<ExtArgs>[];
 		timelines: Prisma.$ReportTimelinePayload<ExtArgs>[];
 	};
@@ -2380,6 +2728,7 @@ export type $ReportPayload<
 			platformId: number | null;
 			categoryId: number | null;
 			statusId: number | null;
+			verdict: $Enums.ReportVerdict | null;
 			riskScore: number | null;
 			viewCount: number | null;
 			reportCount: number | null;
@@ -2989,6 +3338,17 @@ export interface Prisma__ReportClient<
 		ExtArgs,
 		GlobalOmitOptions
 	>;
+	reportLabels<T extends Prisma.Report$reportLabelsArgs<ExtArgs> = {}>(
+		args?: Prisma.Subset<T, Prisma.Report$reportLabelsArgs<ExtArgs>>,
+	): Prisma.PrismaPromise<
+		| runtime.Types.Result.GetResult<
+				Prisma.$ReportLabelRelationPayload<ExtArgs>,
+				T,
+				"findMany",
+				GlobalOmitOptions
+		  >
+		| Null
+	>;
 	images<T extends Prisma.Report$imagesArgs<ExtArgs> = {}>(
 		args?: Prisma.Subset<T, Prisma.Report$imagesArgs<ExtArgs>>,
 	): Prisma.PrismaPromise<
@@ -3061,6 +3421,7 @@ export interface ReportFieldRefs {
 	readonly platformId: Prisma.FieldRef<"Report", "Int">;
 	readonly categoryId: Prisma.FieldRef<"Report", "Int">;
 	readonly statusId: Prisma.FieldRef<"Report", "Int">;
+	readonly verdict: Prisma.FieldRef<"Report", "ReportVerdict">;
 	readonly riskScore: Prisma.FieldRef<"Report", "Int">;
 	readonly viewCount: Prisma.FieldRef<"Report", "Int">;
 	readonly reportCount: Prisma.FieldRef<"Report", "Int">;
@@ -3608,6 +3969,37 @@ export type Report$statusArgs<
 	 */
 	include?: Prisma.ReportStatusInclude<ExtArgs> | null;
 	where?: Prisma.ReportStatusWhereInput;
+};
+
+/**
+ * Report.reportLabels
+ */
+export type Report$reportLabelsArgs<
+	ExtArgs extends
+		runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs,
+> = {
+	/**
+	 * Select specific fields to fetch from the ReportLabelRelation
+	 */
+	select?: Prisma.ReportLabelRelationSelect<ExtArgs> | null;
+	/**
+	 * Omit specific fields from the ReportLabelRelation
+	 */
+	omit?: Prisma.ReportLabelRelationOmit<ExtArgs> | null;
+	/**
+	 * Choose, which related nodes to fetch as well
+	 */
+	include?: Prisma.ReportLabelRelationInclude<ExtArgs> | null;
+	where?: Prisma.ReportLabelRelationWhereInput;
+	orderBy?:
+		| Prisma.ReportLabelRelationOrderByWithRelationInput
+		| Prisma.ReportLabelRelationOrderByWithRelationInput[];
+	cursor?: Prisma.ReportLabelRelationWhereUniqueInput;
+	take?: number;
+	skip?: number;
+	distinct?:
+		| Prisma.ReportLabelRelationScalarFieldEnum
+		| Prisma.ReportLabelRelationScalarFieldEnum[];
 };
 
 /**

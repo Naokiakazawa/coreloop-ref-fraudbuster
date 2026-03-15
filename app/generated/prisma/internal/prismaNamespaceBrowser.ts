@@ -62,6 +62,8 @@ export const ModelName = {
 	Report: "Report",
 	ReportImage: "ReportImage",
 	ReportTimeline: "ReportTimeline",
+	ReportLabel: "ReportLabel",
+	ReportLabelRelation: "ReportLabelRelation",
 	Announcement: "Announcement",
 	AnnouncementTag: "AnnouncementTag",
 	AnnouncementTagRelation: "AnnouncementTagRelation",
@@ -148,6 +150,7 @@ export const ReportScalarFieldEnum = {
 	platformId: "platformId",
 	categoryId: "categoryId",
 	statusId: "statusId",
+	verdict: "verdict",
 	riskScore: "riskScore",
 	viewCount: "viewCount",
 	reportCount: "reportCount",
@@ -182,6 +185,22 @@ export const ReportTimelineScalarFieldEnum = {
 
 export type ReportTimelineScalarFieldEnum =
 	(typeof ReportTimelineScalarFieldEnum)[keyof typeof ReportTimelineScalarFieldEnum];
+
+export const ReportLabelScalarFieldEnum = {
+	id: "id",
+	name: "name",
+} as const;
+
+export type ReportLabelScalarFieldEnum =
+	(typeof ReportLabelScalarFieldEnum)[keyof typeof ReportLabelScalarFieldEnum];
+
+export const ReportLabelRelationScalarFieldEnum = {
+	reportId: "reportId",
+	labelId: "labelId",
+} as const;
+
+export type ReportLabelRelationScalarFieldEnum =
+	(typeof ReportLabelRelationScalarFieldEnum)[keyof typeof ReportLabelRelationScalarFieldEnum];
 
 export const AnnouncementScalarFieldEnum = {
 	id: "id",

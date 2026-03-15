@@ -1,4 +1,20 @@
+import type {
+	ReportStatusCode,
+	ReportVerdictCode,
+} from "@/lib/report-metadata";
+
 export type ReportSortOrder = "newest" | "popular";
+
+export type ReportStatusRef = {
+	id: number;
+	code: ReportStatusCode;
+	label: string;
+};
+
+export type ReportVerdictRef = {
+	code: ReportVerdictCode;
+	label: string;
+};
 
 export type ReportSummary = {
 	id: string;
@@ -15,10 +31,9 @@ export type ReportSummary = {
 		id: number;
 		name: string;
 	} | null;
-	status: {
-		id: number;
-		label: string;
-	} | null;
+	status: ReportStatusRef | null;
+	verdict: ReportVerdictRef | null;
+	labels: string[];
 	images: Array<{
 		id: string;
 		imageUrl: string;
@@ -62,10 +77,9 @@ export type ReportDetailResponse = {
 		id: number;
 		name: string;
 	} | null;
-	status: {
-		id: number;
-		label: string;
-	} | null;
+	status: ReportStatusRef | null;
+	verdict: ReportVerdictRef | null;
+	labels: string[];
 	images: ReportDetailImage[];
 	timelines: ReportTimelineItem[];
 };

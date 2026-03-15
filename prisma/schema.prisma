@@ -7,6 +7,13 @@ datasource db {
   provider = "postgresql"
 }
 
+enum ReportVerdict {
+  CONFIRMED_FRAUD
+  HIGH_RISK
+  SAFE
+  UNKNOWN
+}
+
 model FraudCategory {
   id            Int      @id @default(autoincrement())
   name          String   @unique @db.VarChar(50)
@@ -71,6 +78,7 @@ model Report {
   platformId                Int?             @map("platform_id")
   categoryId                Int?             @map("category_id")
   statusId                  Int?             @map("status_id")
+  verdict                   ReportVerdict?
   riskScore                 Int?             @default(0) @map("risk_score")
   viewCount                 Int?             @default(0) @map("view_count")
   reportCount               Int?             @default(1) @map("report_count")
@@ -83,6 +91,7 @@ model Report {
   platform                 Platform?        @relation(fields: [platformId], references: [id])
   category                 FraudCategory?   @relation(fields: [categoryId], references: [id])
   status                   ReportStatus?    @relation(fields: [statusId], references: [id])
+  reportLabels             ReportLabelRelation[]
   images                    ReportImage[]
   timelines                 ReportTimeline[]
 
@@ -117,6 +126,24 @@ model ReportTimeline {
 
   @@map("report_timelines")
   @@index([reportId, occurredAt(sort: Desc)])
+}
+
+model ReportLabel {
+  id       Int                   @id @default(autoincrement())
+  name     String                @unique @db.VarChar(50)
+  reports  ReportLabelRelation[]
+
+  @@map("report_labels")
+}
+
+model ReportLabelRelation {
+  reportId  String      @map("report_id") @db.VarChar(64)
+  labelId   Int         @map("label_id")
+  report    Report      @relation(fields: [reportId], references: [id], onDelete: Cascade)
+  label     ReportLabel @relation(fields: [labelId], references: [id], onDelete: Cascade)
+
+  @@id([reportId, labelId])
+  @@map("report_label_relations")
 }
 
 model Announcement {

@@ -9,6 +9,13 @@ import {
 	verifyTurnstileToken,
 } from "@/lib/api-utils";
 import { prisma } from "@/lib/prisma";
+import {
+	getReportStatusMeta,
+	getReportVerdictMeta,
+	isReportStatusCode,
+	isReportVerdictCode,
+	REPORT_STATUS_CODES,
+} from "@/lib/report-metadata";
 import { getSafeReportImageAbsoluteUrl } from "@/lib/report-image-delivery";
 import {
 	ReportImageUploadValidationError,
@@ -124,6 +131,40 @@ const createReportId = customAlphabet(
 
 function isPresent<T>(value: T | null): value is T {
 	return value !== null;
+}
+
+function toReportStatusRef(
+	status: {
+		id: number;
+		statusCode: string;
+		label: string;
+	} | null,
+) {
+	if (!status) {
+		return null;
+	}
+
+	const statusMeta = getReportStatusMeta(status.statusCode);
+	return {
+		id: status.id,
+		code:
+			statusMeta && isReportStatusCode(status.statusCode)
+				? status.statusCode
+				: REPORT_STATUS_CODES.PENDING,
+		label: statusMeta?.label ?? status.label,
+	};
+}
+
+function toReportVerdictRef(verdict: string | null) {
+	const verdictMeta = getReportVerdictMeta(verdict);
+	if (!verdictMeta || !verdict || !isReportVerdictCode(verdict)) {
+		return null;
+	}
+
+	return {
+		code: verdict,
+		label: verdictMeta.label,
+	};
 }
 
 function toSafeReportResponseImage(
@@ -253,7 +294,23 @@ export async function GET(request: NextRequest) {
 				status: {
 					select: {
 						id: true,
+						statusCode: true,
 						label: true,
+					},
+				},
+				verdict: true,
+				reportLabels: {
+					select: {
+						label: {
+							select: {
+								name: true,
+							},
+						},
+					},
+					orderBy: {
+						label: {
+							name: "asc",
+						},
 					},
 				},
 				images: {
@@ -284,6 +341,9 @@ export async function GET(request: NextRequest) {
 				(report): ReportSummary => ({
 					...report,
 					createdAt: report.createdAt?.toISOString() ?? null,
+					status: toReportStatusRef(report.status),
+					verdict: toReportVerdictRef(report.verdict),
+					labels: report.reportLabels.map((item) => item.label.name),
 					images: report.images
 						.map((image) => toSafeReportResponseImage(image, request.url))
 						.filter(isPresent),
@@ -385,13 +445,25 @@ export async function POST(request: NextRequest) {
 			);
 		}
 
-		const impersonationCategory = await prisma.fraudCategory.findUnique({
-			where: { name: "なりすまし" },
-			select: { id: true },
-		});
+		const [impersonationCategory, pendingStatus] = await Promise.all([
+			prisma.fraudCategory.findUnique({
+				where: { name: "なりすまし" },
+				select: { id: true },
+			}),
+			prisma.reportStatus.findUnique({
+				where: { statusCode: REPORT_STATUS_CODES.PENDING },
+				select: { id: true },
+			}),
+		]);
 		if (!impersonationCategory) {
 			return errorResponse(
 				"通報カテゴリの設定が見つかりません。管理者へお問い合わせください。",
+				503,
+			);
+		}
+		if (!pendingStatus) {
+			return errorResponse(
+				"通報ステータスの設定が見つかりません。管理者へお問い合わせください。",
 				503,
 			);
 		}
@@ -457,7 +529,7 @@ export async function POST(request: NextRequest) {
 					description,
 					platformId,
 					categoryId: impersonationCategory.id,
-					statusId: 1, // Default to first status (usually 'Pending' or 'Investigating')
+					statusId: pendingStatus.id,
 					riskScore: 0,
 					reportCount: 1,
 					sourceIp: clientIp,
@@ -470,8 +542,35 @@ export async function POST(request: NextRequest) {
 								}
 							: undefined,
 				},
-				include: {
-					status: true,
+				select: {
+					id: true,
+					url: true,
+					title: true,
+					description: true,
+					createdAt: true,
+					riskScore: true,
+					status: {
+						select: {
+							id: true,
+							statusCode: true,
+							label: true,
+						},
+					},
+					verdict: true,
+					reportLabels: {
+						select: {
+							label: {
+								select: {
+									name: true,
+								},
+							},
+						},
+						orderBy: {
+							label: {
+								name: "asc",
+							},
+						},
+					},
 					images: {
 						select: {
 							id: true,
@@ -506,6 +605,9 @@ export async function POST(request: NextRequest) {
 		return successResponse(
 			{
 				...report,
+				status: toReportStatusRef(report.status),
+				verdict: toReportVerdictRef(report.verdict),
+				labels: report.reportLabels.map((item) => item.label.name),
 				images: report.images
 					.map((image) => toSafeReportResponseImage(image, request.url))
 					.filter(isPresent),

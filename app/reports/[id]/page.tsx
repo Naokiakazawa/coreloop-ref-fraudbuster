@@ -13,6 +13,11 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { formatDate } from "@/lib/date";
 import { prisma } from "@/lib/prisma";
+import {
+	REPORT_LABEL_BADGE_CLASS_NAME,
+	getReportStatusMeta,
+	getReportVerdictMeta,
+} from "@/lib/report-metadata";
 import { getSafeReportImageProxyPath } from "@/lib/report-image-delivery";
 import { maskReportUrl } from "@/lib/report-url";
 import { getSiteUrl } from "@/lib/site-url";
@@ -24,10 +29,31 @@ async function getReportById(id: string) {
 
 	return prisma.report.findUnique({
 		where: { id },
-		include: {
+		select: {
+			id: true,
+			url: true,
+			title: true,
+			description: true,
+			riskScore: true,
+			createdAt: true,
 			platform: true,
 			category: true,
 			status: true,
+			verdict: true,
+			reportLabels: {
+				select: {
+					label: {
+						select: {
+							name: true,
+						},
+					},
+				},
+				orderBy: {
+					label: {
+						name: "asc",
+					},
+				},
+			},
 			images: {
 				select: {
 					id: true,
@@ -63,10 +89,12 @@ function buildReportMetadataTitle(report: ReportDetail) {
 
 function buildReportMetadataDescription(report: ReportDetail) {
 	const summary = report.description?.trim().replace(/\s+/g, " ");
+	const verdictLabel = getReportVerdictMeta(report.verdict)?.label ?? null;
 	const metadataParts = [
 		report.category?.name,
 		report.platform?.name,
 		report.status?.label,
+		verdictLabel,
 		report.riskScore && report.riskScore > 0
 			? `リスクスコア ${report.riskScore}`
 			: null,
@@ -169,14 +197,6 @@ export default async function ReportDetailPage({
 		reportId: report.id,
 	}).toString()}`;
 
-	// Format Risk Score color
-	const getRiskColor = (score: number) => {
-		if (score >= 80) return "text-destructive";
-		if (score >= 50) return "text-orange-500";
-		return "text-green-500";
-	};
-	const riskScore = report.riskScore;
-	const shouldMaskRiskScore = riskScore === null || riskScore <= 0;
 	const reportImages = report.images
 		.map((image) => {
 			const imageUrl = getSafeReportImageProxyPath(image);
@@ -198,6 +218,16 @@ export default async function ReportDetailPage({
 			} => image !== null,
 		);
 	const maskedReportUrl = maskReportUrl(report.url);
+	const statusLabel =
+		getReportStatusMeta(report.status?.statusCode)?.label ??
+		report.status?.label ??
+		"処理待ち";
+	const statusBadgeClassName = getReportStatusMeta(
+		report.status?.statusCode,
+	)?.badgeClassName;
+	const verdict = getReportVerdictMeta(report.verdict);
+	const verdictLabel = verdict?.label ?? null;
+	const labels = report.reportLabels.map((item) => item.label.name);
 
 	return (
 		<div className="container py-10 space-y-10">
@@ -221,6 +251,15 @@ export default async function ReportDetailPage({
 							<Badge variant="outline" className="px-3 py-1 text-sm">
 								{report.platform?.name || "不明なプラットフォーム"}
 							</Badge>
+							{labels.map((label) => (
+								<Badge
+									key={label}
+									variant="outline"
+									className={REPORT_LABEL_BADGE_CLASS_NAME}
+								>
+									{label}
+								</Badge>
+							))}
 							<div className="flex items-center gap-2 ml-auto text-sm text-muted-foreground">
 								<Calendar className="h-4 w-4" />
 								<span>
@@ -233,31 +272,29 @@ export default async function ReportDetailPage({
 							{report.title || "（タイトルなし）"}
 						</h1>
 
-						<div className="flex items-center gap-4 p-4 rounded-xl bg-muted/30 border">
-							<div className="flex flex-col items-center justify-center px-4 border-r">
-								<span className="text-xs text-muted-foreground uppercase font-semibold">
-									リスクスコア
-								</span>
-								<span
-									className={`text-3xl font-black ${
-										shouldMaskRiskScore
-											? "text-muted-foreground"
-											: getRiskColor(riskScore)
-									}`}
-								>
-									{shouldMaskRiskScore ? "-" : riskScore}
-								</span>
-							</div>
-							<div className="flex-1 space-y-1">
-								<div className="flex items-center gap-2">
+						<div className="rounded-xl border bg-muted/30 p-4">
+							<div className="space-y-1">
+								<div className="flex flex-wrap items-center gap-2">
 									<CheckCircle2 className="h-5 w-5 text-primary" />
-									<span className="font-bold">
-										{report.status?.label || "調査中"}
-									</span>
+									<Badge
+										variant="outline"
+										className={statusBadgeClassName ?? undefined}
+									>
+										{statusLabel}
+									</Badge>
+									{verdictLabel ? (
+										<Badge
+											variant="outline"
+											className={verdict?.badgeClassName}
+										>
+											{verdictLabel}
+										</Badge>
+									) : null}
 								</div>
 								<p className="text-sm text-muted-foreground">
-									この通報は現在、
-									{report.status?.label || "システムによる自動調査"}の状態です。
+									{verdictLabel
+										? `この通報は調査を完了し、「${verdictLabel}」と判定されています。`
+										: `この通報は現在、「${statusLabel}」の状態です。`}
 								</p>
 							</div>
 						</div>

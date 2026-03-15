@@ -17,7 +17,9 @@ function createReport(params: {
 		riskScore: 85,
 		platform: { id: 1, name: "LINE" },
 		category: { id: 1, name: "フィッシング" },
-		status: { id: 1, label: "調査中" },
+		status: { id: 1, code: "INVESTIGATING", label: "調査中" },
+		verdict: null,
+		labels: ["LINE", "認証偽装"],
 		images: [],
 	};
 }

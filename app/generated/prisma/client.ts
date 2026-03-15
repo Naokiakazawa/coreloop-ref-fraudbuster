@@ -87,6 +87,16 @@ export type ReportImage = Prisma.ReportImageModel;
  */
 export type ReportTimeline = Prisma.ReportTimelineModel;
 /**
+ * Model ReportLabel
+ *
+ */
+export type ReportLabel = Prisma.ReportLabelModel;
+/**
+ * Model ReportLabelRelation
+ *
+ */
+export type ReportLabelRelation = Prisma.ReportLabelRelationModel;
+/**
  * Model Announcement
  *
  */

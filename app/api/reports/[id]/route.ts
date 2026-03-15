@@ -5,10 +5,28 @@ import {
 } from "@/lib/api-utils";
 import { getSafeReportImageAbsoluteUrl } from "@/lib/report-image-delivery";
 import { prisma } from "@/lib/prisma";
+import {
+	getReportStatusMeta,
+	getReportVerdictMeta,
+	isReportStatusCode,
+	isReportVerdictCode,
+	REPORT_STATUS_CODES,
+} from "@/lib/report-metadata";
 import type { ReportDetailResponse } from "@/lib/types/api";
 
 function isPresent<T>(value: T | null): value is T {
 	return value !== null;
+}
+
+function toReportVerdictRef(verdict: string | null) {
+	if (!verdict || !isReportVerdictCode(verdict)) {
+		return null;
+	}
+
+	return {
+		code: verdict,
+		label: getReportVerdictMeta(verdict)?.label ?? verdict,
+	};
 }
 
 /**
@@ -46,7 +64,23 @@ export async function GET(
 				status: {
 					select: {
 						id: true,
+						statusCode: true,
 						label: true,
+					},
+				},
+				verdict: true,
+				reportLabels: {
+					select: {
+						label: {
+							select: {
+								name: true,
+							},
+						},
+					},
+					orderBy: {
+						label: {
+							name: "asc",
+						},
 					},
 				},
 				images: {
@@ -84,7 +118,19 @@ export async function GET(
 			riskScore: report.riskScore,
 			platform: report.platform,
 			category: report.category,
-			status: report.status,
+			status: report.status
+				? {
+						id: report.status.id,
+						code: isReportStatusCode(report.status.statusCode)
+							? report.status.statusCode
+							: REPORT_STATUS_CODES.PENDING,
+						label:
+							getReportStatusMeta(report.status.statusCode)?.label ??
+							report.status.label,
+					}
+				: null,
+			verdict: toReportVerdictRef(report.verdict),
+			labels: report.reportLabels.map((item) => item.label.name),
 			images: report.images
 				.map((image) => {
 					const imageUrl = getSafeReportImageAbsoluteUrl(image, _request.url);

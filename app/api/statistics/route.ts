@@ -1,6 +1,7 @@
 import { connection } from "next/server";
 import { errorResponse, successResponse } from "@/lib/api-utils";
 import { prisma } from "@/lib/prisma";
+import { compareReportStatusCodes } from "@/lib/report-metadata";
 import type {
 	StatisticsBreakdownItem,
 	StatisticsResponse,
@@ -82,7 +83,7 @@ export async function GET(request: Request) {
 				_count: { _all: true },
 			}),
 			prisma.reportStatus.findMany({
-				select: { id: true, label: true },
+				select: { id: true, label: true, statusCode: true },
 			}),
 			prisma.fraudCategory.findMany({
 				select: { id: true, name: true },
@@ -103,6 +104,9 @@ export async function GET(request: Request) {
 		const statusLabelMap = new Map(
 			statuses.map((item) => [item.id, item.label]),
 		);
+		const statusCodeMap = new Map(
+			statuses.map((item) => [item.id, item.statusCode]),
+		);
 		const categoryLabelMap = new Map(
 			categories.map((item) => [item.id, item.name]),
 		);
@@ -118,6 +122,12 @@ export async function GET(request: Request) {
 					: (statusLabelMap.get(item.statusId) ?? "Unknown"),
 			count: item._count._all,
 		}));
+		status.sort((left, right) =>
+			compareReportStatusCodes(
+				left.id === null ? null : statusCodeMap.get(left.id),
+				right.id === null ? null : statusCodeMap.get(right.id),
+			),
+		);
 
 		const category: StatisticsBreakdownItem[] = categoryStatsRaw.map(
 			(item) => ({

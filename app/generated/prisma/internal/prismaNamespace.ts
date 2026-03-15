@@ -424,6 +424,8 @@ export const ModelName = {
 	Report: "Report",
 	ReportImage: "ReportImage",
 	ReportTimeline: "ReportTimeline",
+	ReportLabel: "ReportLabel",
+	ReportLabelRelation: "ReportLabelRelation",
 	Announcement: "Announcement",
 	AnnouncementTag: "AnnouncementTag",
 	AnnouncementTagRelation: "AnnouncementTagRelation",
@@ -460,6 +462,8 @@ export type TypeMap<
 			| "report"
 			| "reportImage"
 			| "reportTimeline"
+			| "reportLabel"
+			| "reportLabelRelation"
 			| "announcement"
 			| "announcementTag"
 			| "announcementTagRelation"
@@ -1077,6 +1081,158 @@ export type TypeMap<
 				};
 			};
 		};
+		ReportLabel: {
+			payload: Prisma.$ReportLabelPayload<ExtArgs>;
+			fields: Prisma.ReportLabelFieldRefs;
+			operations: {
+				findUnique: {
+					args: Prisma.ReportLabelFindUniqueArgs<ExtArgs>;
+					result: runtime.Types.Utils.PayloadToResult<Prisma.$ReportLabelPayload> | null;
+				};
+				findUniqueOrThrow: {
+					args: Prisma.ReportLabelFindUniqueOrThrowArgs<ExtArgs>;
+					result: runtime.Types.Utils.PayloadToResult<Prisma.$ReportLabelPayload>;
+				};
+				findFirst: {
+					args: Prisma.ReportLabelFindFirstArgs<ExtArgs>;
+					result: runtime.Types.Utils.PayloadToResult<Prisma.$ReportLabelPayload> | null;
+				};
+				findFirstOrThrow: {
+					args: Prisma.ReportLabelFindFirstOrThrowArgs<ExtArgs>;
+					result: runtime.Types.Utils.PayloadToResult<Prisma.$ReportLabelPayload>;
+				};
+				findMany: {
+					args: Prisma.ReportLabelFindManyArgs<ExtArgs>;
+					result: runtime.Types.Utils.PayloadToResult<Prisma.$ReportLabelPayload>[];
+				};
+				create: {
+					args: Prisma.ReportLabelCreateArgs<ExtArgs>;
+					result: runtime.Types.Utils.PayloadToResult<Prisma.$ReportLabelPayload>;
+				};
+				createMany: {
+					args: Prisma.ReportLabelCreateManyArgs<ExtArgs>;
+					result: BatchPayload;
+				};
+				createManyAndReturn: {
+					args: Prisma.ReportLabelCreateManyAndReturnArgs<ExtArgs>;
+					result: runtime.Types.Utils.PayloadToResult<Prisma.$ReportLabelPayload>[];
+				};
+				delete: {
+					args: Prisma.ReportLabelDeleteArgs<ExtArgs>;
+					result: runtime.Types.Utils.PayloadToResult<Prisma.$ReportLabelPayload>;
+				};
+				update: {
+					args: Prisma.ReportLabelUpdateArgs<ExtArgs>;
+					result: runtime.Types.Utils.PayloadToResult<Prisma.$ReportLabelPayload>;
+				};
+				deleteMany: {
+					args: Prisma.ReportLabelDeleteManyArgs<ExtArgs>;
+					result: BatchPayload;
+				};
+				updateMany: {
+					args: Prisma.ReportLabelUpdateManyArgs<ExtArgs>;
+					result: BatchPayload;
+				};
+				updateManyAndReturn: {
+					args: Prisma.ReportLabelUpdateManyAndReturnArgs<ExtArgs>;
+					result: runtime.Types.Utils.PayloadToResult<Prisma.$ReportLabelPayload>[];
+				};
+				upsert: {
+					args: Prisma.ReportLabelUpsertArgs<ExtArgs>;
+					result: runtime.Types.Utils.PayloadToResult<Prisma.$ReportLabelPayload>;
+				};
+				aggregate: {
+					args: Prisma.ReportLabelAggregateArgs<ExtArgs>;
+					result: runtime.Types.Utils.Optional<Prisma.AggregateReportLabel>;
+				};
+				groupBy: {
+					args: Prisma.ReportLabelGroupByArgs<ExtArgs>;
+					result: runtime.Types.Utils.Optional<Prisma.ReportLabelGroupByOutputType>[];
+				};
+				count: {
+					args: Prisma.ReportLabelCountArgs<ExtArgs>;
+					result:
+						| runtime.Types.Utils.Optional<Prisma.ReportLabelCountAggregateOutputType>
+						| number;
+				};
+			};
+		};
+		ReportLabelRelation: {
+			payload: Prisma.$ReportLabelRelationPayload<ExtArgs>;
+			fields: Prisma.ReportLabelRelationFieldRefs;
+			operations: {
+				findUnique: {
+					args: Prisma.ReportLabelRelationFindUniqueArgs<ExtArgs>;
+					result: runtime.Types.Utils.PayloadToResult<Prisma.$ReportLabelRelationPayload> | null;
+				};
+				findUniqueOrThrow: {
+					args: Prisma.ReportLabelRelationFindUniqueOrThrowArgs<ExtArgs>;
+					result: runtime.Types.Utils.PayloadToResult<Prisma.$ReportLabelRelationPayload>;
+				};
+				findFirst: {
+					args: Prisma.ReportLabelRelationFindFirstArgs<ExtArgs>;
+					result: runtime.Types.Utils.PayloadToResult<Prisma.$ReportLabelRelationPayload> | null;
+				};
+				findFirstOrThrow: {
+					args: Prisma.ReportLabelRelationFindFirstOrThrowArgs<ExtArgs>;
+					result: runtime.Types.Utils.PayloadToResult<Prisma.$ReportLabelRelationPayload>;
+				};
+				findMany: {
+					args: Prisma.ReportLabelRelationFindManyArgs<ExtArgs>;
+					result: runtime.Types.Utils.PayloadToResult<Prisma.$ReportLabelRelationPayload>[];
+				};
+				create: {
+					args: Prisma.ReportLabelRelationCreateArgs<ExtArgs>;
+					result: runtime.Types.Utils.PayloadToResult<Prisma.$ReportLabelRelationPayload>;
+				};
+				createMany: {
+					args: Prisma.ReportLabelRelationCreateManyArgs<ExtArgs>;
+					result: BatchPayload;
+				};
+				createManyAndReturn: {
+					args: Prisma.ReportLabelRelationCreateManyAndReturnArgs<ExtArgs>;
+					result: runtime.Types.Utils.PayloadToResult<Prisma.$ReportLabelRelationPayload>[];
+				};
+				delete: {
+					args: Prisma.ReportLabelRelationDeleteArgs<ExtArgs>;
+					result: runtime.Types.Utils.PayloadToResult<Prisma.$ReportLabelRelationPayload>;
+				};
+				update: {
+					args: Prisma.ReportLabelRelationUpdateArgs<ExtArgs>;
+					result: runtime.Types.Utils.PayloadToResult<Prisma.$ReportLabelRelationPayload>;
+				};
+				deleteMany: {
+					args: Prisma.ReportLabelRelationDeleteManyArgs<ExtArgs>;
+					result: BatchPayload;
+				};
+				updateMany: {
+					args: Prisma.ReportLabelRelationUpdateManyArgs<ExtArgs>;
+					result: BatchPayload;
+				};
+				updateManyAndReturn: {
+					args: Prisma.ReportLabelRelationUpdateManyAndReturnArgs<ExtArgs>;
+					result: runtime.Types.Utils.PayloadToResult<Prisma.$ReportLabelRelationPayload>[];
+				};
+				upsert: {
+					args: Prisma.ReportLabelRelationUpsertArgs<ExtArgs>;
+					result: runtime.Types.Utils.PayloadToResult<Prisma.$ReportLabelRelationPayload>;
+				};
+				aggregate: {
+					args: Prisma.ReportLabelRelationAggregateArgs<ExtArgs>;
+					result: runtime.Types.Utils.Optional<Prisma.AggregateReportLabelRelation>;
+				};
+				groupBy: {
+					args: Prisma.ReportLabelRelationGroupByArgs<ExtArgs>;
+					result: runtime.Types.Utils.Optional<Prisma.ReportLabelRelationGroupByOutputType>[];
+				};
+				count: {
+					args: Prisma.ReportLabelRelationCountArgs<ExtArgs>;
+					result:
+						| runtime.Types.Utils.Optional<Prisma.ReportLabelRelationCountAggregateOutputType>
+						| number;
+				};
+			};
+		};
 		Announcement: {
 			payload: Prisma.$AnnouncementPayload<ExtArgs>;
 			fields: Prisma.AnnouncementFieldRefs;
@@ -1634,6 +1790,7 @@ export const ReportScalarFieldEnum = {
 	platformId: "platformId",
 	categoryId: "categoryId",
 	statusId: "statusId",
+	verdict: "verdict",
 	riskScore: "riskScore",
 	viewCount: "viewCount",
 	reportCount: "reportCount",
@@ -1668,6 +1825,22 @@ export const ReportTimelineScalarFieldEnum = {
 
 export type ReportTimelineScalarFieldEnum =
 	(typeof ReportTimelineScalarFieldEnum)[keyof typeof ReportTimelineScalarFieldEnum];
+
+export const ReportLabelScalarFieldEnum = {
+	id: "id",
+	name: "name",
+} as const;
+
+export type ReportLabelScalarFieldEnum =
+	(typeof ReportLabelScalarFieldEnum)[keyof typeof ReportLabelScalarFieldEnum];
+
+export const ReportLabelRelationScalarFieldEnum = {
+	reportId: "reportId",
+	labelId: "labelId",
+} as const;
+
+export type ReportLabelRelationScalarFieldEnum =
+	(typeof ReportLabelRelationScalarFieldEnum)[keyof typeof ReportLabelRelationScalarFieldEnum];
 
 export const AnnouncementScalarFieldEnum = {
 	id: "id",
@@ -1845,6 +2018,20 @@ export type ListDateTimeFieldRefInput<$PrismaModel> = FieldRefInputType<
 >;
 
 /**
+ * Reference to a field of type 'ReportVerdict'
+ */
+export type EnumReportVerdictFieldRefInput<$PrismaModel> = FieldRefInputType<
+	$PrismaModel,
+	"ReportVerdict"
+>;
+
+/**
+ * Reference to a field of type 'ReportVerdict[]'
+ */
+export type ListEnumReportVerdictFieldRefInput<$PrismaModel> =
+	FieldRefInputType<$PrismaModel, "ReportVerdict[]">;
+
+/**
  * Reference to a field of type 'Json'
  */
 export type JsonFieldRefInput<$PrismaModel> = FieldRefInputType<
@@ -1987,6 +2174,8 @@ export type GlobalOmitConfig = {
 	report?: Prisma.ReportOmit;
 	reportImage?: Prisma.ReportImageOmit;
 	reportTimeline?: Prisma.ReportTimelineOmit;
+	reportLabel?: Prisma.ReportLabelOmit;
+	reportLabelRelation?: Prisma.ReportLabelRelationOmit;
 	announcement?: Prisma.AnnouncementOmit;
 	announcementTag?: Prisma.AnnouncementTagOmit;
 	announcementTagRelation?: Prisma.AnnouncementTagRelationOmit;

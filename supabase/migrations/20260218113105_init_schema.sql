@@ -101,6 +101,19 @@ CREATE TABLE report_timelines (
     occurred_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP -- 実際の発生日時
 );
 
+-- 通報ラベルマスタ
+CREATE TABLE report_labels (
+    id SERIAL PRIMARY KEY,
+    name VARCHAR(50) UNIQUE NOT NULL
+);
+
+-- 通報とラベルの関連
+CREATE TABLE report_label_relations (
+    report_id VARCHAR(64) NOT NULL REFERENCES reports(id) ON DELETE CASCADE,
+    label_id INT NOT NULL REFERENCES report_labels(id) ON DELETE CASCADE,
+    PRIMARY KEY (report_id, label_id)
+);
+
 -- =============================================
 -- 4. コンテンツ・お知らせ (CMS)
 -- =============================================

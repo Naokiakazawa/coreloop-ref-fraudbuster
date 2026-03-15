@@ -312,9 +312,24 @@ export function createOpenApiDocument(origin: string): OpenApiDocument {
 				},
 				StatusRef: {
 					type: "object",
-					required: ["id", "label"],
+					required: ["id", "code", "label"],
 					properties: {
 						id: { type: "integer" },
+						code: {
+							type: "string",
+							enum: ["PENDING", "INVESTIGATING", "COMPLETED"],
+						},
+						label: { type: "string" },
+					},
+				},
+				VerdictRef: {
+					type: "object",
+					required: ["code", "label"],
+					properties: {
+						code: {
+							type: "string",
+							enum: ["CONFIRMED_FRAUD", "HIGH_RISK", "SAFE", "UNKNOWN"],
+						},
 						label: { type: "string" },
 					},
 				},
@@ -377,6 +392,8 @@ export function createOpenApiDocument(origin: string): OpenApiDocument {
 						"platform",
 						"category",
 						"status",
+						"verdict",
+						"labels",
 						"images",
 					],
 					properties: {
@@ -404,6 +421,14 @@ export function createOpenApiDocument(origin: string): OpenApiDocument {
 						status: {
 							allOf: [{ $ref: "#/components/schemas/StatusRef" }],
 							nullable: true,
+						},
+						verdict: {
+							allOf: [{ $ref: "#/components/schemas/VerdictRef" }],
+							nullable: true,
+						},
+						labels: {
+							type: "array",
+							items: { type: "string" },
 						},
 						images: {
 							type: "array",
@@ -495,6 +520,8 @@ export function createOpenApiDocument(origin: string): OpenApiDocument {
 						"platform",
 						"category",
 						"status",
+						"verdict",
+						"labels",
 						"images",
 						"timelines",
 					],
@@ -520,6 +547,14 @@ export function createOpenApiDocument(origin: string): OpenApiDocument {
 						status: {
 							allOf: [{ $ref: "#/components/schemas/StatusRef" }],
 							nullable: true,
+						},
+						verdict: {
+							allOf: [{ $ref: "#/components/schemas/VerdictRef" }],
+							nullable: true,
+						},
+						labels: {
+							type: "array",
+							items: { type: "string" },
 						},
 						images: {
 							type: "array",
