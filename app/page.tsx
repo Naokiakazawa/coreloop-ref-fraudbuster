@@ -7,6 +7,7 @@ import { HomeReportsGrid } from "@/components/home-reports-grid";
 import { SiteIntroductionModal } from "@/components/site-introduction-modal";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { getStartOfJstDay } from "@/lib/date";
 import { prisma } from "@/lib/prisma";
 
 async function getCurrentStatus() {
@@ -14,13 +15,14 @@ async function getCurrentStatus() {
 	cacheTag("reports");
 	cacheTag("home-stats");
 	cacheLife({ revalidate: 60 });
+	const todayStart = getStartOfJstDay();
 
 	const [totalReports, todayReports] = await Promise.all([
 		prisma.report.count(),
 		prisma.report.count({
 			where: {
 				createdAt: {
-					gte: new Date(new Date().setHours(0, 0, 0, 0)),
+					gte: todayStart,
 				},
 			},
 		}),

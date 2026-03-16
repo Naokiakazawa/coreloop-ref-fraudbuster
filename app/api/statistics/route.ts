@@ -1,5 +1,6 @@
 import { connection } from "next/server";
 import { errorResponse, successResponse } from "@/lib/api-utils";
+import { getJstDateKey, getStartOfJstDay } from "@/lib/date";
 import { prisma } from "@/lib/prisma";
 import { compareReportStatusCodes } from "@/lib/report-metadata";
 import type {
@@ -18,16 +19,12 @@ function parseDays(value: string | null): number {
 	return Math.min(Math.max(parsed, 1), MAX_DAYS);
 }
 
-function formatTrendDate(date: Date): string {
-	const month = `${date.getMonth() + 1}`.padStart(2, "0");
-	const day = `${date.getDate()}`.padStart(2, "0");
-	return `${month}.${day}`;
+function formatTrendDate(dateKey: string): string {
+	return dateKey.slice(5).replace("-", ".");
 }
 
 function toDateKey(date: Date): string {
-	const normalized = new Date(date);
-	normalized.setHours(0, 0, 0, 0);
-	return normalized.toISOString().slice(0, 10);
+	return getJstDateKey(date) ?? "";
 }
 
 /**
@@ -42,12 +39,10 @@ export async function GET(request: Request) {
 		const days = parseDays(searchParams.get("days"));
 
 		const now = new Date();
-		const startDate = new Date(now);
-		startDate.setDate(startDate.getDate() - (days - 1));
-		startDate.setHours(0, 0, 0, 0);
-
-		const todayStart = new Date(now);
-		todayStart.setHours(0, 0, 0, 0);
+		const todayStart = getStartOfJstDay(now);
+		const startDate = new Date(
+			todayStart.getTime() - (days - 1) * 24 * 60 * 60 * 1000,
+		);
 
 		const [
 			totalReports,
@@ -156,8 +151,9 @@ export async function GET(request: Request) {
 
 		const trendCountMap = new Map<string, number>();
 		for (let i = 0; i < days; i += 1) {
-			const bucketDate = new Date(startDate);
-			bucketDate.setDate(startDate.getDate() + i);
+			const bucketDate = new Date(
+				startDate.getTime() + i * 24 * 60 * 60 * 1000,
+			);
 			trendCountMap.set(toDateKey(bucketDate), 0);
 		}
 
@@ -171,7 +167,7 @@ export async function GET(request: Request) {
 		const trend: StatisticsTrendItem[] = Array.from(
 			trendCountMap.entries(),
 		).map(([dateKey, count]) => ({
-			date: formatTrendDate(new Date(dateKey)),
+			date: formatTrendDate(dateKey),
 			count,
 		}));
 
