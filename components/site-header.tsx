@@ -1,6 +1,6 @@
 "use client";
 
-import { CircleHelp, Menu, ShieldAlert, X } from "lucide-react";
+import { CircleHelp, ExternalLink, Menu, ShieldAlert, X } from "lucide-react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import * as React from "react";
@@ -25,6 +25,11 @@ const NAV_ITEMS = [
 	{ href: "/statistics", label: "統計" },
 	{ href: "/announcements", label: "お知らせ" },
 	{ href: "/contact", label: "お問い合わせ" },
+	{
+		href: "https://coreloop.dd2030.org/home",
+		label: "Project Coreloop公式サイト",
+		external: true,
+	},
 ];
 
 export function SiteHeader() {
@@ -67,18 +72,29 @@ export function SiteHeader() {
 							<Link
 								key={item.href}
 								href={item.href}
-								prefetch
-								onMouseEnter={() => prefetchRoute(item.href)}
-								onFocus={() => prefetchRoute(item.href)}
-								onTouchStart={() => prefetchRoute(item.href)}
+								prefetch={item.external ? false : true}
+								onMouseEnter={
+									item.external ? undefined : () => prefetchRoute(item.href)
+								}
+								onFocus={
+									item.external ? undefined : () => prefetchRoute(item.href)
+								}
+								onTouchStart={
+									item.external ? undefined : () => prefetchRoute(item.href)
+								}
+								target={item.external ? "_blank" : undefined}
+								rel={item.external ? "noreferrer" : undefined}
 								className={cn(
-									"relative pb-1 transition-colors hover:text-foreground/80 after:absolute after:left-0 after:-bottom-1 after:h-0.5 after:w-full after:scale-x-0 after:bg-blue-500 after:transition-transform after:duration-200 after:content-['']",
-									isActive(item.href)
+									"relative inline-flex items-center gap-1 pb-1 transition-colors hover:text-foreground/80 after:absolute after:left-0 after:-bottom-1 after:h-0.5 after:w-full after:scale-x-0 after:bg-blue-500 after:transition-transform after:duration-200 after:content-['']",
+									!item.external && isActive(item.href)
 										? "font-bold text-foreground after:scale-x-100"
 										: "text-foreground/60",
 								)}
 							>
-								{item.label}
+								<span>{item.label}</span>
+								{item.external ? (
+									<ExternalLink className="h-3.5 w-3.5 shrink-0" />
+								) : null}
 							</Link>
 						))}
 					</nav>
@@ -129,18 +145,35 @@ export function SiteHeader() {
 									<SheetClose key={item.href} asChild>
 										<Link
 											href={item.href}
-											prefetch
-											onMouseEnter={() => prefetchRoute(item.href)}
-											onFocus={() => prefetchRoute(item.href)}
-											onTouchStart={() => prefetchRoute(item.href)}
+											prefetch={item.external ? false : true}
+											onMouseEnter={
+												item.external
+													? undefined
+													: () => prefetchRoute(item.href)
+											}
+											onFocus={
+												item.external
+													? undefined
+													: () => prefetchRoute(item.href)
+											}
+											onTouchStart={
+												item.external
+													? undefined
+													: () => prefetchRoute(item.href)
+											}
+											target={item.external ? "_blank" : undefined}
+											rel={item.external ? "noreferrer" : undefined}
 											className={cn(
-												"rounded-xl px-3 py-3 text-sm font-medium transition-colors hover:bg-accent hover:text-accent-foreground",
-												isActive(item.href)
+												"inline-flex items-center justify-between gap-2 rounded-xl px-3 py-3 text-sm font-medium transition-colors hover:bg-accent hover:text-accent-foreground",
+												!item.external && isActive(item.href)
 													? "bg-accent text-foreground"
 													: "text-foreground/70",
 											)}
 										>
-											{item.label}
+											<span>{item.label}</span>
+											{item.external ? (
+												<ExternalLink className="h-4 w-4 shrink-0" />
+											) : null}
 										</Link>
 									</SheetClose>
 								))}

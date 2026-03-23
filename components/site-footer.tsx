@@ -1,4 +1,4 @@
-import { ShieldAlert } from "lucide-react";
+import { ExternalLink, ShieldAlert } from "lucide-react";
 import Link from "next/link";
 import { SITE_NAME } from "@/lib/site";
 
@@ -43,6 +43,17 @@ export function SiteFooter() {
 									className="text-muted-foreground hover:text-foreground"
 								>
 									お知らせ
+								</Link>
+							</li>
+							<li>
+								<Link
+									href="https://coreloop.dd2030.org/home"
+									target="_blank"
+									rel="noreferrer"
+									className="inline-flex items-center gap-1 text-muted-foreground underline-offset-2 hover:text-foreground hover:underline"
+								>
+									<span>Project Coreloop公式サイト</span>
+									<ExternalLink className="h-3.5 w-3.5 shrink-0" />
 								</Link>
 							</li>
 						</ul>
