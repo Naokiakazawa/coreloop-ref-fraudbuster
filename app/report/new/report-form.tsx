@@ -393,6 +393,16 @@ export function ReportForm({ platforms }: ReportFormProps) {
 						<div className="space-y-1">
 							<p className="text-sm font-semibold">通報を受け付けました</p>
 							<p className="text-sm">続けて別のリンクも通報できます。</p>
+							<p className="text-sm">
+								不具合やご意見がある場合は
+								<Link
+									href="/contact"
+									className="ml-1 underline underline-offset-2 hover:text-emerald-700"
+								>
+									お問い合わせページ
+								</Link>
+								からご連絡ください。
+							</p>
 						</div>
 					</div>
 				</div>

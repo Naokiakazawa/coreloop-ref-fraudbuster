@@ -24,6 +24,7 @@ const NAV_ITEMS = [
 	{ href: "/", label: "ホーム" },
 	{ href: "/statistics", label: "統計" },
 	{ href: "/announcements", label: "お知らせ" },
+	{ href: "/contact", label: "お問い合わせ" },
 ];
 
 export function SiteHeader() {
