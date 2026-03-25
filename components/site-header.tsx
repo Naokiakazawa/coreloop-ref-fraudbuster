@@ -225,7 +225,7 @@ export function SiteHeader() {
 			{isCrowdfundingBannerVisible ? (
 				<div className="border-t border-sky-200/80 bg-sky-50 text-sky-950">
 					<div className="container flex items-start gap-3 py-2 text-sm leading-relaxed sm:items-center">
-						<div className="flex flex-1 flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+						<div className="flex flex-1 flex-col gap-2 sm:flex-row sm:items-center">
 							<p className="font-medium">クラウドファンディング実施中！</p>
 							<Link
 								href="https://camp-fire.jp/projects/930941/view"
