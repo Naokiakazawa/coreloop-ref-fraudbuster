@@ -223,15 +223,19 @@ export function SiteHeader() {
 				</div>
 			) : null}
 			{isCrowdfundingBannerVisible ? (
-				<div className="border-t border-sky-200/80 bg-sky-50 text-sky-950">
-					<div className="container flex items-start gap-3 py-2 text-sm leading-relaxed sm:items-center">
+				<div className="relative isolate overflow-hidden bg-[#e8f5e9] text-[#1b5e20] before:absolute before:inset-x-0 before:top-0 before:h-px before:bg-[#4caf50] after:absolute after:inset-x-0 after:bottom-0 after:h-px after:bg-[#4caf50]">
+					<div
+						aria-hidden="true"
+						className="pointer-events-none absolute inset-0 bg-[#c8e6c9]/60 motion-safe:animate-pulse"
+					/>
+					<div className="container relative z-10 flex items-start gap-3 py-1 text-sm leading-relaxed sm:items-center">
 						<div className="flex flex-1 flex-col gap-2 sm:flex-row sm:items-center">
 							<p className="font-medium">クラウドファンディング実施中！</p>
 							<Link
 								href="https://camp-fire.jp/projects/930941/view"
 								target="_blank"
 								rel="noreferrer"
-								className="inline-flex items-center gap-1 font-medium text-sky-700 underline underline-offset-4 transition-colors hover:text-sky-900"
+								className="inline-flex items-center gap-1 font-medium text-[#2e7d32] underline underline-offset-4 transition-colors hover:text-[#1b5e20]"
 							>
 								<span>詳しくはこちら</span>
 								<ExternalLink className="h-3.5 w-3.5 shrink-0" />
@@ -241,7 +245,7 @@ export function SiteHeader() {
 							type="button"
 							variant="ghost"
 							size="icon"
-							className="h-8 w-8 shrink-0 rounded-full text-sky-950 hover:bg-sky-100 hover:text-sky-950"
+							className="h-8 w-8 shrink-0 rounded-full text-[#1b5e20] hover:bg-[#dcedc8] hover:text-[#1b5e20]"
 							aria-label="クラウドファンディングのお知らせを閉じる"
 							onClick={() => setIsCrowdfundingBannerVisible(false)}
 						>
