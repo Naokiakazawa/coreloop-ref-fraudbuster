@@ -1,8 +1,10 @@
 "use client";
 
-import { Activity, BarChart3, TrendingUp } from "lucide-react";
+import { Activity, BarChart3 } from "lucide-react";
 import * as React from "react";
 import {
+	Area,
+	AreaChart,
 	Bar,
 	BarChart,
 	CartesianGrid,
@@ -22,19 +24,20 @@ import {
 	CardTitle,
 } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import type {
 	StatisticsBreakdownItem,
 	StatisticsResponse,
 } from "@/lib/types/api";
 
 const FALLBACK_TREND_DATA = [
-	{ date: "02.08", count: 42 },
-	{ date: "02.09", count: 56 },
-	{ date: "02.10", count: 48 },
-	{ date: "02.11", count: 72 },
-	{ date: "02.12", count: 64 },
-	{ date: "02.13", count: 88 },
-	{ date: "02.14", count: 94 },
+	{ date: "2026/02/08", count: 42 },
+	{ date: "2026/02/09", count: 56 },
+	{ date: "2026/02/10", count: 48 },
+	{ date: "2026/02/11", count: 72 },
+	{ date: "2026/02/12", count: 64 },
+	{ date: "2026/02/13", count: 88 },
+	{ date: "2026/02/14", count: 94 },
 ];
 
 function ChartTooltipStyle() {
@@ -45,17 +48,33 @@ function ChartTooltipStyle() {
 	};
 }
 
+type StatisticsRange = "all" | "week";
+
 export default function StatisticsPage() {
+	const [selectedRange, setSelectedRange] =
+		React.useState<StatisticsRange>("all");
 	const [stats, setStats] = React.useState<StatisticsResponse | null>(null);
 	const [loading, setLoading] = React.useState(true);
+	const [isRefreshing, setIsRefreshing] = React.useState(false);
 	const [hasError, setHasError] = React.useState(false);
+	const hasLoadedOnceRef = React.useRef(false);
 
 	React.useEffect(() => {
 		const controller = new AbortController();
 
 		async function fetchStats() {
+			if (hasLoadedOnceRef.current) {
+				setIsRefreshing(true);
+			} else {
+				setLoading(true);
+			}
+
 			try {
-				const res = await fetch("/api/statistics?days=7", {
+				const url =
+					selectedRange === "week"
+						? "/api/statistics?days=7"
+						: "/api/statistics";
+				const res = await fetch(url, {
 					cache: "no-store",
 					signal: controller.signal,
 				});
@@ -66,6 +85,7 @@ export default function StatisticsPage() {
 				const data: StatisticsResponse = await res.json();
 				setStats(data);
 				setHasError(false);
+				hasLoadedOnceRef.current = true;
 			} catch (error) {
 				if (controller.signal.aborted) return;
 				console.error("Failed to fetch statistics:", error);
@@ -73,18 +93,31 @@ export default function StatisticsPage() {
 			} finally {
 				if (!controller.signal.aborted) {
 					setLoading(false);
+					setIsRefreshing(false);
 				}
 			}
 		}
 
 		void fetchStats();
 		return () => controller.abort();
-	}, []);
+	}, [selectedRange]);
 
 	const trendData = stats?.trend.length ? stats.trend : FALLBACK_TREND_DATA;
+	const cumulativeTrendData = React.useMemo(() => {
+		let runningTotal = 0;
+
+		return trendData.map((item) => {
+			runningTotal += item.count;
+			return {
+				...item,
+				cumulativeCount: runningTotal,
+			};
+		});
+	}, [trendData]);
 	const platformData: StatisticsBreakdownItem[] =
 		stats?.breakdown.platform ?? [];
 	const statusData: StatisticsBreakdownItem[] = stats?.breakdown.status ?? [];
+	const rangeLabel = selectedRange === "all" ? "全期間" : "過去1週間";
 
 	const updatedAtLabel = React.useMemo(() => {
 		if (!stats?.updatedAt) return "データ未取得";
@@ -101,11 +134,12 @@ export default function StatisticsPage() {
 					<Skeleton className="h-4 w-96" />
 				</div>
 				<div className="grid grid-cols-1 gap-6 md:grid-cols-2">
-					{[1, 2, 3].map((i) => (
+					{[1, 2].map((i) => (
 						<Skeleton key={i} className="h-32 w-full rounded-2xl" />
 					))}
 				</div>
-				<Skeleton className="h-[400px] w-full rounded-2xl" />
+				<Skeleton className="h-[640px] w-full rounded-2xl" />
+				<Skeleton className="h-[300px] w-full rounded-2xl" />
 			</div>
 		);
 	}
@@ -137,12 +171,7 @@ export default function StatisticsPage() {
 							{stats?.summary.totalReports.toLocaleString() ?? "0"}
 						</CardTitle>
 					</CardHeader>
-					<CardContent>
-						<div className="flex items-center gap-1 text-xs font-bold text-primary">
-							<TrendingUp className="h-3 w-3" />
-							<span>直近7日を表示中</span>
-						</div>
-					</CardContent>
+					<CardContent />
 				</Card>
 				<Card>
 					<CardHeader className="pb-2">
@@ -153,63 +182,165 @@ export default function StatisticsPage() {
 							{stats?.summary.todayReports ?? 0}
 						</CardTitle>
 					</CardHeader>
-					<CardContent>
-						<div className="flex items-center gap-1 text-xs text-muted-foreground">
-							<span>高リスク件数: {stats?.summary.highRiskReports ?? 0}</span>
-						</div>
-					</CardContent>
+					<CardContent />
 				</Card>
 			</div>
 
 			<div className="grid grid-cols-1 gap-10 lg:grid-cols-2">
 				<Card className="lg:col-span-2">
-					<CardHeader>
-						<CardTitle className="flex items-center gap-2">
-							<Activity className="h-5 w-5 text-primary" />
-							通報件数の推移
-						</CardTitle>
-						<CardDescription>過去7日間の日別通報件数</CardDescription>
+					<CardHeader className="gap-4 md:flex-row md:items-start md:justify-between">
+						<div className="space-y-1.5">
+							<CardTitle className="flex items-center gap-2">
+								<Activity className="h-5 w-5 text-primary" />
+								通報件数の推移
+							</CardTitle>
+						</div>
+						<Tabs
+							value={selectedRange}
+							onValueChange={(value) =>
+								setSelectedRange(value as StatisticsRange)
+							}
+							className="w-full md:w-auto"
+						>
+							<TabsList className="grid w-full grid-cols-2 md:w-auto">
+								<TabsTrigger value="all" disabled={isRefreshing}>
+									全期間
+								</TabsTrigger>
+								<TabsTrigger value="week" disabled={isRefreshing}>
+									過去1週間
+								</TabsTrigger>
+							</TabsList>
+						</Tabs>
 					</CardHeader>
-					<CardContent className="h-[350px]">
-						<ResponsiveContainer width="100%" height="100%">
-							<LineChart data={trendData}>
-								<CartesianGrid
-									strokeDasharray="3 3"
-									vertical={false}
-									stroke="oklch(0.9 0.02 240)"
-								/>
-								<XAxis
-									dataKey="date"
-									stroke="oklch(0.5 0.05 240)"
-									fontSize={12}
-									tickLine={false}
-									axisLine={false}
-								/>
-								<YAxis
-									stroke="oklch(0.5 0.05 240)"
-									fontSize={12}
-									tickLine={false}
-									axisLine={false}
-								/>
-								<Tooltip
-									contentStyle={ChartTooltipStyle()}
-									itemStyle={{ color: "var(--primary)" }}
-								/>
-								<Line
-									type="monotone"
-									dataKey="count"
-									stroke="var(--primary)"
-									strokeWidth={4}
-									dot={{
-										r: 6,
-										fill: "var(--primary)",
-										strokeWidth: 2,
-										stroke: "var(--card)",
-									}}
-									activeDot={{ r: 8, strokeWidth: 0 }}
-								/>
-							</LineChart>
-						</ResponsiveContainer>
+					<CardContent className="space-y-8">
+						<div className="space-y-3">
+							<div className="flex items-center justify-between">
+								<div>
+									<p className="text-sm font-semibold">累積通報件数</p>
+									<p className="text-xs text-muted-foreground">
+										{rangeLabel}の累積推移
+									</p>
+								</div>
+								<Badge variant="secondary">累積</Badge>
+							</div>
+							<div className="h-[220px]">
+								<ResponsiveContainer width="100%" height="100%">
+									<AreaChart data={cumulativeTrendData}>
+										<defs>
+											<linearGradient
+												id="cumulativeTrendFill"
+												x1="0"
+												y1="0"
+												x2="0"
+												y2="1"
+											>
+												<stop
+													offset="5%"
+													stopColor="var(--primary)"
+													stopOpacity={0.28}
+												/>
+												<stop
+													offset="95%"
+													stopColor="var(--primary)"
+													stopOpacity={0.04}
+												/>
+											</linearGradient>
+										</defs>
+										<CartesianGrid
+											strokeDasharray="3 3"
+											vertical={false}
+											stroke="oklch(0.9 0.02 240)"
+										/>
+										<XAxis
+											dataKey="date"
+											stroke="oklch(0.5 0.05 240)"
+											fontSize={12}
+											tickLine={false}
+											axisLine={false}
+										/>
+										<YAxis
+											stroke="oklch(0.5 0.05 240)"
+											fontSize={12}
+											tickLine={false}
+											axisLine={false}
+										/>
+										<Tooltip
+											contentStyle={ChartTooltipStyle()}
+											itemStyle={{ color: "var(--primary)" }}
+										/>
+										<Area
+											type="monotone"
+											dataKey="cumulativeCount"
+											name="累積通報件数"
+											stroke="var(--primary)"
+											strokeWidth={3}
+											fill="url(#cumulativeTrendFill)"
+											dot={{
+												r: 4,
+												fill: "var(--primary)",
+												strokeWidth: 2,
+												stroke: "var(--card)",
+											}}
+											activeDot={{ r: 6, strokeWidth: 0 }}
+										/>
+									</AreaChart>
+								</ResponsiveContainer>
+							</div>
+						</div>
+
+						<div className="space-y-3">
+							<div className="flex items-center justify-between">
+								<div>
+									<p className="text-sm font-semibold">日別通報件数</p>
+									<p className="text-xs text-muted-foreground">
+										{rangeLabel}の日別件数
+									</p>
+								</div>
+								<Badge variant="outline">日別</Badge>
+							</div>
+							<div className="h-[260px]">
+								<ResponsiveContainer width="100%" height="100%">
+									<LineChart data={trendData}>
+										<CartesianGrid
+											strokeDasharray="3 3"
+											vertical={false}
+											stroke="oklch(0.9 0.02 240)"
+										/>
+										<XAxis
+											dataKey="date"
+											stroke="oklch(0.5 0.05 240)"
+											fontSize={12}
+											tickLine={false}
+											axisLine={false}
+										/>
+										<YAxis
+											stroke="oklch(0.5 0.05 240)"
+											fontSize={12}
+											tickLine={false}
+											axisLine={false}
+										/>
+										<Tooltip
+											contentStyle={ChartTooltipStyle()}
+											itemStyle={{ color: "var(--primary)" }}
+										/>
+										<Line
+											type="monotone"
+											dataKey="count"
+											name="日別通報件数"
+											stroke="var(--primary)"
+											strokeWidth={4}
+											dot={{
+												r: 6,
+												fill: "var(--primary)",
+												strokeWidth: 2,
+												stroke: "var(--card)",
+											}}
+											activeDot={{ r: 8, strokeWidth: 0 }}
+										/>
+									</LineChart>
+								</ResponsiveContainer>
+							</div>
+						</div>
 					</CardContent>
 				</Card>
 
