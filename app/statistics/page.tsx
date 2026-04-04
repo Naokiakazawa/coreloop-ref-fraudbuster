@@ -104,7 +104,12 @@ export default function StatisticsPage() {
 
 	const trendData = stats?.trend.length ? stats.trend : FALLBACK_TREND_DATA;
 	const cumulativeTrendData = React.useMemo(() => {
-		let runningTotal = 0;
+		const rangeTotal = trendData.reduce((sum, item) => sum + item.count, 0);
+		const baselineTotal =
+			selectedRange === "week"
+				? Math.max(0, (stats?.summary.totalReports ?? 0) - rangeTotal)
+				: 0;
+		let runningTotal = baselineTotal;
 
 		return trendData.map((item) => {
 			runningTotal += item.count;
@@ -113,7 +118,7 @@ export default function StatisticsPage() {
 				cumulativeCount: runningTotal,
 			};
 		});
-	}, [trendData]);
+	}, [selectedRange, stats?.summary.totalReports, trendData]);
 	const platformData: StatisticsBreakdownItem[] =
 		stats?.breakdown.platform ?? [];
 	const statusData: StatisticsBreakdownItem[] = stats?.breakdown.status ?? [];
@@ -212,7 +217,7 @@ export default function StatisticsPage() {
 							</TabsList>
 						</Tabs>
 					</CardHeader>
-					<CardContent className="space-y-8">
+					<CardContent className="grid gap-8 lg:grid-cols-2">
 						<div className="space-y-3">
 							<div className="flex items-center justify-between">
 								<div>
@@ -223,7 +228,7 @@ export default function StatisticsPage() {
 								</div>
 								<Badge variant="secondary">累積</Badge>
 							</div>
-							<div className="h-[220px]">
+							<div className="h-[260px]">
 								<ResponsiveContainer width="100%" height="100%">
 									<AreaChart data={cumulativeTrendData}>
 										<defs>
