@@ -12,15 +12,15 @@ import type {
 const DEFAULT_DAYS = 7;
 const MAX_DAYS = 90;
 
-function parseDays(value: string | null): number {
-	if (!value) return DEFAULT_DAYS;
+function parseDays(value: string | null): number | null {
+	if (value === null) return null;
 	const parsed = Number.parseInt(value, 10);
 	if (Number.isNaN(parsed)) return DEFAULT_DAYS;
 	return Math.min(Math.max(parsed, 1), MAX_DAYS);
 }
 
 function formatTrendDate(dateKey: string): string {
-	return dateKey.slice(5).replace("-", ".");
+	return dateKey.replaceAll("-", "/");
 }
 
 function toDateKey(date: Date): string {
@@ -40,9 +40,19 @@ export async function GET(request: Request) {
 
 		const now = new Date();
 		const todayStart = getStartOfJstDay(now);
-		const startDate = new Date(
-			todayStart.getTime() - (days - 1) * 24 * 60 * 60 * 1000,
-		);
+		const firstReport = days
+			? null
+			: await prisma.report.findFirst({
+					orderBy: { createdAt: "asc" },
+					select: { createdAt: true },
+				});
+		const startDate = days
+			? new Date(todayStart.getTime() - (days - 1) * 24 * 60 * 60 * 1000)
+			: getStartOfJstDay(firstReport?.createdAt ?? now);
+		const totalDays =
+			Math.floor(
+				(todayStart.getTime() - startDate.getTime()) / (24 * 60 * 60 * 1000),
+			) + 1;
 
 		const [
 			totalReports,
@@ -150,7 +160,7 @@ export async function GET(request: Request) {
 			platform.find((item) => item.id !== null)?.label ?? null;
 
 		const trendCountMap = new Map<string, number>();
-		for (let i = 0; i < days; i += 1) {
+		for (let i = 0; i < totalDays; i += 1) {
 			const bucketDate = new Date(
 				startDate.getTime() + i * 24 * 60 * 60 * 1000,
 			);

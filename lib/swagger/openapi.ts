@@ -262,12 +262,11 @@ export function createOpenApiDocument(origin: string): OpenApiDocument {
 							name: "days",
 							in: "query",
 							description:
-								"トレンド表示対象の日数。1-90 の範囲でクランプされ、未指定時は 7。",
+								"トレンド表示対象の日数。1-90 の範囲でクランプされ、未指定時は全期間。",
 							schema: {
 								type: "integer",
 								minimum: 1,
 								maximum: 90,
-								default: 7,
 							},
 						},
 					],
@@ -580,7 +579,7 @@ export function createOpenApiDocument(origin: string): OpenApiDocument {
 					type: "object",
 					required: ["date", "count"],
 					properties: {
-						date: { type: "string", example: "03.01" },
+						date: { type: "string", example: "2026/03/01" },
 						count: { type: "integer", minimum: 0 },
 					},
 				},
