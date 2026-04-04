@@ -1,7 +1,8 @@
 "use client";
 
-import { ChevronDown, ExternalLink } from "lucide-react";
+import { ChevronDown, ExternalLink, Trash2 } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
+import { BulkReportImageDeleteDialog } from "@/app/admin/report-statuses/_components/bulk-report-image-delete-dialog";
 import { ReportActionsMenu } from "@/app/admin/report-statuses/_components/report-actions-menu";
 import { ReportImagePreviews } from "@/app/admin/report-statuses/_components/report-image-previews";
 import { Badge } from "@/components/ui/badge";
@@ -88,6 +89,7 @@ export function ReportStatusesTable({
 	totalReports,
 }: ReportStatusesTableProps) {
 	const [isBulkOpen, setIsBulkOpen] = useState(false);
+	const [isBulkImageDialogOpen, setIsBulkImageDialogOpen] = useState(false);
 	const [selectedReportIds, setSelectedReportIds] = useState<string[]>([]);
 	const selectAllRef = useRef<HTMLInputElement | null>(null);
 	const allVisibleSelected =
@@ -119,6 +121,12 @@ export function ReportStatusesTable({
 
 	return (
 		<>
+			<BulkReportImageDeleteDialog
+				reportIds={selectedReportIds}
+				open={isBulkImageDialogOpen}
+				onOpenChange={setIsBulkImageDialogOpen}
+			/>
+
 			{reportStatusOptions.length > 0 && reports.length > 0 ? (
 				<form
 					id="bulk-status-form"
@@ -152,6 +160,16 @@ export function ReportStatusesTable({
 										? `${selectedReportIds.length}件を選択中`
 										: "対象未選択"}
 								</div>
+								<Button
+									type="button"
+									variant="outline"
+									size="sm"
+									disabled={selectedReportIds.length === 0}
+									onClick={() => setIsBulkImageDialogOpen(true)}
+								>
+									<Trash2 className="mr-2 h-4 w-4" />
+									画像を一括削除
+								</Button>
 								<CollapsibleTrigger asChild>
 									<Button type="button" variant="outline" size="sm">
 										<ChevronDown

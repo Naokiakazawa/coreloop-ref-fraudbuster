@@ -1,6 +1,12 @@
 "use client";
 
-import { FilePenLine, ImagePlus, MoreHorizontal, Trash2 } from "lucide-react";
+import {
+	FilePenLine,
+	ImagePlus,
+	LoaderCircle,
+	MoreHorizontal,
+	Trash2,
+} from "lucide-react";
 import { useCallback, useId, useState } from "react";
 import {
 	AlertDialog,
@@ -34,10 +40,10 @@ import {
 } from "@/components/ui/native-select";
 import { Textarea } from "@/components/ui/textarea";
 import {
-	REPORT_VERDICT_CODES,
 	getReportStatusMeta,
 	getReportVerdictMeta,
 	isCompletedReportStatus,
+	REPORT_VERDICT_CODES,
 	type ReportVerdictCode,
 } from "@/lib/report-metadata";
 import { ReportImageUploadDialog } from "./report-image-upload-dialog";
@@ -84,6 +90,7 @@ export function ReportActionsMenu({
 	const [isManageDialogOpen, setIsManageDialogOpen] = useState(false);
 	const [isImageDialogOpen, setIsImageDialogOpen] = useState(false);
 	const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+	const [isUpdatingStatus, setIsUpdatingStatus] = useState(false);
 	const deleteFormId = useId();
 	const displayTitle = reportTitle || reportUrl;
 	const [statusValue, setStatusValue] = useState(String(selectedStatusId));
@@ -104,6 +111,7 @@ export function ReportActionsMenu({
 		setVerdictValue(selectedVerdict ?? "");
 		setSelectedLabelIds(selectedLabels.map((label) => label.id));
 		setNewLabelsValue("");
+		setIsUpdatingStatus(false);
 	}, [selectedLabels, selectedStatusId, selectedVerdict]);
 
 	function toggleLabel(labelId: number, checked: boolean) {
@@ -168,7 +176,6 @@ export function ReportActionsMenu({
 				reportId={reportId}
 				reportTitle={reportTitle}
 				reportUrl={reportUrl}
-				currentPage={currentPage}
 				existingImageCount={existingImageCount}
 				open={isImageDialogOpen}
 				onOpenChange={setIsImageDialogOpen}
@@ -210,6 +217,9 @@ export function ReportActionsMenu({
 			<Dialog
 				open={isManageDialogOpen}
 				onOpenChange={(nextOpen) => {
+					if (!nextOpen && isUpdatingStatus) {
+						return;
+					}
 					if (!nextOpen) {
 						resetManageForm();
 					}
@@ -224,7 +234,16 @@ export function ReportActionsMenu({
 						</DialogDescription>
 					</DialogHeader>
 
-					<div className="space-y-4">
+					<div className="relative space-y-4">
+						{isUpdatingStatus ? (
+							<div className="absolute inset-0 z-10 flex items-center justify-center rounded-lg bg-background/80 backdrop-blur-sm">
+								<div className="inline-flex items-center rounded-full border bg-background px-4 py-2 text-sm font-medium shadow-sm">
+									<LoaderCircle className="mr-2 h-4 w-4 animate-spin" />
+									更新しています...
+								</div>
+							</div>
+						) : null}
+
 						<div className="rounded-lg border bg-muted/30 p-4 text-sm">
 							<p className="font-medium">{displayTitle}</p>
 							<p className="mt-1 break-all text-muted-foreground">
@@ -253,6 +272,7 @@ export function ReportActionsMenu({
 							action={`/api/admin/reports/${reportId}/status`}
 							method="post"
 							className="space-y-4"
+							onSubmit={() => setIsUpdatingStatus(true)}
 						>
 							<input type="hidden" name="page" value={currentPage} />
 							{selectedLabelIds.map((labelId) => (
@@ -394,10 +414,20 @@ export function ReportActionsMenu({
 									type="button"
 									variant="outline"
 									onClick={() => setIsManageDialogOpen(false)}
+									disabled={isUpdatingStatus}
 								>
 									キャンセル
 								</Button>
-								<Button type="submit">更新する</Button>
+								<Button type="submit" disabled={isUpdatingStatus}>
+									{isUpdatingStatus ? (
+										<>
+											<LoaderCircle className="mr-2 h-4 w-4 animate-spin" />
+											更新中...
+										</>
+									) : (
+										"更新する"
+									)}
+								</Button>
 							</div>
 						</form>
 					</div>
