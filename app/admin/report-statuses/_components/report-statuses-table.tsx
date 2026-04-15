@@ -20,6 +20,7 @@ import {
 import {
 	Pagination,
 	PaginationContent,
+	PaginationEllipsis,
 	PaginationItem,
 	PaginationLink,
 } from "@/components/ui/pagination";
@@ -91,6 +92,31 @@ function buildPageHref(page: number, filters: AdminReportStatusesFilters) {
 	});
 }
 
+function getPaginationItems(currentPage: number, totalPages: number) {
+	const visiblePages = new Set([1, totalPages]);
+	const windowStart = Math.max(1, currentPage - 2);
+	const windowEnd = Math.min(totalPages, currentPage + 2);
+
+	for (let page = windowStart; page <= windowEnd; page += 1) {
+		visiblePages.add(page);
+	}
+
+	const items: Array<number | { type: "ellipsis"; afterPage: number }> = [];
+	let previousPage = 0;
+
+	for (const page of Array.from(visiblePages).sort(
+		(left, right) => left - right,
+	)) {
+		if (previousPage > 0 && page - previousPage > 1) {
+			items.push({ type: "ellipsis", afterPage: previousPage });
+		}
+		items.push(page);
+		previousPage = page;
+	}
+
+	return items;
+}
+
 function FilterReturnFields({
 	filters,
 }: {
@@ -135,6 +161,46 @@ function FilterReturnFields({
 				name="returnExpression"
 				value={filters.expressionCode}
 			/>
+		</>
+	);
+}
+
+function FilterQueryFields({
+	filters,
+}: {
+	filters: AdminReportStatusesFilters;
+}) {
+	return (
+		<>
+			{filters.statusIds.map((statusId) => (
+				<input key={statusId} type="hidden" name="statusId" value={statusId} />
+			))}
+			{filters.verdictFilter !== "all" ? (
+				<input
+					type="hidden"
+					name="verdictFilter"
+					value={filters.verdictFilter}
+				/>
+			) : null}
+			{filters.imageFilter !== "all" ? (
+				<input type="hidden" name="imageFilter" value={filters.imageFilter} />
+			) : null}
+			{filters.genreCodes.map((genreCode) => (
+				<input key={genreCode} type="hidden" name="genre" value={genreCode} />
+			))}
+			{filters.impersonationCode !== "all" ? (
+				<input
+					type="hidden"
+					name="impersonation"
+					value={filters.impersonationCode}
+				/>
+			) : null}
+			{filters.mediaCode !== "all" ? (
+				<input type="hidden" name="media" value={filters.mediaCode} />
+			) : null}
+			{filters.expressionCode !== "all" ? (
+				<input type="hidden" name="expression" value={filters.expressionCode} />
+			) : null}
 		</>
 	);
 }
@@ -211,6 +277,7 @@ export function ReportStatusesTable({
 	const someVisibleSelected =
 		selectedReportIds.length > 0 && selectedReportIds.length < reports.length;
 	const hasActiveFilters = hasActiveAdminReportStatusesFilters(filters);
+	const paginationItems = getPaginationItems(currentPage, totalPages);
 
 	useEffect(() => {
 		if (!selectAllRef.current) {
@@ -670,60 +737,83 @@ export function ReportStatusesTable({
 			</div>
 
 			{totalPages > 1 ? (
-				<Pagination>
-					<PaginationContent>
-						<PaginationItem>
-							{currentPage > 1 ? (
-								<PaginationLink
-									href={buildPageHref(currentPage - 1, filters)}
-									size="default"
-								>
-									前へ
-								</PaginationLink>
-							) : (
-								<span className="inline-flex h-9 items-center rounded-md px-3 text-muted-foreground">
-									前へ
-								</span>
-							)}
-						</PaginationItem>
-						<PaginationItem>
-							<PaginationLink
-								href={buildPageHref(currentPage, filters)}
-								isActive
-							>
-								{currentPage}
-							</PaginationLink>
-						</PaginationItem>
-						{currentPage < totalPages ? (
+				<div className="flex flex-col gap-3 rounded-lg bg-muted/25 p-3 sm:flex-row sm:items-center sm:justify-between">
+					<Pagination className="mx-0 justify-start sm:w-auto">
+						<PaginationContent className="flex-wrap justify-start">
 							<PaginationItem>
-								<PaginationLink href={buildPageHref(currentPage + 1, filters)}>
-									{currentPage + 1}
-								</PaginationLink>
+								{currentPage > 1 ? (
+									<PaginationLink
+										href={buildPageHref(currentPage - 1, filters)}
+										size="default"
+									>
+										前へ
+									</PaginationLink>
+								) : (
+									<span className="inline-flex h-9 items-center rounded-md px-3 text-muted-foreground">
+										前へ
+									</span>
+								)}
 							</PaginationItem>
-						) : null}
-						{currentPage + 1 < totalPages ? (
-							<PaginationItem>
-								<PaginationLink href={buildPageHref(totalPages, filters)}>
-									{totalPages}
-								</PaginationLink>
-							</PaginationItem>
-						) : null}
-						<PaginationItem>
-							{currentPage < totalPages ? (
-								<PaginationLink
-									href={buildPageHref(currentPage + 1, filters)}
-									size="default"
-								>
-									次へ
-								</PaginationLink>
-							) : (
-								<span className="inline-flex h-9 items-center rounded-md px-3 text-muted-foreground">
-									次へ
-								</span>
+							{paginationItems.map((item) =>
+								typeof item === "object" ? (
+									<PaginationItem key={`ellipsis-after-${item.afterPage}`}>
+										<PaginationEllipsis />
+									</PaginationItem>
+								) : (
+									<PaginationItem key={item}>
+										<PaginationLink
+											href={buildPageHref(item, filters)}
+											isActive={item === currentPage}
+										>
+											{item}
+										</PaginationLink>
+									</PaginationItem>
+								),
 							)}
-						</PaginationItem>
-					</PaginationContent>
-				</Pagination>
+							<PaginationItem>
+								{currentPage < totalPages ? (
+									<PaginationLink
+										href={buildPageHref(currentPage + 1, filters)}
+										size="default"
+									>
+										次へ
+									</PaginationLink>
+								) : (
+									<span className="inline-flex h-9 items-center rounded-md px-3 text-muted-foreground">
+										次へ
+									</span>
+								)}
+							</PaginationItem>
+						</PaginationContent>
+					</Pagination>
+					<form
+						action={ADMIN_REPORT_STATUSES_PATH}
+						method="get"
+						className="flex flex-wrap items-center gap-2 text-sm"
+					>
+						<FilterQueryFields filters={filters} />
+						<label
+							htmlFor="admin-report-statuses-page-jump"
+							className="text-muted-foreground"
+						>
+							ページ指定
+						</label>
+						<input
+							id="admin-report-statuses-page-jump"
+							type="number"
+							name="page"
+							min={1}
+							max={totalPages}
+							defaultValue={currentPage}
+							className="h-9 w-24 rounded-md border bg-background px-3 text-sm tabular-nums"
+							aria-label={`移動先ページ番号。1から${totalPages}まで`}
+						/>
+						<span className="text-muted-foreground">/ {totalPages}</span>
+						<Button type="submit" variant="outline" size="sm">
+							移動
+						</Button>
+					</form>
+				</div>
 			) : null}
 
 			<div className="overflow-x-auto rounded-lg border">
